@@ -1,5 +1,5 @@
 {
-    "Db_link": "core-db",
+    "Db_link": "core-db:3306",
     "Db_username": "root",
     "Db_password": "aldim"
 }

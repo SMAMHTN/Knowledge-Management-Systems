@@ -1,4 +1,4 @@
-package setup
+package core
 
 import (
 	"encoding/json"
@@ -6,6 +6,8 @@ import (
 	"os"
 	// "reflect"
 )
+
+const Appname = "core"
 
 type Configuration struct {
 	Db_link     string
@@ -20,15 +22,18 @@ func fixpath(path string) string {
 	return path
 }
 
-func Read_conf() Configuration {
+func Get_Parent_Path() string {
 	parent, a := os.Getwd()
-	fmt.Println(parent)
 	if a != nil {
 		panic(a)
 	}
 	parent = fixpath(parent)
+	return parent
+}
+
+func Read_conf() Configuration {
+	parent := Get_Parent_Path()
 	path := parent + "core_conf.json"
-	fmt.Println(path)
 	file, _ := os.Open(path)
 	defer file.Close()
 	decoder := json.NewDecoder(file)
@@ -37,11 +42,5 @@ func Read_conf() Configuration {
 	if err != nil {
 		fmt.Println("error:", err)
 	}
-	fmt.Println(Configuration.Db_link) // output: [UserA, UserB]
-	// fmt.Println(reflect.TypeOf(configuration))
 	return Configuration
-}
-
-func (c *Configuration) GetLink() string {
-	return c.Db_link
 }

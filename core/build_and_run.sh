@@ -3,6 +3,7 @@ docker build -t core:test .
 echo "\n"
 #Run container with detach (no running log)
 docker run --name core core:test
+
 # docker run core:test run infinity
 #Run container without detach
 ## docker run -p 3000:3000 --name frontend frontend:test
@@ -16,3 +17,7 @@ docker run --name core core:test
 ##docker rm frontend
 #copy
 ##docker cp conf/frontend.conf frontend:/frontend
+
+
+# docker run -p 3333:3306 --name mariadb -e MYSQL_ROOT_PASSWORD=aldim -e MARIADB_DATABASE=core -d mariadb:10.10-jammy
+# mysqldump --skip-set-charset -u root -p core > core.sql
