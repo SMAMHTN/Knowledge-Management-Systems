@@ -1,12 +1,13 @@
-docker build -t frontend:test .
+docker build -t core:test .
 #Build docker image
 echo "\n"
 #Run container with detach (no running log)
-docker run -dp 3000:3000 --name frontend frontend:test
+docker run --name core core:test
+# docker run core:test run infinity
 #Run container without detach
 ## docker run -p 3000:3000 --name frontend frontend:test
 #Run with bind mount
-## docker run -dp 3000:3000 --name frontend -v "$(pwd)":/frontend:z frontend:test
+## docker run --name core -v "$(pwd)":/core:z core:test
 #run command inside container
 ##docker exec -it frontend bash
 #To stop container

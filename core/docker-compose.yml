@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  core:
+    build: .
+    depends_on:
+      - core-db
+    volumes:
+      - ./:/core:rw
+    command: /bin/sh -c "while true; do sleep 100000; done"
+  core-db:
+    image: "mariadb:latest"
+    environment:
+      - MARIADB_ROOT_PASSWORD=aldim
+      - MARIADB_DATABASE=core
