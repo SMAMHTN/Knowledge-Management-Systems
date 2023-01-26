@@ -1,15 +1,13 @@
-package core
+package dependency
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	// "reflect"
 )
 
-const Appname = "core"
-
 type Configuration struct {
+	Appname     string
 	Db_link     string
 	Db_username string
 	Db_password string
@@ -31,7 +29,7 @@ func Get_Parent_Path() string {
 	return parent
 }
 
-func Read_conf() Configuration {
+func Read_conf() (Configuration, error) {
 	parent := Get_Parent_Path()
 	path := parent + "core_conf.json"
 	file, _ := os.Open(path)
@@ -40,7 +38,7 @@ func Read_conf() Configuration {
 	Configuration := Configuration{}
 	err := decoder.Decode(&Configuration)
 	if err != nil {
-		fmt.Println("error:", err)
+		return Configuration, err
 	}
-	return Configuration
+	return Configuration, nil
 }

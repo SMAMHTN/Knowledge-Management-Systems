@@ -1,4 +1,5 @@
 {
+    "Appname": "core",
     "Db_link": "core-db:3306",
     "Db_username": "root",
     "Db_password": "aldim"
