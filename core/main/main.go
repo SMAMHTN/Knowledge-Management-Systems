@@ -21,4 +21,5 @@ func main() {
 		fmt.Println(err)
 	}
 	fmt.Println(role[0].RoleName)
+	fmt.Println("iam writing from android")
 }
