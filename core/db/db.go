@@ -10,8 +10,7 @@ import (
 )
 
 func Db_Connect(dbname string) (database *sql.DB, err error) {
-	conf := &dep.Conf
-	fmt.Println(dep.Conf.Appname)
+	conf := dep.Conf
 	if dbname == "" {
 		dbname = conf.Appname
 	}
@@ -25,7 +24,7 @@ func Db_Connect(dbname string) (database *sql.DB, err error) {
 }
 
 func Execute_sql_file(sqlfile string, dbname string) error {
-	conf := &dep.Conf
+	conf := dep.Conf
 	if dbname == "" {
 		dbname = conf.Appname
 	}
@@ -49,7 +48,7 @@ func Execute_sql_file(sqlfile string, dbname string) error {
 }
 
 func Execute_sql_string_no_return(sqlstring string, dbname string) error {
-	conf := &dep.Conf
+	conf := dep.Conf
 	if dbname == "" {
 		dbname = conf.Appname
 	}
@@ -69,7 +68,7 @@ func Execute_sql_string_no_return(sqlstring string, dbname string) error {
 }
 
 func Execute_sql_string_array_no_return(sqlslice []string, dbname string) error {
-	conf := &dep.Conf
+	conf := dep.Conf
 	if dbname == "" {
 		dbname = conf.Appname
 	}
