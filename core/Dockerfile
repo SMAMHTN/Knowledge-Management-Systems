@@ -8,5 +8,5 @@ COPY . .
 # #Run NPM install and build
 # EXPOSE 3000
 #Expose port 3000 to be accessible to host
-CMD go run ./core/
+# CMD go run ./core/
 #npm start

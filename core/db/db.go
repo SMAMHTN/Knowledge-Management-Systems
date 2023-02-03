@@ -15,7 +15,19 @@ func Db_Connect(dbname string) (database *sql.DB, err error) {
 		dbname = conf.Appname
 	}
 	url := conf.Db_username + ":" + conf.Db_password + "@tcp(" + conf.Db_link + ")/" + dbname
-	fmt.Println(url)
+	Db, err := sql.Open("mysql", url)
+	if err != nil {
+		return Db, err
+	}
+	return Db, nil
+}
+
+func Db_Connect_custom(dbname string, args string) (database *sql.DB, err error) {
+	conf := dep.Conf
+	if dbname == "" {
+		dbname = conf.Appname
+	}
+	url := conf.Db_username + ":" + conf.Db_password + "@tcp(" + conf.Db_link + ")/" + dbname + "?" + args
 	Db, err := sql.Open("mysql", url)
 	if err != nil {
 		return Db, err

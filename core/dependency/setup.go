@@ -7,7 +7,10 @@ import (
 var Conf Configuration
 
 func init() {
-	defer fmt.Println("Dependency Setup Done")
+	fmt.Println("---------------------------------------")
+	fmt.Println("BEGIN READING FILE CONF")
+	fmt.Println("---------------------------------------")
+	defer fmt.Println("READING FILE CONF DONE\n---------------------------------------")
 	var err error
 	Conf, err = Read_conf()
 	if err != nil {

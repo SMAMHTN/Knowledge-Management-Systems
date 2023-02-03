@@ -1,6 +1,7 @@
 package core
 
 import (
+	"database/sql"
 	"db"
 )
 
@@ -11,11 +12,21 @@ type Role struct {
 	RoleDescription string
 }
 
-func CoreRole_Select(args string) ([]Role, error) {
+func SelectRole(args string) ([]Role, error) {
 	var results []Role
+	var sqlresult *sql.Rows
+	var err error
 	database, _ := db.Db_Connect("")
+	if err != nil {
+		return []Role{}, err
+	}
 	defer database.Close()
-	sqlresult, err := database.Query("SELECT * FROM core_role" + args)
+	if args != "" {
+		sqlresult, err = database.Query("SELECT * FROM core_role" + " " + args)
+	} else {
+		sqlresult, err = database.Query("SELECT * FROM core_role")
+	}
+
 	if err != nil {
 		return results, err
 	}
@@ -29,5 +40,4 @@ func CoreRole_Select(args string) ([]Role, error) {
 		results = append(results, result)
 	}
 	return results, nil
-
 }

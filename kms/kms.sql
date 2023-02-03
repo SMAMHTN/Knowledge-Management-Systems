@@ -23,21 +23,21 @@ DROP TABLE IF EXISTS `kms_article`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `kms_article` (
-  `article_id` int(11) NOT NULL AUTO_INCREMENT,
-  `article_owner_id` int(11) NOT NULL,
-  `article_last_edited_by` int(11) NOT NULL,
-  `article_last_edited_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `article_tag` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`article_tag`)),
-  `article_title` varchar(255) DEFAULT NULL,
-  `article_category_id` int(11) DEFAULT NULL,
-  `article_article` longtext DEFAULT NULL,
-  `article_file_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`article_file_id`)),
-  `article_doc_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`article_doc_id`)),
-  `is_active` tinyint(1) DEFAULT NULL,
-  PRIMARY KEY (`article_id`),
-  UNIQUE KEY `kms_article_UN` (`article_title`),
-  KEY `kms_article_FK_category` (`article_category_id`),
-  CONSTRAINT `kms_article_FK_category` FOREIGN KEY (`article_category_id`) REFERENCES `kms_category` (`category_id`) ON UPDATE CASCADE
+  `ArticleID` int(11) NOT NULL AUTO_INCREMENT,
+  `OwnerID` int(11) NOT NULL,
+  `LastEditedByID` int(11) NOT NULL,
+  `LastEditedTime` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `Tag` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`Tag`)),
+  `Title` varchar(255) DEFAULT NULL,
+  `CategoryID` int(11) DEFAULT NULL,
+  `Article` longtext DEFAULT NULL,
+  `FileID` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`FileID`)),
+  `DocID` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`DocID`)),
+  `IsActive` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`ArticleID`),
+  UNIQUE KEY `kms_article_UN` (`Title`),
+  KEY `kms_article_FK_category` (`CategoryID`),
+  CONSTRAINT `kms_article_FK_category` FOREIGN KEY (`CategoryID`) REFERENCES `kms_category` (`CategoryID`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -58,12 +58,12 @@ DROP TABLE IF EXISTS `kms_category`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `kms_category` (
-  `category_id` int(11) NOT NULL AUTO_INCREMENT,
-  `category_name` varchar(255) NOT NULL,
-  `category_parent_id` int(11) NOT NULL,
-  `category_description` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`category_id`),
-  UNIQUE KEY `kms_category_UN` (`category_name`)
+  `CategoryID` int(11) NOT NULL AUTO_INCREMENT,
+  `CategoryName` varchar(255) NOT NULL,
+  `CategoryParentID` int(11) NOT NULL,
+  `CategoryDescription` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`CategoryID`),
+  UNIQUE KEY `kms_category_UN` (`CategoryName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -84,11 +84,11 @@ DROP TABLE IF EXISTS `kms_doc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `kms_doc` (
-  `doc_id` int(11) NOT NULL AUTO_INCREMENT,
-  `doc_loc` varchar(255) NOT NULL,
-  `doc_owner_id` int(11) NOT NULL,
-  `doc_type` varchar(50) NOT NULL,
-  PRIMARY KEY (`doc_id`)
+  `DocID` int(11) NOT NULL AUTO_INCREMENT,
+  `DocLoc` varchar(255) NOT NULL,
+  `OwnerID` int(11) NOT NULL,
+  `DocType` varchar(50) NOT NULL,
+  PRIMARY KEY (`DocID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -109,11 +109,11 @@ DROP TABLE IF EXISTS `kms_file`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `kms_file` (
-  `file_id` int(11) NOT NULL AUTO_INCREMENT,
-  `file_loc` varchar(255) NOT NULL,
-  `file_owner_id` int(11) NOT NULL,
-  `file_type` varchar(50) NOT NULL,
-  PRIMARY KEY (`file_id`)
+  `FileID` int(11) NOT NULL AUTO_INCREMENT,
+  `FileLoc` varchar(255) NOT NULL,
+  `OwnerID` int(11) NOT NULL,
+  `FileType` varchar(50) NOT NULL,
+  PRIMARY KEY (`FileID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -134,18 +134,18 @@ DROP TABLE IF EXISTS `kms_permission`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `kms_permission` (
-  `permission_id` int(11) NOT NULL AUTO_INCREMENT,
-  `permission_category_id` int(11) NOT NULL,
-  `permission_role_id` int(11) NOT NULL,
-  `permission_create` tinyint(1) NOT NULL DEFAULT 0,
-  `permission_read` tinyint(1) NOT NULL DEFAULT 0,
-  `permission_update` tinyint(1) NOT NULL DEFAULT 0,
-  `permission_delete` tinyint(1) NOT NULL DEFAULT 0,
-  `permission_doc_type` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`permission_doc_type`)),
-  `permission_file_type` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`permission_file_type`)),
-  PRIMARY KEY (`permission_id`),
-  KEY `kms_permission_FK` (`permission_category_id`),
-  CONSTRAINT `kms_permission_FK` FOREIGN KEY (`permission_category_id`) REFERENCES `kms_category` (`category_id`)
+  `PermissionID` int(11) NOT NULL AUTO_INCREMENT,
+  `CategoryID` int(11) NOT NULL,
+  `RoleID` int(11) NOT NULL,
+  `Create` tinyint(1) NOT NULL DEFAULT 0,
+  `Read` tinyint(1) NOT NULL DEFAULT 0,
+  `Update` tinyint(1) NOT NULL DEFAULT 0,
+  `Delete` tinyint(1) NOT NULL DEFAULT 0,
+  `DocType` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`DocType`)),
+  `FileType` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`FileType`)),
+  PRIMARY KEY (`PermissionID`),
+  KEY `kms_permission_FK` (`CategoryID`),
+  CONSTRAINT `kms_permission_FK` FOREIGN KEY (`CategoryID`) REFERENCES `kms_category` (`CategoryID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
