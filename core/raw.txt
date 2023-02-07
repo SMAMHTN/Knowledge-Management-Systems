@@ -1,0 +1,23 @@
+// var ins = core.History{HistoryID: 6, ActivityType: "broo", Time: time.Now(), UserID: 5, Changes: "test", IPAddress: "tsssses"}
+// // err = ins.Update()
+// // err = ins.Create()
+// tablecore := core.History{HistoryID: 6}
+// // err = tablecore.Read()
+// // if err != nil {
+// // 	fmt.Println(err)
+// // }
+// // fmt.Println(tablecore)
+// // fmt.Println("test")
+// err = tablecore.Delete()
+// // fmt.Println(tablecore)
+// // fmt.Println("test")
+// if err != nil {
+// 	fmt.Println(err)
+// }
+
+// // db.Execute_sql_file("core.sql", dependency.Conf.Appname)
+// // role, err := core.CoreRole_Select("WHERE RoleID=0")
+// // if err != nil {
+// // 	fmt.Println(err)
+// // }
+// // fmt.Println(role[0].RoleName)

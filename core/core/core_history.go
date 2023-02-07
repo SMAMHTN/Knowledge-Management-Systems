@@ -20,7 +20,7 @@ func EmptyHistory() History {
 	return History{HistoryID: 1, ActivityType: "a", Time: t.Now(), UserID: 1, Changes: "a", IPAddress: "a"}
 }
 
-func SelectHistory(args string) ([]History, error) {
+func ReadHistory(args string) ([]History, error) {
 	var results []History
 	var sqlresult *sql.Rows
 	var err error
@@ -50,7 +50,26 @@ func SelectHistory(args string) ([]History, error) {
 	return results, nil
 }
 
-func (data *History) Select() error {
+func (data History) Create() error {
+	var err error
+	database, err := db.Db_Connect("")
+	if err != nil {
+		return err
+	}
+	defer database.Close()
+	ins, err := database.Prepare("INSERT INTO core_history(ActivityType, `Time`, UserID, Changes, IPAddress) VALUES(?, ?, ?, ?, ?)")
+	if err != nil {
+		return err
+	}
+	defer ins.Close()
+	_, err = ins.Exec(data.ActivityType, data.Time, data.UserID, data.Changes, data.IPAddress)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (data *History) Read() error {
 	database, err := db.Db_Connect_custom("", "parseTime=true")
 	if err != nil {
 		return err
@@ -64,19 +83,22 @@ func (data *History) Select() error {
 	if err != nil {
 		return err
 	}
-	// return nil
 	return nil
 }
 
-func (data History) Insert() error {
+func (data History) Update() error {
 	var err error
 	database, err := db.Db_Connect("")
 	if err != nil {
 		return err
 	}
 	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO core_history(ActivityType, `Time`, UserID, Changes, IPAddress) VALUES(?, ?, ?, ?, ?)")
-	_, err = ins.Exec(data.ActivityType, data.Time, data.UserID, data.Changes, data.IPAddress)
+	upd, err := database.Prepare("UPDATE core.core_history SET ActivityType=?, `Time`=?, UserID=?, Changes=?, IPAddress=? WHERE HistoryID=?;")
+	if err != nil {
+		return err
+	}
+	defer upd.Close()
+	_, err = upd.Exec(data.ActivityType, data.Time, data.UserID, data.Changes, data.IPAddress, data.HistoryID)
 	if err != nil {
 		return err
 	}

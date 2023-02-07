@@ -1,8 +1,8 @@
 package core
 
 type Core interface {
-	// Select() error
-	Insert() error
-	// update(args string)
-	// delete(args string)
+	// Read() error for this one you need pointer
+	Create() error
+	Update() error
+	Delete() error
 }
