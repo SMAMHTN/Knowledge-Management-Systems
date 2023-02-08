@@ -1,3 +1,4 @@
+#!/bin/bash
 docker build -t core:test .
 #Build docker image
 echo "\n"

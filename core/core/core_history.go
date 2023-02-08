@@ -78,7 +78,7 @@ func (data *History) Read() error {
 	if data.HistoryID != 0 {
 		err = database.QueryRow("SELECT * FROM core_history WHERE HistoryID = ?", data.HistoryID).Scan(&data.HistoryID, &data.ActivityType, &data.Time, &data.UserID, &data.Changes, &data.IPAddress)
 	} else {
-		return errors.New("Please Insert HistoryID")
+		return errors.New("please insert historyid")
 	}
 	if err != nil {
 		return err
@@ -108,6 +108,9 @@ func (data History) Update() error {
 func (data History) Delete() error {
 	var err error
 	database, err := db.Db_Connect("")
+	if err != nil {
+		return err
+	}
 	del, err := database.Prepare("DELETE FROM core_history WHERE `HistoryID`=?")
 	if err != nil {
 		return err
