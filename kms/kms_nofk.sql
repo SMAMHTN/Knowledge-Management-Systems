@@ -36,7 +36,7 @@ CREATE TABLE `kms_article` (
   `IsActive` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`ArticleID`),
   UNIQUE KEY `kms_article_UN` (`Title`),
-  KEY `kms_article_FK_category` (`CategoryID`),
+  KEY `kms_article_FK_category` (`CategoryID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -143,7 +143,7 @@ CREATE TABLE `kms_permission` (
   `DocType` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`DocType`)),
   `FileType` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`FileType`)),
   PRIMARY KEY (`PermissionID`),
-  KEY `kms_permission_FK` (`CategoryID`),
+  KEY `kms_permission_FK` (`CategoryID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -165,4 +165,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-23 15:16:02
+-- Dump completed on 2023-02-10 19:16:37

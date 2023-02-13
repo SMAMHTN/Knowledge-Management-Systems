@@ -57,7 +57,7 @@ CREATE TABLE `core_role` (
   `RoleDescription` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`RoleID`),
   UNIQUE KEY `core_role_UN` (`RoleName`,`RoleParentID`),
-  KEY `core_role_FK` (`RoleParentID`),
+  KEY `core_role_FK` (`RoleParentID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -67,7 +67,7 @@ CREATE TABLE `core_role` (
 
 LOCK TABLES `core_role` WRITE;
 /*!40000 ALTER TABLE `core_role` DISABLE KEYS */;
-INSERT INTO `core_role` VALUES (0,'Everyone',0,'everyone'),(1,'Parent',1,'parent');
+INSERT INTO `core_role` VALUES (1,'Everyone',1,'everyone'),(2,'Parent',2,'parent');
 /*!40000 ALTER TABLE `core_role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -86,7 +86,7 @@ CREATE TABLE `core_setting` (
   `Timezone` varchar(50) NOT NULL,
   `AppthemeID` int(11) DEFAULT NULL,
   PRIMARY KEY (`CompanyID`),
-  KEY `core_setting_FK` (`AppthemeID`),
+  KEY `core_setting_FK` (`AppthemeID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -147,7 +147,7 @@ CREATE TABLE `core_user` (
   `IsActive` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`UserID`),
   UNIQUE KEY `core_user_UN` (`Username`),
-  KEY `core_user_FK` (`RoleID`),
+  KEY `core_user_FK` (`RoleID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -169,4 +169,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-23 15:08:01
+-- Dump completed on 2023-02-10 19:16:25

@@ -69,7 +69,7 @@ CREATE TABLE `core_role` (
 
 LOCK TABLES `core_role` WRITE;
 /*!40000 ALTER TABLE `core_role` DISABLE KEYS */;
-INSERT INTO `core_role` VALUES (0,'Everyone',0,'everyone'),(1,'Parent',1,'parent');
+INSERT INTO `core_role` VALUES (1,'Everyone',1,'everyone'),(2,'Parent',2,'parent');
 /*!40000 ALTER TABLE `core_role` ENABLE KEYS */;
 UNLOCK TABLES;
 

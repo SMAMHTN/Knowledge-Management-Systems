@@ -3,6 +3,7 @@ package core
 import (
 	"database/sql"
 	"db"
+	"errors"
 )
 
 type Role struct {
@@ -54,64 +55,67 @@ func (data Role) Create() error {
 		return err
 	}
 	defer ins.Close()
-	_, err = ins.Exec(data.RoleName,data.RoleParentID,data.RoleDescription)
+	_, err = ins.Exec(data.RoleName, data.RoleParentID, data.RoleDescription)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// func (data *Role) Read() error {
-// 	database, err := db.Db_Connect_custom("", "parseTime=true")
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer database.Close()
-// 	if data.HistoryID != 0 {
-// 		err = database.QueryRow("SELECT * FROM core_history WHERE HistoryID = ?", data.HistoryID).Scan(&data.HistoryID, &data.ActivityType, &data.Time, &data.UserID, &data.Changes, &data.IPAddress)
-// 	} else {
-// 		return errors.New("Please Insert HistoryID")
-// 	}
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
+func (data *Role) Read() error {
+	database, err := db.Db_Connect("")
+	if err != nil {
+		return err
+	}
+	defer database.Close()
+	if data.RoleID != 0 {
+		err = database.QueryRow("SELECT * FROM core_role WHERE RoleID = ?", data.RoleID).Scan(&data.RoleID, &data.RoleName, &data.RoleParentID, &data.RoleDescription)
+	} else {
+		return errors.New("please insert roleid")
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-// func (data Role) Update() error {
-// 	var err error
-// 	database, err := db.Db_Connect("")
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer database.Close()
-// 	upd, err := database.Prepare("UPDATE core.core_history SET ActivityType=?, `Time`=?, UserID=?, Changes=?, IPAddress=? WHERE HistoryID=?;")
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer upd.Close()
-// 	_, err = upd.Exec(data.ActivityType, data.Time, data.UserID, data.Changes, data.IPAddress, data.HistoryID)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
+func (data Role) Update() error {
+	var err error
+	database, err := db.Db_Connect("")
+	if err != nil {
+		return err
+	}
+	defer database.Close()
+	upd, err := database.Prepare("UPDATE core.core_role SET RoleName=?, RoleParentID=?, RoleDescription=? WHERE RoleID=?;")
+	if err != nil {
+		return err
+	}
+	defer upd.Close()
+	_, err = upd.Exec(data.RoleName, data.RoleParentID, data.RoleDescription, data.RoleID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-// func (data Role) Delete() error {
-// 	var err error
-// 	database, err := db.Db_Connect("")
-// 	del, err := database.Prepare("DELETE FROM core_history WHERE `HistoryID`=?")
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if data.HistoryID != 0 {
-// 		_, err = del.Exec(data.HistoryID)
-// 	} else {
-// 		return errors.New("HistoryID Needed")
-// 	}
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer database.Close()
-// 	return nil
-// }
+func (data Role) Delete() error {
+	var err error
+	database, err := db.Db_Connect("")
+	if err != nil {
+		return err
+	}
+	del, err := database.Prepare("DELETE FROM core_role WHERE `RoleID`=?")
+	if err != nil {
+		return err
+	}
+	if data.RoleID != 0 {
+		_, err = del.Exec(data.RoleID)
+	} else {
+		return errors.New("roleid needed")
+	}
+	if err != nil {
+		return err
+	}
+	defer database.Close()
+	return nil
+}
