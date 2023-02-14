@@ -71,9 +71,9 @@ func (data *Setting) Read() error {
 	}
 	defer database.Close()
 	if data.CompanyID != 0 {
-		err = database.QueryRow("SELECT * FROM core_setting WHERE SettingID = ?", data.CompanyID).Scan(&data.CompanyID, &data.CompanyName, &data.CompanyLogo, &data.CompanyAddress, &data.TimeZone, &data.AppthemeID)
+		err = database.QueryRow("SELECT * FROM core_setting WHERE CompanyID = ?", data.CompanyID).Scan(&data.CompanyID, &data.CompanyName, &data.CompanyLogo, &data.CompanyAddress, &data.TimeZone, &data.AppthemeID)
 	} else {
-		return errors.New("please insert settingid")
+		return errors.New("please insert companyid")
 	}
 	if err != nil {
 		return err

@@ -58,7 +58,7 @@ CREATE TABLE `core_role` (
   PRIMARY KEY (`RoleID`),
   UNIQUE KEY `core_role_UN` (`RoleName`,`RoleParentID`),
   KEY `core_role_FK` (`RoleParentID`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
