@@ -1,0 +1,8 @@
+{
+    "Appname": "frontend",
+    "core-link":"localhost:4000",
+    "core-pass":"halo",
+    "kms-link":"localhost:4001",
+    "kms-pass":"tes",
+    "search-link":"localhost:4002"
+}
