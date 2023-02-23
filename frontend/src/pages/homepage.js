@@ -13,7 +13,6 @@ function Home() {
     }
   }, [history]);
 
-
   const handleLogout = () => {
     // sessiion logout
     localStorage.removeItem("isLoggedIn");
