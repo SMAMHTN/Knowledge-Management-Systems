@@ -1,4 +1,4 @@
-FROM node:18.14-bullseye
+FROM node:20.3.1-alpine3.17
 #Using Node version 19.4 with debian bullseye as OS
 WORKDIR /frontend
 #Workdir set as frontend
