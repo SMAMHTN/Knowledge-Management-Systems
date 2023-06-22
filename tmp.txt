@@ -1,0 +1,42 @@
+docker exec -it knowledge-management-systems-core-1 bash
+docker exec -it knowledge-management-systems-kms-1 bash
+docker exec -it knowledge-management-systems-solr-1 bash
+docker exec -it knowledge-management-systems-frontend-1 bash
+
+glpat-1Shxy1cQZ8t6zuxxZ8Pe
+
+docker rm knowledge-management-systems-core-1
+docker rm knowledge-management-systems-kms-1
+docker stop knowledge-management-systems-kms-db-1
+docker rm knowledge-management-systems-kms-db-1
+
+docker image rm knowledge-management-systems-core
+docker image rm knowledge-management-systems-kms
+docker image rm knowledge-management-systems-solr
+
+docker restart knowledge-management-systems-solr-1
+docker stop knowledge-management-systems-solr-1
+
+docker exec knowledge-management-systems-solr-1 /usr/bin/env
+
+<delete><query>*:*</query></delete>
+
+
+PATH=/opt/solr/bin:/opt/solr/docker/scripts:/opt/solr/prometheus-exporter/bin:/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOSTNAME=667f388172f9
+JAVA_HOME=/opt/java/openjdk
+LANG=en_US.UTF-8
+LANGUAGE=en_US:en
+LC_ALL=en_US.UTF-8
+JAVA_VERSION=jdk-17.0.7+7
+SOLR_USER=solr
+SOLR_UID=8983
+SOLR_GROUP=solr
+SOLR_GID=8983
+SOLR_INCLUDE=/etc/default/solr.in.sh
+SOLR_HOME=/var/solr/data
+SOLR_PID_DIR=/var/solr
+SOLR_LOGS_DIR=/var/solr/logs
+LOG4J_PROPS=/var/solr/log4j2.xml
+SOLR_JETTY_HOST=0.0.0.0
+HOME=/home/solr

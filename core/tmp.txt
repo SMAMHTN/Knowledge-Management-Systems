@@ -1,0 +1,2 @@
+docker exec -it knowledge-management-systems-core-1 bash
+docker exec -it knowledge-management-systems-kms-1 bash

@@ -27,13 +27,13 @@ CREATE TABLE `kms_article` (
   `OwnerID` int(11) NOT NULL,
   `LastEditedByID` int(11) NOT NULL,
   `LastEditedTime` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `Tag` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`Tag`)),
-  `Title` varchar(255) DEFAULT NULL,
-  `CategoryID` int(11) DEFAULT NULL,
+  `Tag` longtext DEFAULT "[]",
+  `Title` varchar(255) NOT NULL,
+  `CategoryID` int(11) DEFAULT 1,
   `Article` longtext DEFAULT NULL,
-  `FileID` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`FileID`)),
-  `DocID` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`DocID`)),
-  `IsActive` tinyint(1) DEFAULT NULL,
+  `FileID` longtext DEFAULT "[]",
+  `DocID` longtext DEFAULT "[]",
+  `IsActive` tinyint(1) DEFAULT 1,
   PRIMARY KEY (`ArticleID`),
   UNIQUE KEY `kms_article_UN` (`Title`),
   KEY `kms_article_FK_category` (`CategoryID`),
@@ -63,7 +63,8 @@ CREATE TABLE `kms_category` (
   `CategoryParentID` int(11) NOT NULL,
   `CategoryDescription` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`CategoryID`),
-  UNIQUE KEY `kms_category_UN` (`CategoryName`)
+  UNIQUE KEY `kms_category_UN` (`CategoryName`),
+  CONSTRAINT `kms_category_parent_rel` FOREIGN KEY (`CategoryParentID`) REFERENCES `kms_category` (`CategoryID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -73,6 +74,8 @@ CREATE TABLE `kms_category` (
 
 LOCK TABLES `kms_category` WRITE;
 /*!40000 ALTER TABLE `kms_category` DISABLE KEYS */;
+INSERT INTO `kms_category` VALUES (1, "Public", 1, "Can be seen by Everyone");
+INSERT INTO `kms_category` VALUES (2, "Parent", 2, "Parent Category");
 /*!40000 ALTER TABLE `kms_category` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -86,7 +89,7 @@ DROP TABLE IF EXISTS `kms_doc`;
 CREATE TABLE `kms_doc` (
   `DocID` int(11) NOT NULL AUTO_INCREMENT,
   `DocLoc` varchar(255) NOT NULL,
-  `OwnerID` int(11) NOT NULL,
+  `CategoryID` int(11) NOT NULL,
   `DocType` varchar(50) NOT NULL,
   PRIMARY KEY (`DocID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -111,7 +114,7 @@ DROP TABLE IF EXISTS `kms_file`;
 CREATE TABLE `kms_file` (
   `FileID` int(11) NOT NULL AUTO_INCREMENT,
   `FileLoc` varchar(255) NOT NULL,
-  `OwnerID` int(11) NOT NULL,
+  `CategoryID` int(11) NOT NULL,
   `FileType` varchar(50) NOT NULL,
   PRIMARY KEY (`FileID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -141,9 +144,10 @@ CREATE TABLE `kms_permission` (
   `Read` tinyint(1) NOT NULL DEFAULT 0,
   `Update` tinyint(1) NOT NULL DEFAULT 0,
   `Delete` tinyint(1) NOT NULL DEFAULT 0,
-  `DocType` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`DocType`)),
-  `FileType` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`FileType`)),
+  `FileType` longtext DEFAULT "[]",
+  `DocType` longtext DEFAULT "[]",
   PRIMARY KEY (`PermissionID`),
+  UNIQUE KEY `kms_permission_UN` (`CategoryID`, `RoleID`),
   KEY `kms_permission_FK` (`CategoryID`),
   CONSTRAINT `kms_permission_FK` FOREIGN KEY (`CategoryID`) REFERENCES `kms_category` (`CategoryID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -155,6 +159,7 @@ CREATE TABLE `kms_permission` (
 
 LOCK TABLES `kms_permission` WRITE;
 /*!40000 ALTER TABLE `kms_permission` DISABLE KEYS */;
+INSERT INTO `kms_permission` VALUES (1, 1, 1, 0, 1, 0, 0, "[]", "[]");
 /*!40000 ALTER TABLE `kms_permission` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

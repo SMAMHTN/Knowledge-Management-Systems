@@ -2,24 +2,38 @@ package core
 
 import (
 	"database/sql"
-	"db"
+	"dependency"
 	"errors"
+	"net/http"
+	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Setting struct {
-	CompanyID      int
-	CompanyName    string
-	CompanyLogo    []byte
-	CompanyAddress string
-	TimeZone       string
-	AppthemeID     int
+	CompanyID         int    `json:"CompanyID"`
+	CompanyName       string `json:"CompanyName"`
+	CompanyLogo       []byte `json:"-"`
+	CompanyLogoBase64 string `json:"CompanyLogo"`
+	CompanyAddress    string `json:"CompanyAddress"`
+	TimeZone          string `json:"TimeZone"`
+	AppthemeID        int    `json:"AppthemeID"`
+}
+
+func GetTime() time.Time {
+	var TimeZone string
+	database, _ := dependency.Db_Connect(Conf, DatabaseName)
+	defer database.Close()
+	database.QueryRow("SELECT TimeZone FROM core_setting WHERE CompanyID = 1").Scan(&TimeZone)
+	Timenow, _ := dependency.GetTime(TimeZone)
+	return Timenow
 }
 
 func ReadSetting(args string) ([]Setting, error) {
 	var results []Setting
 	var sqlresult *sql.Rows
 	var err error
-	database, _ := db.Db_Connect("")
+	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
 		return []Setting{}, err
 	}
@@ -47,7 +61,7 @@ func ReadSetting(args string) ([]Setting, error) {
 
 func (data Setting) Create() error {
 	var err error
-	database, err := db.Db_Connect("")
+	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
 		return err
 	}
@@ -65,7 +79,7 @@ func (data Setting) Create() error {
 }
 
 func (data *Setting) Read() error {
-	database, err := db.Db_Connect("")
+	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
 		return err
 	}
@@ -81,9 +95,32 @@ func (data *Setting) Read() error {
 	return nil
 }
 
+func (data *Setting) ReadAPI() error {
+	err := data.Read()
+	data.CompanyLogoBase64 = dependency.BytesToBase64(data.CompanyLogo)
+	return err
+}
+
+func (data *Setting) UpdateAPI() error {
+	var err error
+	data.CompanyLogo, err = dependency.Base64ToBytes(data.CompanyLogoBase64)
+	if err != nil {
+		return err
+	}
+	err = data.Update()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (data Setting) Update() error {
 	var err error
-	database, err := db.Db_Connect("")
+	_, err = dependency.GetTime(data.TimeZone)
+	if err != nil {
+		return err
+	}
+	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
 		return err
 	}
@@ -102,7 +139,7 @@ func (data Setting) Update() error {
 
 func (data Setting) Delete() error {
 	var err error
-	database, err := db.Db_Connect("")
+	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
 		return err
 	}
@@ -120,4 +157,56 @@ func (data Setting) Delete() error {
 	}
 	defer database.Close()
 	return nil
+}
+
+func ShowSetting(c echo.Context) error {
+	// var err error
+	res := Response{}
+	u := new(Setting)
+	u.CompanyID = 1
+	// err = c.Bind(u)
+	// if err != nil {
+	// 	res.StatusCode = http.StatusBadRequest
+	// res.Data = err.Error()
+	// 	return c.JSON(http.StatusBadRequest, res)
+	// }
+	_ = u.ReadAPI()
+	// if err != nil {
+	// 	res.StatusCode = http.StatusNotFound
+	// 	res.Data = "THEME NOT FOUND"
+	// 	return c.JSON(http.StatusNotFound, res)
+	// }
+	res.StatusCode = http.StatusOK
+	res.Data = u
+	return c.JSON(http.StatusOK, res)
+}
+
+func EditSetting(c echo.Context) error {
+	permission, _, _ := Check_Permission_API(c)
+	var err error
+	res := Response{}
+	u := new(Setting)
+	err = c.Bind(u)
+	if err != nil {
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	u.CompanyID = 1
+	if permission {
+		err = u.UpdateAPI()
+		if err != nil {
+			res.StatusCode = http.StatusConflict
+			res.Data = err.Error()
+			return c.JSON(http.StatusConflict, res)
+		}
+		u.Read()
+		res.StatusCode = http.StatusOK
+		res.Data = u
+		return c.JSON(http.StatusOK, res)
+	} else {
+		res.StatusCode = http.StatusForbidden
+		res.Data = "ONLY SUPERADMIN HAVE THIS PERMISSION"
+		return c.JSON(http.StatusForbidden, res)
+	}
 }

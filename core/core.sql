@@ -83,7 +83,7 @@ DROP TABLE IF EXISTS `core_setting`;
 CREATE TABLE `core_setting` (
   `CompanyID` int(11) NOT NULL AUTO_INCREMENT,
   `CompanyName` varchar(50) NOT NULL,
-  `CompanyLogo` mediumblob NOT NULL,
+  `CompanyLogo` mediumblob DEFAULT NULL,
   `CompanyAddress` varchar(100) DEFAULT NULL,
   `Timezone` varchar(50) NOT NULL,
   `AppthemeID` int(11) DEFAULT NULL,
@@ -99,6 +99,7 @@ CREATE TABLE `core_setting` (
 
 LOCK TABLES `core_setting` WRITE;
 /*!40000 ALTER TABLE `core_setting` DISABLE KEYS */;
+INSERT INTO `core_setting` VALUES (1,'Chosen', NULL, "Semarang, Central Java, Indonesia", "Asia/Jakarta", 1);
 /*!40000 ALTER TABLE `core_setting` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -124,6 +125,7 @@ CREATE TABLE `core_theme` (
 
 LOCK TABLES `core_theme` WRITE;
 /*!40000 ALTER TABLE `core_theme` DISABLE KEYS */;
+INSERT INTO `core_theme` VALUES (1,'theme_1', '{"primary_color": "#ff0000", "secondary_color": "#00ff00"}');
 /*!40000 ALTER TABLE `core_theme` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -143,8 +145,9 @@ CREATE TABLE `core_user` (
   `Email` varchar(50) DEFAULT NULL,
   `Address` varchar(100) DEFAULT NULL,
   `Phone` varchar(20) DEFAULT NULL,
-  `RoleID` int(11) NOT NULL DEFAULT 0,
-  `AppthemeID` int(11) NOT NULL,
+  `RoleID` int(11) NOT NULL DEFAULT 1,
+  `AppthemeID` int(11) DEFAULT 1,
+  -- APP THEME MUST NOT NULL
   `Note` text DEFAULT NULL,
   `IsSuperAdmin` tinyint(1) NOT NULL DEFAULT 0,
   `IsActive` tinyint(1) NOT NULL DEFAULT 1,
@@ -161,6 +164,7 @@ CREATE TABLE `core_user` (
 
 LOCK TABLES `core_user` WRITE;
 /*!40000 ALTER TABLE `core_user` DISABLE KEYS */;
+INSERT INTO `core_user` VALUES (1,NULL, 'administrator', 'admin', 'Super Admin', 'administrator@admin.com', "", "", 1, 1, "", 1, 1);
 /*!40000 ALTER TABLE `core_user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

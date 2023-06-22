@@ -1,23 +1,68 @@
-// var ins = core.History{HistoryID: 6, ActivityType: "broo", Time: time.Now(), UserID: 5, Changes: "test", IPAddress: "tsssses"}
-// // err = ins.Update()
-// // err = ins.Create()
-// tablecore := core.History{HistoryID: 6}
-// // err = tablecore.Read()
-// // if err != nil {
-// // 	fmt.Println(err)
-// // }
-// // fmt.Println(tablecore)
-// // fmt.Println("test")
-// err = tablecore.Delete()
-// // fmt.Println(tablecore)
-// // fmt.Println("test")
-// if err != nil {
-// 	fmt.Println(err)
-// }
-
-// // db.Execute_sql_file("core.sql", dependency.Conf.Appname)
-// // role, err := core.CoreRole_Select("WHERE RoleID=0")
-// // if err != nil {
-// // 	fmt.Println(err)
-// // }
-// // fmt.Println(role[0].RoleName)
+"Data": [
+        {
+            "RoleID": 1,
+            "RoleName": "Everyone",
+            "RoleParentID": 1,
+            "RoleDescription": "everyone"
+        },
+        {
+            "RoleID": 2,
+            "RoleName": "Parent",
+            "RoleParentID": 2,
+            "RoleDescription": "parent"
+        },
+        {
+            "RoleID": 3,
+            "RoleName": "Software Developer",
+            "RoleParentID": 2,
+            "RoleDescription": "Developer nih bos, senggol dong"
+        },
+        {
+            "RoleID": 4,
+            "RoleName": "Frontend Developer",
+            "RoleParentID": 3,
+            "RoleDescription": "Developer nih bos, senggol dong"
+        },
+        {
+            "RoleID": 5,
+            "RoleName": "Backend Developer",
+            "RoleParentID": 3,
+            "RoleDescription": "Developer nih bos, senggol dong"
+        },
+        {
+            "RoleID": 6,
+            "RoleName": "React Developer",
+            "RoleParentID": 4,
+            "RoleDescription": "Developer nih bos, senggol dong"
+        },
+        {
+            "RoleID": 7,
+            "RoleName": "HTML Developer",
+            "RoleParentID": 4,
+            "RoleDescription": "Developer nih bos, senggol dong"
+        },
+        {
+            "RoleID": 8,
+            "RoleName": "JavaScript Developer",
+            "RoleParentID": 6,
+            "RoleDescription": "Developer nih bos, senggol dong"
+        },
+        {
+            "RoleID": 9,
+            "RoleName": "Python Developer",
+            "RoleParentID": 5,
+            "RoleDescription": "Developer nih bos, senggol dong"
+        },
+        {
+            "RoleID": 10,
+            "RoleName": "Golang Developer",
+            "RoleParentID": 5,
+            "RoleDescription": "Developer nih bos, senggol dong"
+        },
+        {
+            "RoleID": 11,
+            "RoleName": "ML Developer",
+            "RoleParentID": 9,
+            "RoleDescription": "Developer nih bos, senggol dong"
+        }
+    ]

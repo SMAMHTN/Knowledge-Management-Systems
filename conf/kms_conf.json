@@ -1,0 +1,10 @@
+{
+    "app_name": "core",
+    "app_port": 6565,
+    "app_password": "aldim",
+    "db_link": "core-db",
+    "db_username": "root",
+    "db_password": "aldim",
+    "core_link":"",
+    "core_password":""
+}

@@ -1,6 +1,8 @@
 {
-    "Appname": "core",
-    "Db_link": "localhost:3306",
-    "Db_username": "root",
-    "Db_password": "aldim"
+    "app_name": "core",
+    "app_port": 6565,
+    "app_password": "aldim",
+    "db_link": "core-db",
+    "db_username": "root",
+    "db_password": "aldim"
 }
