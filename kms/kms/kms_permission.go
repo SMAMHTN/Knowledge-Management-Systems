@@ -325,6 +325,10 @@ func GetTruePermission(c echo.Context, CategoryID int, RoleID int) (Create bool,
 		return Create, Read, Update, Delete, err
 	}
 
+	if len(RoleIDList) == 0 {
+		return Create, Read, Update, Delete, errors.New("permission not found")
+	}
+
 	var roleIDListString string
 	roleIDListString = fmt.Sprintf("%d", RoleIDList[0])
 	for i := 1; i < len(RoleIDList); i++ {
@@ -337,6 +341,10 @@ func GetTruePermission(c echo.Context, CategoryID int, RoleID int) (Create bool,
 	CategoryIDList, err := CategoryIDData.ListAllCategoryParent()
 	if err != nil {
 		return Create, Read, Update, Delete, err
+	}
+
+	if len(CategoryIDList) == 0 {
+		return Create, Read, Update, Delete, errors.New("permission not found")
 	}
 
 	var categoryIDListString string

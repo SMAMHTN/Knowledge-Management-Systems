@@ -353,9 +353,9 @@ func ShowArticle(c echo.Context) error {
 		res.Data = u
 		return c.JSON(http.StatusOK, res)
 	} else {
-		res.StatusCode = http.StatusUnauthorized
+		res.StatusCode = http.StatusForbidden
 		res.Data = "YOU DONT HAVE PERMISSION TO READ THIS ARTICLE"
-		return c.JSON(http.StatusUnauthorized, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 }
 
@@ -396,9 +396,9 @@ func AddArticle(c echo.Context) error {
 	}
 	TrueCreate, _, _, _, err := GetTruePermission(c, u.CategoryID, role_id)
 	if err != nil {
-		res.StatusCode = http.StatusInternalServerError
+		res.StatusCode = http.StatusForbidden
 		res.Data = err
-		return c.JSON(http.StatusInternalServerError, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 	if TrueCreate {
 		_, err = u.Create()
@@ -407,31 +407,31 @@ func AddArticle(c echo.Context) error {
 			res.Data = "CREATE ERROR : " + err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		resulta, err := u.ConvForSolr()
-		if err != nil {
-			res.StatusCode = http.StatusBadRequest
-			res.Data = "UPDATE ERROR : " + err.Error()
-			return c.JSON(http.StatusBadRequest, res)
-		}
-		err = resulta.PrepareSolrData(c)
-		if err != nil {
-			res.StatusCode = http.StatusBadRequest
-			res.Data = "UPDATE ERROR : " + err.Error()
-			return c.JSON(http.StatusBadRequest, res)
-		}
-		_, _, err = SolrCallUpdate("POST", resulta)
-		if err != nil {
-			res.StatusCode = http.StatusBadRequest
-			res.Data = "UPDATE ERROR : " + err.Error()
-			return c.JSON(http.StatusBadRequest, res)
-		}
+		// resulta, err := u.ConvForSolr()
+		// if err != nil {
+		// 	res.StatusCode = http.StatusBadRequest
+		// 	res.Data = "UPDATE ERROR : " + err.Error()
+		// 	return c.JSON(http.StatusBadRequest, res)
+		// }
+		// err = resulta.PrepareSolrData(c)
+		// if err != nil {
+		// 	res.StatusCode = http.StatusBadRequest
+		// 	res.Data = "UPDATE ERROR : " + err.Error()
+		// 	return c.JSON(http.StatusBadRequest, res)
+		// }
+		// _, _, err = SolrCallUpdate("POST", resulta)
+		// if err != nil {
+		// 	res.StatusCode = http.StatusBadRequest
+		// 	res.Data = "UPDATE ERROR : " + err.Error()
+		// 	return c.JSON(http.StatusBadRequest, res)
+		// }
 		res.StatusCode = http.StatusOK
 		res.Data = u
 		return c.JSON(http.StatusOK, res)
 	} else {
-		res.StatusCode = http.StatusUnauthorized
+		res.StatusCode = http.StatusForbidden
 		res.Data = "YOU DONT HAVE PERMISSION TO CREATE ARTICLE IN THIS CATEGORY"
-		return c.JSON(http.StatusUnauthorized, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 }
 
@@ -479,9 +479,9 @@ func EditArticle(c echo.Context) error {
 	}
 	_, _, TrueUpdate, _, err := GetTruePermission(c, u.CategoryID, role_id)
 	if err != nil {
-		res.StatusCode = http.StatusInternalServerError
+		res.StatusCode = http.StatusForbidden
 		res.Data = err
-		return c.JSON(http.StatusInternalServerError, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 	if TrueUpdate {
 		resulta, err := u.ConvForSolr()
@@ -512,9 +512,9 @@ func EditArticle(c echo.Context) error {
 		res.Data = u
 		return c.JSON(http.StatusOK, res)
 	} else {
-		res.StatusCode = http.StatusUnauthorized
+		res.StatusCode = http.StatusForbidden
 		res.Data = "YOU DONT HAVE PERMISSION TO EDIT THIS ARTICLE"
-		return c.JSON(http.StatusUnauthorized, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 }
 
@@ -545,9 +545,9 @@ func DeleteArticle(c echo.Context) error {
 	_, _, _, TrueDelete, err := GetTruePermission(c, u.CategoryID, role_id)
 	// err = permission_kms.Read()
 	if err != nil {
-		res.StatusCode = http.StatusInternalServerError
+		res.StatusCode = http.StatusForbidden
 		res.Data = err
-		return c.JSON(http.StatusInternalServerError, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 	if TrueDelete {
 		err = u.Delete()
@@ -566,9 +566,9 @@ func DeleteArticle(c echo.Context) error {
 		res.Data = u
 		return c.JSON(http.StatusOK, res)
 	} else {
-		res.StatusCode = http.StatusUnauthorized
+		res.StatusCode = http.StatusForbidden
 		res.Data = "YOU DONT HAVE PERMISSION TO DELETE THIS ARTICLE"
-		return c.JSON(http.StatusUnauthorized, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 }
 
