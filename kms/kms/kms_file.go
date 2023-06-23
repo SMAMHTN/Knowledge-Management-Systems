@@ -172,16 +172,16 @@ func ShowFile(c echo.Context) error {
 	}
 	_, TrueRead, TrueUpdate, _, err := GetTruePermission(c, u.CategoryID, role_id)
 	if err != nil {
-		res.StatusCode = http.StatusInternalServerError
+		res.StatusCode = http.StatusForbidden
 		res.Data = err
-		return c.JSON(http.StatusInternalServerError, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 	if TrueRead || TrueUpdate {
 		return c.Attachment(u.FileLoc, path.Base(u.FileLoc))
 	} else {
-		res.StatusCode = http.StatusUnauthorized
+		res.StatusCode = http.StatusForbidden
 		res.Data = "YOU DONT HAVE PERMISSION TO DELETE THIS FILE"
-		return c.JSON(http.StatusUnauthorized, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 }
 
@@ -211,14 +211,14 @@ func AddFile(c echo.Context) error {
 	}
 	TrueCreate, _, _, _, err := GetTruePermission(c, category_id, role_id)
 	if err != nil {
-		res.StatusCode = http.StatusInternalServerError
-		res.Data = err
-		return c.JSON(http.StatusInternalServerError, res)
+		res.StatusCode = http.StatusForbidden
+		res.Data = "YOU DONT HAVE PERMISSION TO UPLOAD IN THIS CATEGORY"
+		return c.JSON(http.StatusForbidden, res)
 	}
 	if !TrueCreate {
-		res.StatusCode = http.StatusUnauthorized
+		res.StatusCode = http.StatusForbidden
 		res.Data = "YOU DONT HAVE PERMISSION TO UPLOAD IN THIS CATEGORY"
-		return c.JSON(http.StatusUnauthorized, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 	AllowedFileType, err = GetAllFileTypePermission(c, category_id, role_id)
 	if err != nil {
@@ -310,14 +310,14 @@ func DeleteFile(c echo.Context) error {
 	}
 	_, _, _, TrueDelete, err := GetTruePermission(c, u.CategoryID, role_id)
 	if err != nil {
-		res.StatusCode = http.StatusInternalServerError
+		res.StatusCode = http.StatusForbidden
 		res.Data = err
-		return c.JSON(http.StatusInternalServerError, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 	if !TrueDelete {
-		res.StatusCode = http.StatusUnauthorized
+		res.StatusCode = http.StatusForbidden
 		res.Data = "YOU DONT HAVE PERMISSION TO DELETE THIS DOCUMENT"
-		return c.JSON(http.StatusUnauthorized, res)
+		return c.JSON(http.StatusForbidden, res)
 	}
 	err = os.Remove(u.FileLoc)
 	if err != nil {
