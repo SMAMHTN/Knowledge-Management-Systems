@@ -7,7 +7,8 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
 
-  const handleLogin = async () => {
+  const handleLogin = async (event: React.FormEvent<HTMLDivElement>) => {
+    event.preventDefault()
     const credentials = btoa(`aldim:${password}&&${username}`);
 
     try {
@@ -29,7 +30,7 @@ export default function Login() {
     }
   };
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
+    <div onSubmit={handleLogin} className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
       <div className="w-full p-6 bg-white rounded-md shadow-md lg:max-w-xl">
         <h1 className="text-3xl font-bold text-center text-gray-700">Logo</h1>
         <form className="mt-6">
@@ -69,7 +70,7 @@ export default function Login() {
             Forget Password?
           </Link>
           <div className="mt-2">
-            <button onClick={() => handleLogin()} className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-blue-800 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-gray-600">
+            <button type="submit" className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-blue-800 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-gray-600">
               Login
             </button>
           </div>
@@ -85,7 +86,6 @@ export default function Login() {
           </Link>
         </p>
       </div>
-      <p>{message}</p>
     </div>
   );
 }
