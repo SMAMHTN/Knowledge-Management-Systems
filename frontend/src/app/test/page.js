@@ -5,9 +5,15 @@ export default function Page() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  // const [a, setA] = useState('');
 
+  // useEffect(() => {
+  //   readConf('conf.json').then(configuration => {
+  //     setA(configuration.app_name);
+  //   });
+  // }, []);
   const handleLogin = async () => {
-    const credentials = btoa(`aldim:${password}&&${username}`);
+    const credentials = btoa(`aldim:${username}&&${password}`);
 
     try {
       const response = await fetch('http://code.smam.my.id:6565/login', {
