@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { Login } from '../../dep/coreUser/coreUserHandler';
 
 export default function Page() {
   const [username, setUsername] = useState('');
@@ -13,17 +14,18 @@ export default function Page() {
   //   });
   // }, []);
   const handleLogin = async () => {
-    const credentials = btoa(`aldim:${username}&&${password}`);
+    // const credentials = btoa(`aldim:${username}&&${password}`);
 
     try {
-      const response = await fetch('http://code.smam.my.id:6565/login', {
-        headers: {
-          Authorization: `Basic ${credentials}`,
-          Accept: '*/*',
-        },
-      });
+      const response = await Login(username,password)
+      // const response = await fetch('http://code.smam.my.id:6565/login', {
+      //   headers: {
+      //     Authorization: `Basic ${credentials}`,
+      //     Accept: '*/*',
+      //   },
+      // });
 
-      if (response.ok) {
+      if (response == true) {
         setMessage('Login successful!');
         // Perform any additional actions after successful login
       } else {

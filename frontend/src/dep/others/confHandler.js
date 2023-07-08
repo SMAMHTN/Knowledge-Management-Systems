@@ -1,5 +1,3 @@
-"use server"
-
 const fs = require("fs");
 
 function fixPath(path) {
@@ -42,8 +40,19 @@ export function readConf(ConfFile) {
       throw new Error("Conf file not found");
     }
   }
+
   const fileData = fs.readFileSync(ConfFile, "utf8");
   const configuration = JSON.parse(fileData);
+
+  for (const key in configuration) {
+    if (configuration.hasOwnProperty(key) && key.endsWith("_link")) {
+      const value = configuration[key];
+      if (typeof value === "string" && value[value.length - 1] !== "/") {
+        configuration[key] = value + "/";
+      }
+    }
+  }
+
   return configuration;
 }
 

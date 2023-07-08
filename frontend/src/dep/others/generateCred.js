@@ -1,4 +1,3 @@
-"use server";
 import { readConf } from "./confHandler";
 
 function generateCoreCred(username, password) {
