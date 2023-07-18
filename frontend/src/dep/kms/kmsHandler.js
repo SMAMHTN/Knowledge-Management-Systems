@@ -16,9 +16,11 @@ export async function KmsAPI(method,path,data) {
           Authorization: `Basic ${credentials}`,
           Accept: "*/*",
           Connection: "keep-alive",
+          "Content-Type": "application/json", 
         },
         body: JSON.stringify(data),
       });
+      console.log(JSON.stringify(data))
       return response.headers,await response.json();
     } catch (error) {
       throw error;

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Login, CoreAPIGET } from "../../dep/core/coreHandler";
-import { KmsAPIGET } from "../../dep/kms/kmsHandler";
+import { KmsAPIGET, KmsAPI } from "../../dep/kms/kmsHandler";
 
 export default function Page() {
   const [username, setUsername] = useState("");
@@ -15,6 +15,7 @@ export default function Page() {
       CategoryDescription:"",
     }
   });
+  const [statuscode, setStatusCode] = useState("");
   // const jsonRequestData = {
   //   UserID:1,
   // }
@@ -32,6 +33,15 @@ export default function Page() {
       KmsAPIGET("category?CategoryID=1").then((configuration) => {
         setA(configuration);
       });
+      const jsonRequestData = {
+          CategoryName:"Tes dari Frontend 2",
+          CategoryParentID:2,
+          CategoryDescription:"TEst"
+        }
+      KmsAPI("POST","category",jsonRequestData).then((res) =>{
+        setStatusCode(res.Data)
+        console.log(res.Data)
+      })
       console.log(a);
       // const response = await fetch('http://code.smam.my.id:6565/login', {
       //   headers: {
@@ -71,10 +81,11 @@ export default function Page() {
       />
       <button onClick={handleLogin}>Login</button>
       <p>{message}</p>
-      <p>{a.Data.CategoryID}</p>
+      {/* <p>{a.Data.CategoryID}</p>
       <p>{a.Data.CategoryName}</p>
       <p>{a.Data.CategoryParentID}</p>
-      <p>{a.Data.CategoryDescription}</p>
+      <p>{a.Data.CategoryDescription}</p> */}
+      <p>{statuscode}</p>
       {/* <img src={`data:image/png;base64, ${a.Data.UserPhoto}`} alt="User" /> */}
     </div>
   );

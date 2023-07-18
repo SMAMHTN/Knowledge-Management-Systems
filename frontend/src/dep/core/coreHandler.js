@@ -67,6 +67,7 @@ export async function CoreAPI(method,path,data) {
         Authorization: `Basic ${credentials}`,
         Accept: "*/*",
         Connection: "keep-alive",
+        "Content-Type": "application/json", 
       },
       body: JSON.stringify(data),
     });
