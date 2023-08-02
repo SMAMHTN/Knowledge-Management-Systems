@@ -3,15 +3,15 @@
 import { useState, useEffect } from "react";
 
 const DateTime = ({ initialTime }) => {
-    const [currentTime, setCurrentTime] = useState(new Date(initialTime));
-  
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setCurrentTime(new Date());
-      }, 1000);
-  
-      return () => clearInterval(interval);
-    }, []); 
+  const [currentTime, setCurrentTime] = useState(new Date(initialTime));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Helper function to format the date and time
   const formatTime = (date) => {
@@ -29,16 +29,28 @@ const DateTime = ({ initialTime }) => {
   };
 
   const isValidTime = !isNaN(currentTime.getTime());
-  const formattedTime = isValidTime ? formatTime(currentTime) : 'Invalid Time';
-  const formattedDate = isValidTime ? formatDate(currentTime) : 'Invalid Date';
+  const formattedTime = isValidTime ? formatTime(currentTime) : "Invalid Time";
+  const formattedDate = isValidTime ? formatDate(currentTime) : "Invalid Date";
 
   return (
-    <div className={`dateTimeContainer transition-opacity ${isValidTime ? 'opacity-100' : 'opacity-0'}`}>
-      <div className={`time transition-opacity ${isValidTime ? 'opacity-100' : 'opacity-0'}`}>
-        Current Time:  {isValidTime ? formatTime(currentTime) : 'Invalid Time'}
+    <div
+      className={`dateTimeContainer transition-opacity ${
+        isValidTime ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      <div
+        className={`time transition-opacity ${
+          isValidTime ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        Current Time: {isValidTime ? formatTime(currentTime) : "Invalid Time"}
       </div>
-      <div className={`date transition-opacity ${isValidTime ? 'opacity-100' : 'opacity-0'}`}>
-        Current Date : {isValidTime ? formatDate(currentTime) : 'Invalid Date'}
+      <div
+        className={`date transition-opacity ${
+          isValidTime ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        Current Date : {isValidTime ? formatDate(currentTime) : "Invalid Date"}
       </div>
     </div>
   );
