@@ -37,7 +37,7 @@ export function readConf(ConfFile) {
       fs.accessSync(path);
       ConfFile = path;
     } catch (err) {
-      throw new Error("Conf file not found");
+      throw new URIError("Conf file not found");
     }
   }
 
