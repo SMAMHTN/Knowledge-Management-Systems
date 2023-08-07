@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Login, CoreAPIGET } from "../../dep/core/coreHandler";
-import { KmsAPIGET } from "../../dep/kms/kmsHandler";
+import { KmsAPIGET, KmsAPI } from "../../dep/kms/kmsHandler";
 
 export default function Page() {
   const [username, setUsername] = useState("");
@@ -30,10 +30,15 @@ export default function Page() {
 
     try {
       const response = await Login(username, password);
-      KmsAPIGET("category?CategoryID=1").then((configuration) => {
-        setA(configuration);
-      });
-      console.log(a);
+      // KmsAPIGET("category?CategoryID=1").then((configuration) => {
+      //   setA(configuration);
+      // });
+      let datasent = {
+        CategoryID: 13,
+      };
+      const response2 = await KmsAPI("DELETE", "category",datasent);
+      setA(response2.body);
+      console.log(response2);
       // const response = await fetch('http://code.smam.my.id:6565/login', {
       //   headers: {
       //     Authorization: `Basic ${credentials}`,
