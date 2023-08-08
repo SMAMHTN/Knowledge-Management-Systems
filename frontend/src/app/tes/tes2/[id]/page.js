@@ -1,15 +1,40 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation'
-import { Login, CoreAPIGET } from "../../dep/core/coreHandler";
+import { CoreAPI, CoreAPIGET } from "../../../../dep/core/coreHandler";
 // import { KmsAPIGET, KmsAPI } from "../../dep/kms/kmsHandler";
 
-export default function Page() {
+export default function Page({ params }) {
   const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [nextlink, setNextlink] = useState("/tes");
-  const router = useRouter()
+  const router = useRouter();
+  const [UserData, setUserData] = useState({
+    body:{Data:{
+      Username:"",
+      Password:"",
+      Name:"",
+    }}
+  });
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await CoreAPIGET("user?UserID=" + params.id);
+        setUserData(response); // Assuming the response is an object that represents the user data.
+        console.log(response);
+        setName(response.body.Data.Name)
+        setUsername(response.body.Data.Username)
+        setPassword(response.body.Data.Password)
+      } catch (error) {
+        // Handle errors here
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [params.id]);
   // const [a, setA] = useState({
   //   Data: {
   //     CategoryID: 0,
@@ -29,39 +54,21 @@ export default function Page() {
   //   });
   // }, []);
   const handleLogin = async () => {
-    // const credentials = btoa(`aldim:${username}&&${password}`);
-
     try {
-      const response = await Login(username, password);
-      // KmsAPIGET("category?CategoryID=1").then((configuration) => {
-      //   setA(configuration);
-      // });
-      // let datasent = {
-      //   CategoryID: 13,
-      // };
-      // const response2 = await KmsAPI("DELETE", "category",datasent);
-      // setA(response2.body);
-      // console.log(response2);
-      // const response = await fetch('http://code.smam.my.id:6565/login', {
-      //   headers: {
-      //     Authorization: `Basic ${credentials}`,
-      //     Accept: '*/*',
-      //   },
-      // });
-
-      if (response == true) {
-        const response2 = await CoreAPIGET("loginuser")
-        // setNextlink("/tes/tes2/" + response2.body.Data.UserID)
-        router.push("/tes/tes2/" + response2.body.Data.UserID)
-        setMessage("Login successful!");
-        // Perform any additional actions after successful login
-      } else {
-        // setNextlink("/tes")
-        setMessage("Login failed!");
-        // Handle login failure
+      // let EdittedUserData = UserData.body.Data;
+      // EdittedUserData.Username = username;
+      // EdittedUserData.Password = password;
+      // EdittedUserData.Name = name;
+      // console.log(EdittedUserData)
+      // const response2 = await CoreAPI("PUT","user",EdittedUserData);
+      let DelUserData = {
+        UserID: parseInt(params.id)
       }
+      console.log(typeof(params.id))
+      const response2 = await CoreAPI("DELETE","user",DelUserData)
     } catch (error) {
-      // console.log(error);
+      console.log(error);
+      console.log("Ada error anjg")
       setMessage("An error occurred during login.");
       // Handle error
     }
@@ -81,6 +88,24 @@ export default function Page() {
           </div>
           <div class="mt-10">
             <form action={handleLogin}>
+              <div class="flex flex-col mb-6">
+                <label
+                  for="name"
+                  class="mb-1 text-xs sm:text-sm tracking-wide text-gray-600"
+                >
+                  Name:
+                </label>
+                <div class="relative">
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    class="text-sm sm:text-base placeholder-gray-500 pl-4 pr-4 rounded-lg border border-gray-400 w-full py-2 focus:outline-none focus:border-blue-400"
+                    placeholder="Password"
+                  />
+                </div>
+              </div>
               <div class="flex flex-col mb-6">
                 <label
                   for="email"
