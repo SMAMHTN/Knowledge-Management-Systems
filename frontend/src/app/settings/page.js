@@ -1,30 +1,61 @@
-import Link from "next/link";
+import React from "react";
 
-
-export default function Home() {
+function SystemSetting() {
+  // Sample data for the table
+  const roles = [
+    {
+      RoleID: 1,
+      RoleName: "Everyone",
+      RoleParentID: 1,
+      RoleDescription: "everyone",
+    },
+    {
+      RoleID: 2,
+      RoleName: "Parent",
+      RoleParentID: 2,
+      RoleDescription: "parent",
+    },
+    // Add more user data as needed
+  ];
   return (
     <>
       <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
         {/* buat s.admin */}
         <div className="max-w-md mx-auto p-4 mt-9">
-      <h2 className="text-2xl font-bold mb-4">Navigation</h2>
-      <div className="space-y-4">
-          <Link href="/nama-pengguna" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-            Nama Pengguna dan Role Pengguna
-          </Link>
-          <Link href="/settings" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-            Settings
-          </Link>
-          <Link  href="/management-dokumen" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-            Management Dokumen
-          </Link>
-          <Link href="/management-s-admin" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-            Management S.Admin
-          </Link>
-      </div>
-    </div>
-{/* buat user biasa */}
-
+          <div className="max-w-3xl mx-auto p-4">
+            <h2 className="text-2xl font-bold mb-4">Roles Table</h2>
+            <table className="w-full border">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2">id</th>
+                  <th className="px-4 py-2">Role Name</th>
+                  <th className="px-4 py-2">role parent id</th>
+                  <th className="px-4 py-2">Description</th>
+                  <th className="px-4 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {roles.map((role) => (
+                  <tr key={role.id} className="border-b">
+                    <td className="px-4 py-2">{role.RoleID}</td>
+                    <td className="px-4 py-2">{role.RoleName}</td>
+                    <td className="px-4 py-2">{role.RoleParentID}</td>
+                    <td className="px-4 py-2">{role.RoleDescription}</td>
+                    <td className="px-4 py-2 flex justify-end items-center">
+                      <button className="bg-yellow-500 text-white rounded px-2 py-1">
+                        Edit
+                      </button>
+                      <button className="bg-red-500 text-white rounded px-2 py-1 ml-2">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* buat user biasa */}
 
         {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
@@ -273,3 +304,5 @@ export default function Home() {
     </>
   );
 }
+
+export default SystemSetting;
