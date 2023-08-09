@@ -30,6 +30,8 @@ function UserDetails({ params }) {
 
       console.log(data);
       console.log(params.id);
+      data.RoleID = parseInt(data.RoleID);
+      data.AppThemeID = parseInt(role.AppThemeID);
       const response = await CoreAPI("PUT", "user", data);
     } catch (error) {
       console.log(error);
