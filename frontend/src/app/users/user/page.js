@@ -1,46 +1,48 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation'
+import { CoreAPIGET } from "../../../dep/core/coreHandler";
 
 function UserTable() {
   // Sample data for the table
-  const users = [
-    {
-      "UserID": 1,
-            "UserPhoto": "",
-            "Username": "administrator",
-            "Password": "admin",
-            "Name": "Super Admin",
-            "Email": "administrator@admin.com",
-            "Address": "",
-            "Phone": "",
-            "RoleID": 1,
-            "AppthemeID": 1,
-            "Note": "",
-            "IsSuperAdmin": 1,
-            "IsActive": 1
-    },
-    {
-      "UserID": 3,
-            "UserPhoto": "",
-            "Username": "smam",
-            "Password": "smam",
-            "Name": "Aldi Mulyawan",
-            "Email": "aldismartkid@gmail.com",
-            "Address": "Blora",
-            "Phone": "081350488901",
-            "RoleID": 3,
-            "AppthemeID": 1,
-            "Note": "INI PERCOBAAN",
-            "IsSuperAdmin": 0,
-            "IsActive": 1
-    },
-    
-    // Add more user data as needed
-  ];
+  const router = useRouter()
+  const [data, setData] = useState([]);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    console.log("useEffect executed");
+    const fetchData = async () => {
+      console.log("bald");
+      try {
+        const response = await CoreAPIGET("listuser");
+
+        console.log(response);
+        console.log("bald v2");
+        console.log(response.body.StatusCode);
+        const jsonData = response.body.Data; // Update this line
+        setData(jsonData);
+        setError(null);
+        console.log("bald v3");
+        console.log(data);
+        console.log("bald v4");
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
   const truncateText = (text, length) => {
     if (text.length > length) {
-      return text.slice(0, length - 3) + '...';
+      return text.slice(0, length - 3) + "...";
     }
     return text;
+  };
+  const handleNavigate = (userID) => {
+    // Programmatically navigate to a different route
+    router.push(`/users/user/${userID}`);
   };
 
   return (
@@ -48,45 +50,51 @@ function UserTable() {
       <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
         {/* buat s.admin */}
         <div className="max-w-md ml-14 p-4 mt-9">
-      <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">User Table</h2>
-      <table className="w-full border">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2">Username</th>
-              <th className="px-4 py-2">Full Name</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Roles</th>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id} className="border-b">
-                <td className="px-4 py-2">{user.Username}</td>
-                <td className="px-4 py-2 whitespace-nowrap overflow-hidden overflow-ellipsis">
-                  {truncateText(user.Name, 15)}
-                </td>
-                <td className="px-4 py-2">{user.IsActive ? 'Active' : 'Inactive'}</td>
-                <td className="px-4 py-2">{user.RoleID}</td>
-                <td className="px-4 py-2">{truncateText(user.Email, 20)}</td>
-                <td className="px-4 py-2 flex justify-end items-center">
-                  <button className="bg-yellow-500 text-white rounded px-2 py-1">
-                    Edit
-                  </button>
-                  <button className="bg-red-500 text-white rounded px-2 py-1 ml-2">
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-    </div>
-    </div>
-{/* buat user biasa */}
-
+          <div className="max-w-3xl mx-auto p-4">
+            <h2 className="text-2xl font-bold mb-4">User Table</h2>
+            <table className="w-full border">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2">Username</th>
+                  <th className="px-4 py-2">Full Name</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2">Roles</th>
+                  <th className="px-4 py-2">Email</th>
+                  <th className="px-4 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((user) => (
+                  <tr key={user.UserID}>
+                    <td className="px-4 py-2">{user.Username}</td>
+                    <td className="px-4 py-2 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                      {truncateText(user.Name, 15)}
+                    </td>
+                    <td className="text-center">
+                      {user.IsActive === 1 ? "Active" : "Not Active"}
+                    </td>
+                    <td className="text-center">{user.RoleID}</td>
+                    <td className="px-4 py-2">
+                      {truncateText(user.Email, 20)}
+                    </td>
+                    <td className="px-4 py-2 flex justify-end items-center">
+                      <button
+                        onClick={() => handleNavigate(user.UserID)}
+                        className="bg-yellow-500 text-white rounded px-2 py-1"
+                      >
+                        View
+                      </button>
+                      <button className="bg-red-500 text-white rounded px-2 py-1 ml-2">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* buat user biasa */}
 
         {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
@@ -334,6 +342,6 @@ function UserTable() {
       </section>
     </>
   );
-      }
+}
 
 export default UserTable;
