@@ -12,7 +12,7 @@ import (
 )
 
 type User struct {
-	UserID          int    `json:"UserID"`
+	UserID          int    `json:"UserID" query:"UserID"`
 	UserPhoto       []byte `json:"-"`
 	UserPhotoBase64 string `json:"UserPhoto"`
 	Username        string `json:"Username"`

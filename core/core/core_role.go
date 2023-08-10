@@ -12,7 +12,7 @@ import (
 )
 
 type Role struct {
-	RoleID          int
+	RoleID          int `json:"RoleID" query:"RoleID"`
 	RoleName        string
 	RoleParentID    int
 	RoleDescription string

@@ -14,7 +14,7 @@ import (
 )
 
 type Doc struct {
-	DocID      int
+	DocID      int `json:"DocID" query:"DocID"`
 	DocLoc     string
 	CategoryID int
 	DocType    string

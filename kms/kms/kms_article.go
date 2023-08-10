@@ -13,7 +13,7 @@ import (
 )
 
 type Article_Table struct {
-	ArticleID      int
+	ArticleID      int `json:"ArticleID" query:"ArticleID"`
 	OwnerID        int
 	LastEditedByID int
 	LastEditedTime time.Time

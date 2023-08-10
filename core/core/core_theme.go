@@ -11,7 +11,7 @@ import (
 )
 
 type Theme struct {
-	AppthemeID    int
+	AppthemeID    int `json:"AppthemeID" query:"AppthemeID"`
 	AppthemeName  string
 	AppthemeValue string //json
 }

@@ -69,6 +69,9 @@ func Test_api() {
 	e := echo.New()
 
 	basicAuthMiddleware := middleware.BasicAuth(Validator)
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+	}))
 
 	// Define a protected route that requires Basic Authentication
 	e.GET("/login", Login, basicAuthMiddleware)
