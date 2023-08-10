@@ -72,7 +72,7 @@ func Test_api() {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 	}))
-	e.Use(middleware.BodyLimit("2M"))
+	e.Use(middleware.BodyLimit("6M"))
 
 
 	// Define a protected route that requires Basic Authentication
