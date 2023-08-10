@@ -21,6 +21,7 @@ type Configuration struct {
 	Solr_link     string `json:"solr_link"`
 	Solr_username string `json:"solr_username"`
 	Solr_password string `json:"solr_password"`
+	Max_upload    string `json:"max_upload"`
 }
 
 func fixpath(path string) string {

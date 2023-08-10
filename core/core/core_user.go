@@ -410,6 +410,15 @@ func EditUser(c echo.Context) error {
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
+	_, userpass, _ := c.Request().BasicAuth()
+	cred := strings.Split(userpass, "&&")
+	now_user := User{Username: dependency.GetElementString(cred, 0), Password: dependency.GetElementString(cred, 1)}
+	now_user.Read()
+	if u.UserID == now_user.UserID {
+		res.StatusCode = http.StatusOK
+		res.Data = now_user
+		return c.JSON(http.StatusOK, res)
+	}
 	if permission {
 		err = u.UpdateFromAPI()
 		if err != nil {
