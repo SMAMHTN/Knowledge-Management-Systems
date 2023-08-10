@@ -1,0 +1,10 @@
+{
+    "type": "node",
+    "request": "launch",
+    "name": "Node.js: Launch Program",
+    "program": "${file}",
+    "runtimeArgs": ["--experimental-modules"],
+    "outFiles": [],
+    "sourceMaps": true
+  }
+  
