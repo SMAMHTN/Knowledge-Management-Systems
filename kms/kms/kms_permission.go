@@ -14,7 +14,7 @@ import (
 )
 
 type Permission struct {
-	PermissionID int
+	PermissionID int `json:"PermissionID" query:"PermissionID"`
 	CategoryID   int
 	RoleID       int
 	PCreate      int    `json:"Create"`

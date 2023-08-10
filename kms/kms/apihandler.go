@@ -181,8 +181,10 @@ func Test_api() {
 	e := echo.New()
 
 	basicAuthMiddleware := middleware.BasicAuth(Validator)
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+	}))
 	e.Use(middleware.BodyLimit(Conf.Max_upload))
-
 	// Define a protected route that requires Basic Authentication
 	e.GET("/listcategory", ListCategory, basicAuthMiddleware)
 	e.GET("/listcategoryparent", ListCategoryParent, basicAuthMiddleware)

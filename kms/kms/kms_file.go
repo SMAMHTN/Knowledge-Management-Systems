@@ -14,7 +14,7 @@ import (
 )
 
 type File struct {
-	FileID     int
+	FileID     int `json:"FileID" query:"FileID"`
 	FileLoc    string
 	CategoryID int
 	FileType   string

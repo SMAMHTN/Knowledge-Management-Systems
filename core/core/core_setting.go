@@ -11,7 +11,7 @@ import (
 )
 
 type Setting struct {
-	CompanyID         int    `json:"CompanyID"`
+	CompanyID         int    `json:"CompanyID" query:"CompanyID"`
 	CompanyName       string `json:"CompanyName"`
 	CompanyLogo       []byte `json:"-"`
 	CompanyLogoBase64 string `json:"CompanyLogo"`

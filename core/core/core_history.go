@@ -12,7 +12,7 @@ import (
 )
 
 type History struct {
-	HistoryID    int
+	HistoryID    int `json:"HistoryID" query:"HistoryID"`
 	ActivityType string
 	Time         t.Time
 	UserID       int
@@ -21,7 +21,7 @@ type History struct {
 }
 
 type HistoryAPI struct {
-	HistoryID    int
+	HistoryID    int `json:"HistoryID" query:"HistoryID"`
 	ActivityType string
 	Time         string
 	UserID       int

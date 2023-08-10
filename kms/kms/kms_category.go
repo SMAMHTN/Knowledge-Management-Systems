@@ -11,7 +11,7 @@ import (
 )
 
 type Category struct {
-	CategoryID          int
+	CategoryID          int `json:"CategoryID" query:"CategoryID"`
 	CategoryName        string
 	CategoryParentID    int
 	CategoryDescription string
