@@ -407,24 +407,24 @@ func AddArticle(c echo.Context) error {
 			res.Data = "CREATE ERROR : " + err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		// resulta, err := u.ConvForSolr()
-		// if err != nil {
-		// 	res.StatusCode = http.StatusBadRequest
-		// 	res.Data = "UPDATE ERROR : " + err.Error()
-		// 	return c.JSON(http.StatusBadRequest, res)
-		// }
-		// err = resulta.PrepareSolrData(c)
-		// if err != nil {
-		// 	res.StatusCode = http.StatusBadRequest
-		// 	res.Data = "UPDATE ERROR : " + err.Error()
-		// 	return c.JSON(http.StatusBadRequest, res)
-		// }
-		// _, _, err = SolrCallUpdate("POST", resulta)
-		// if err != nil {
-		// 	res.StatusCode = http.StatusBadRequest
-		// 	res.Data = "UPDATE ERROR : " + err.Error()
-		// 	return c.JSON(http.StatusBadRequest, res)
-		// }
+		resulta, err := u.ConvForSolr()
+		if err != nil {
+			res.StatusCode = http.StatusBadRequest
+			res.Data = "UPDATE ERROR : " + err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = resulta.PrepareSolrData(c)
+		if err != nil {
+			res.StatusCode = http.StatusBadRequest
+			res.Data = "UPDATE ERROR : " + err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		_, _, err = SolrCallUpdate("POST", resulta)
+		if err != nil {
+			res.StatusCode = http.StatusBadRequest
+			res.Data = "UPDATE ERROR : " + err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
 		res.StatusCode = http.StatusOK
 		res.Data = u
 		return c.JSON(http.StatusOK, res)
