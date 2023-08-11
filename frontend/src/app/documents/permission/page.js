@@ -2,30 +2,27 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation'
 import { KmsAPIGET } from "@/dep/kms/kmsHandler";
+import AddPermission from "./AddPermission";
 
-function DocTable() {
-  // Sample data for the table
-  const router = useRouter()
+function PerTable() {
+  const router = useRouter();
   const [data, setData] = useState([]);
   const [error, setError] = useState("");
+
+  const fetchData = async () => {
+    try {
+      const response = await KmsAPIGET("listpermission");
+      const jsonData = response.body.Data;
+      setData(jsonData);
+      setError(null);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await KmsAPIGET("listpermission");
-
-        console.log(response);
-        console.log(response.body.StatusCode);
-        const jsonData = response.body.Data; // Update this line
-        setData(jsonData);
-        setError(null);
-        console.log(data);
-      } catch (error) {
-        setError(error.message);
-      }
-    };
-
     fetchData();
-  }, []);
+  }, [router.pathname]);
 
   const truncateText = (text, length) => {
     if (text.length > length) {
@@ -46,6 +43,9 @@ function DocTable() {
         <div className="max-w-md ml-14 p-4 mt-9">
           <div className="max-w-3xl mx-auto p-4">
             <h2 className="text-2xl font-bold mb-4">permission Table</h2>
+            <div className="my-2">
+              <AddPermission fetchData={fetchData}/>
+            </div>
             <table className="w-full border">
               <thead>
                 <tr className="bg-gray-100">
@@ -63,7 +63,7 @@ function DocTable() {
               </thead>
               <tbody>
                 {data.map((permission) => (
-                  <tr key={permission.ArticleID}>
+                  <tr key={permission.PermissionID}>
                     <td className="px-4 py-2">{permission.PermissionID}</td>
                     <td className="px-4 py-2">{permission.CategoryID}</td>
                     <td className="px-4 py-2">{permission.RoleID}</td>
@@ -340,4 +340,4 @@ function DocTable() {
   );
 }
 
-export default DocTable;
+export default PerTable;
