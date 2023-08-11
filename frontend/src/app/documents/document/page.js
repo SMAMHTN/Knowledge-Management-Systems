@@ -1,17 +1,18 @@
-'use client'
-import React, { useState, useEffect } from "react";
-import { CoreAPIGET } from "../../../dep/core/coreHandler";
+"use client";
 
-function HistoryTable() {
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { KmsAPIGET } from "@/dep/kms/kmsHandler";
+
+function DocTable() {
   // Sample data for the table
+  const router = useRouter();
   const [data, setData] = useState([]);
   const [error, setError] = useState("");
-
   useEffect(() => {
-
     const fetchData = async () => {
       try {
-        const response = await CoreAPIGET("listhistory");
+        const response = await KmsAPIGET("listarticle");
 
         console.log(response);
         console.log(response.body.StatusCode);
@@ -19,47 +20,82 @@ function HistoryTable() {
         setData(jsonData);
         setError(null);
         console.log(data);
-
       } catch (error) {
-        // Handle errors here
-        console.error("Error fetching user data:", error);
+        setError(error.message);
       }
     };
 
     fetchData();
   }, []);
 
+  const truncateText = (text, length) => {
+    if (text.length > length) {
+      return text.slice(0, length - 3) + "...";
+    }
+    return text;
+  };
+
+  const handleNavigate = (ArticleID) => {
+    // Programmatically navigate to a different route
+    router.push(`/documents/document/${ArticleID}`);
+  };
+
   return (
     <>
       <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
         {/* buat s.admin */}
-        <div className="max-w-md mx-auto p-4 mt-9">
-      <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Activity Log</h2>
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="px-4 py-2">ActivityType</th>
-            <th className="px-4 py-2">Changes</th>
-            <th className="px-4 py-2">UserID</th>
-            <th className="px-4 py-2">Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((history) => (
-            <tr key={history.id} className="border-b">
-              <td className="px-4 py-2">{history.ActivityType}</td>
-              <td className="px-4 py-2">{history.Changes}</td>
-              <td className="px-4 py-2">{history.UserID}</td>
-              <td className="px-4 py-2">{history.Time}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-    </div>
-{/* buat user biasa */}
-
+        <div className="max-w-md ml-14 p-4 mt-9">
+          <div className="max-w-3xl mx-auto p-4">
+            <h2 className="text-2xl font-bold mb-4">Doc Table</h2>
+            <table className="w-full border">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2">OwnerID</th>
+                  <th className="px-4 py-2">LastEditedByID</th>
+                  <th className="px-4 py-2">LastEditedTime</th>
+                  <th className="px-4 py-2">Tag</th>
+                  <th className="px-4 py-2">Title</th>
+                  <th className="px-4 py-2">CategoryID</th>
+                  <th className="px-4 py-2">Article</th>
+                  <th className="px-4 py-2">Active</th>
+                  <th className="px-4 py-2">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((article) => (
+                  <tr key={article.ArticleID}>
+                    <td className="px-4 py-2">{article.OwnerID}</td>
+                    <td className="px-4 py-2">{article.LastEditedByID}</td>
+                    <td className="px-4 py-2">{article.LastEditedTime}</td>
+                    <td className="px-4 py-2">{article.Tag}</td>
+                    <td className="px-4 py-2">{article.Title}</td>
+                    <td className="px-4 py-2">{article.CategoryID}</td>
+                    <td className="px-4 py-2">{article.Article}</td>
+                    <td className="px-4 py-2">{article.IsActive}</td>
+                    {/* <td className="px-4 py-2 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                      {truncateText(article.DocType, 15)}
+                    </td>
+                    <td className="px-4 py-2">
+                      {truncateText(article.DocLoc, 20)}
+                    </td> */}
+                    <td className="px-4 py-2 flex justify-end items-center">
+                      <button
+                        onClick={() => handleNavigate(article.ArticleID)}
+                        className="bg-yellow-500 text-white rounded px-2 py-1"
+                      >
+                        View
+                      </button>
+                      <button className="bg-red-500 text-white rounded px-2 py-1 ml-2">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* buat user biasa */}
 
         {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
@@ -307,6 +343,6 @@ function HistoryTable() {
       </section>
     </>
   );
-      }
+}
 
-export default HistoryTable;
+export default DocTable;

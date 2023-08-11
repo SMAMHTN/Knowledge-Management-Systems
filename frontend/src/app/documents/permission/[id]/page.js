@@ -1,65 +1,179 @@
-'use client'
-import React, { useState, useEffect } from "react";
-import { CoreAPIGET } from "../../../dep/core/coreHandler";
+"use client";
 
-function HistoryTable() {
-  // Sample data for the table
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { KmsAPI, KmsAPIGET } from "../../../../dep/kms/kmsHandler";
+
+function ArticleDetail({ params }) {
   const [data, setData] = useState([]);
-  const [error, setError] = useState("");
 
   useEffect(() => {
-
-    const fetchData = async () => {
+    const fetchUserData = async () => {
       try {
-        const response = await CoreAPIGET("listhistory");
-
+        const response = await KmsAPIGET("permission?PermissionID=" + params.id);
         console.log(response);
-        console.log(response.body.StatusCode);
-        const jsonData = response.body.Data; // Update this line
-        setData(jsonData);
-        setError(null);
-        console.log(data);
+        const jsonData = response.body.Data;
 
+        setData(jsonData);
+        console.log(data);
       } catch (error) {
         // Handle errors here
         console.error("Error fetching user data:", error);
       }
     };
 
-    fetchData();
-  }, []);
+    fetchUserData();
+  }, [params.id]);
+
+  const handleUpdate = async () => {
+    try {
+      console.log(data);
+      const response = await KmsAPI("PUT", "permission", data);
+    } catch (error) {
+      console.log(error);
+      console.log("Ada error anjg");
+      // Handle error
+    }
+  };
 
   return (
     <>
       <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
         {/* buat s.admin */}
-        <div className="max-w-md mx-auto p-4 mt-9">
-      <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Activity Log</h2>
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="px-4 py-2">ActivityType</th>
-            <th className="px-4 py-2">Changes</th>
-            <th className="px-4 py-2">UserID</th>
-            <th className="px-4 py-2">Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((history) => (
-            <tr key={history.id} className="border-b">
-              <td className="px-4 py-2">{history.ActivityType}</td>
-              <td className="px-4 py-2">{history.Changes}</td>
-              <td className="px-4 py-2">{history.UserID}</td>
-              <td className="px-4 py-2">{history.Time}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-    </div>
-{/* buat user biasa */}
-
+        <div className="max-w-md ml-14 p-4 mt-9">
+          <div className="max-w-3xl mx-auto p-4">
+            <h2 className="text-2xl font-bold mb-4">permission  edit</h2>
+            <form action={handleUpdate}>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">PermissionID</label>
+                <input
+                  type="text"
+                  value={data.PermissionID || ""}
+                  className="border px-2 py-1 w-full"
+                  readOnly
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">CategoryID</label>
+                <input
+                  type="text"
+                  value={data.CategoryID || ""}
+                  className="border px-2 py-1 w-full"
+                  onChange={(e) =>
+                    setData({ ...data, CategoryID: parseInt(e.target.value, 10) })
+                  }
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">
+                RoleID
+                </label>
+                <input
+                  type="text"
+                  value={data.RoleID || ""}
+                  className="border px-2 py-1 w-full"
+                  onChange={(e) =>
+                    setData({
+                      ...data,
+                      RoleID: parseInt(e.target.value, 10),
+                    })
+                  }
+                />
+              </div>
+              <div>
+              <label className="font-medium">
+                <input
+                  type="checkbox"
+                  className="mr-1"
+                  checked={data.Create === 1  || 0} // Check if IsActive is 1
+                  onChange={() =>
+                    setData({ ...data, Create: data.Create === 1 ? 0 : 1 })
+                  } // Toggle between 1 and 0
+                />
+                Create
+              </label>
+            </div>
+            <div>
+              <label className="font-medium">
+                <input
+                  type="checkbox"
+                  className="mr-1"
+                  checked={data.Read === 1  || 0} // Check if IsActive is 1
+                  onChange={() =>
+                    setData({ ...data, Read: data.Read === 1 ? 0 : 1 })
+                  } // Toggle between 1 and 0
+                />
+                Read
+              </label>
+            </div>
+            <div>
+              <label className="font-medium">
+                <input
+                  type="checkbox"
+                  className="mr-1"
+                  checked={data.Update === 1  || 0} // Check if IsActive is 1
+                  onChange={() =>
+                    setData({ ...data, Update: data.Update === 1 ? 0 : 1 })
+                  } // Toggle between 1 and 0
+                />
+                Update
+              </label>
+            </div>
+            <div>
+              <label className="font-medium">
+                <input
+                  type="checkbox"
+                  className="mr-1"
+                  checked={data.Delete === 1  || 0} // Check if IsActive is 1
+                  onChange={() =>
+                    setData({ ...data, Delete: data.Delete === 1 ? 0 : 1 })
+                  } // Toggle between 1 and 0
+                />
+                Delete
+              </label>
+            </div>
+            <div className="mb-4">
+                <label className="block font-semibold mb-1">
+                FileType
+                </label>
+                <input
+                  type="text"
+                  value={data.FileType || ""}
+                  className="border px-2 py-1 w-full"
+                  onChange={(e) =>
+                    setData({
+                      ...data,
+                      FileType: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">
+                DocType
+                </label>
+                <input
+                  type="text"
+                  value={data.DocType || ""}
+                  className="border px-2 py-1 w-full"
+                  onChange={(e) =>
+                    setData({
+                      ...data,
+                      DocType: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Update
+              </button>
+            </form>
+          </div>
+        </div>
+        {/* buat user biasa */}
 
         {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
@@ -307,6 +421,6 @@ function HistoryTable() {
       </section>
     </>
   );
-      }
+}
 
-export default HistoryTable;
+export default ArticleDetail;

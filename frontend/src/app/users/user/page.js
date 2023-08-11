@@ -12,19 +12,15 @@ function UserTable() {
   useEffect(() => {
     console.log("useEffect executed");
     const fetchData = async () => {
-      console.log("bald");
       try {
         const response = await CoreAPIGET("listuser");
 
         console.log(response);
-        console.log("bald v2");
         console.log(response.body.StatusCode);
         const jsonData = response.body.Data; // Update this line
         setData(jsonData);
         setError(null);
-        console.log("bald v3");
         console.log(data);
-        console.log("bald v4");
       } catch (error) {
         setError(error.message);
       }

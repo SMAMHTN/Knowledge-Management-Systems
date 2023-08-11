@@ -1,17 +1,17 @@
-'use client'
+"use client";
 import React, { useState, useEffect } from "react";
-import { CoreAPIGET } from "../../../dep/core/coreHandler";
+import { useRouter } from 'next/navigation'
+import { KmsAPIGET } from "@/dep/kms/kmsHandler";
 
-function HistoryTable() {
+function DocTable() {
   // Sample data for the table
+  const router = useRouter()
   const [data, setData] = useState([]);
   const [error, setError] = useState("");
-
   useEffect(() => {
-
     const fetchData = async () => {
       try {
-        const response = await CoreAPIGET("listhistory");
+        const response = await KmsAPIGET("listpermission");
 
         console.log(response);
         console.log(response.body.StatusCode);
@@ -19,47 +19,78 @@ function HistoryTable() {
         setData(jsonData);
         setError(null);
         console.log(data);
-
       } catch (error) {
-        // Handle errors here
-        console.error("Error fetching user data:", error);
+        setError(error.message);
       }
     };
 
     fetchData();
   }, []);
 
+  const truncateText = (text, length) => {
+    if (text.length > length) {
+      return text.slice(0, length - 3) + "...";
+    }
+    return text;
+  };
+
+  const handleNavigate = (PermissionID) => {
+    // Programmatically navigate to a different route
+    router.push(`/documents/permission/${PermissionID}`);
+  };
+
   return (
     <>
       <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
         {/* buat s.admin */}
-        <div className="max-w-md mx-auto p-4 mt-9">
-      <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Activity Log</h2>
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="px-4 py-2">ActivityType</th>
-            <th className="px-4 py-2">Changes</th>
-            <th className="px-4 py-2">UserID</th>
-            <th className="px-4 py-2">Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((history) => (
-            <tr key={history.id} className="border-b">
-              <td className="px-4 py-2">{history.ActivityType}</td>
-              <td className="px-4 py-2">{history.Changes}</td>
-              <td className="px-4 py-2">{history.UserID}</td>
-              <td className="px-4 py-2">{history.Time}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-    </div>
-{/* buat user biasa */}
-
+        <div className="max-w-md ml-14 p-4 mt-9">
+          <div className="max-w-3xl mx-auto p-4">
+            <h2 className="text-2xl font-bold mb-4">permission Table</h2>
+            <table className="w-full border">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2">PermissionID</th>
+                  <th className="px-4 py-2">CategoryID</th>
+                  <th className="px-4 py-2">RoleID</th>
+                  <th className="px-4 py-2">Create</th>
+                  <th className="px-4 py-2">Read</th>
+                  <th className="px-4 py-2">Update</th>
+                  <th className="px-4 py-2">Delete</th>
+                  <th className="px-4 py-2">FileType</th>
+                  <th className="px-4 py-2">DocType</th>
+                  <th className="px-4 py-2">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((permission) => (
+                  <tr key={permission.ArticleID}>
+                    <td className="px-4 py-2">{permission.PermissionID}</td>
+                    <td className="px-4 py-2">{permission.CategoryID}</td>
+                    <td className="px-4 py-2">{permission.RoleID}</td>
+                    <td className="px-4 py-2">{permission.Create}</td>
+                    <td className="px-4 py-2">{permission.Read}</td>
+                    <td className="px-4 py-2">{permission.Update}</td>
+                    <td className="px-4 py-2">{permission.Delete}</td>
+                    <td className="px-4 py-2">{permission.FileType}</td>
+                    <td className="px-4 py-2">{permission.DocType}</td>
+                    <td className="px-4 py-2 flex justify-end items-center">
+                      <button
+                        onClick={() => handleNavigate(permission.PermissionID)}
+                        className="bg-yellow-500 text-white rounded px-2 py-1"
+                      >
+                        View
+                      </button>
+                      <button className="bg-red-500 text-white rounded px-2 py-1 ml-2">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* buat user biasa */}
 
         {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
@@ -307,6 +338,6 @@ function HistoryTable() {
       </section>
     </>
   );
-      }
+}
 
-export default HistoryTable;
+export default DocTable;

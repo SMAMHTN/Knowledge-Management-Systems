@@ -1,22 +1,41 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { CoreAPIGET } from "../../../dep/core/coreHandler";
 
 function RoleTable() {
   // Sample data for the table
-  const roles = [
-    {
-      RoleID: 1,
-      RoleName: "Everyone",
-      RoleParentID: 1,
-      RoleDescription: "everyone",
-    },
-    {
-      RoleID: 2,
-      RoleName: "Parent",
-      RoleParentID: 2,
-      RoleDescription: "parent",
-    },
-    // Add more user data as needed
-  ];
+  const router = useRouter();
+  const [data, setData] = useState([]);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    console.log("useEffect executed");
+    const fetchData = async () => {
+      console.log("bald");
+      try {
+        const response = await CoreAPIGET("listrole");
+
+        console.log(response);
+        console.log("bald v2");
+        console.log(response.body.StatusCode);
+        const jsonData = response.body.Data; // Update this line
+        setData(jsonData);
+        setError(null);
+        console.log("bald v3");
+        console.log(data);
+        console.log("bald v4");
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+
+    fetchData();
+  }, []);
+  const handleNavigate = (RoleID) => {
+    // Programmatically navigate to a different route
+    router.push(`/users/roles/${RoleID}`);
+  };
+
   return (
     <>
       <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
@@ -35,14 +54,17 @@ function RoleTable() {
                 </tr>
               </thead>
               <tbody>
-                {roles.map((role) => (
+                {data.map((role) => (
                   <tr key={role.id} className="border-b">
                     <td className="px-4 py-2">{role.RoleID}</td>
                     <td className="px-4 py-2">{role.RoleName}</td>
                     <td className="px-4 py-2">{role.RoleParentID}</td>
                     <td className="px-4 py-2">{role.RoleDescription}</td>
                     <td className="px-4 py-2 flex justify-end items-center">
-                      <button className="bg-yellow-500 text-white rounded px-2 py-1">
+                      <button 
+                      onClick={() => handleNavigate(role.RoleID)}
+                      className="bg-yellow-500 text-white rounded px-2 py-1">
+                        
                         Edit
                       </button>
                       <button className="bg-red-500 text-white rounded px-2 py-1 ml-2">

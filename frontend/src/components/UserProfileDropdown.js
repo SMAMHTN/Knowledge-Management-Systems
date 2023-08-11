@@ -86,7 +86,7 @@ const CustomLink = ({ href, text }) => {
 const UserProfileDropdown = () => {
   return (
     <div className="flex justify-center items-center h-screen">
-      <UserProfile imageUrl="/path/to/user-image.jpg" username="John Doe" />
+      <UserProfile username="John Doe" />
     </div>
   );
 };

@@ -30,8 +30,6 @@ function UserDetails({ params }) {
 
       console.log(data);
       console.log(params.id);
-      data.RoleID = parseInt(data.RoleID);
-      data.AppThemeID = parseInt(role.AppThemeID);
       const response = await CoreAPI("PUT", "user", data);
     } catch (error) {
       console.log(error);
@@ -40,6 +38,7 @@ function UserDetails({ params }) {
     }
   };
 
+  
   return (
     <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
       <div className="max-w-md ml-14 p-4 mt-9">
@@ -105,7 +104,7 @@ function UserDetails({ params }) {
                 type="text"
                 value={data.RoleID || ""}
                 className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, RoleID: e.target.value })}
+                onChange={(e) => setData({ ...data, RoleID: parseInt(e.target.value, 10)})}
               />
             </div>
             <div className="mb-4">
@@ -115,7 +114,7 @@ function UserDetails({ params }) {
                 value={data.AppThemeID || ""}
                 className="border px-2 py-1 w-full"
                 onChange={(e) =>
-                  setData({ ...data, AppThemeID: e.target.value })
+                  setData({ ...data, AppThemeID: parseInt(e.target.value, 10)})
                 }
               />
             </div>

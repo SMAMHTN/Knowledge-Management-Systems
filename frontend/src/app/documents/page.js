@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 
 
@@ -7,16 +8,16 @@ export default function Home() {
       <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
         {/* buat s.admin */}
         <div className="max-w-md mx-auto p-4 mt-9">
-      <h2 className="text-2xl font-bold mb-4">Documents</h2>
+      <h2 className="text-2xl font-bold mb-4">Document</h2>
       <div className="space-y-4">
-          <Link href="/nama-pengguna" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
+          <Link href="documents/document" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
             Document 
           </Link>
-          <Link href="/settings" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
+          <Link href="documents/category" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
             Category
           </Link>
-          <Link  href="/management-dokumen" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-           Permission Settings
+          <Link  href="documents/permission" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
+           Permission
           </Link>
       </div>
     </div>
