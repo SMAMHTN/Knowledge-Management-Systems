@@ -163,7 +163,7 @@ func ShowFile(c echo.Context) error {
 		res.Data = "FILE NOT FOUND"
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	_, user, _ := Check_Admin_Permission_API(c)
+	permission, user, _ := Check_Admin_Permission_API(c)
 	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	if err != nil {
 		res.StatusCode = http.StatusInternalServerError
@@ -176,7 +176,7 @@ func ShowFile(c echo.Context) error {
 		res.Data = err
 		return c.JSON(http.StatusForbidden, res)
 	}
-	if TrueRead || TrueUpdate {
+	if TrueRead || TrueUpdate || permission {
 		return c.Attachment(u.FileLoc, path.Base(u.FileLoc))
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -202,7 +202,7 @@ func AddFile(c echo.Context) error {
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	_, user, _ := Check_Admin_Permission_API(c)
+	permission, user, _ := Check_Admin_Permission_API(c)
 	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	if err != nil {
 		res.StatusCode = http.StatusInternalServerError
@@ -245,7 +245,7 @@ func AddFile(c echo.Context) error {
 		res.StatusCode = http.StatusUnauthorized
 		res.Data = "YOU DONT HAVE PERMISSION TO UPLOAD THIS TYPE OF FILE"
 		return c.JSON(http.StatusUnauthorized, res)
-	} else if dependency.CheckValueExistString(AllowedFileType, "*") || dependency.CheckValueExistString(AllowedFileType, filepathext) {
+	} else if dependency.CheckValueExistString(AllowedFileType, "*") || dependency.CheckValueExistString(AllowedFileType, filepathext) || permission {
 		dst, filepath, err := dependency.CreateEmptyFileDuplicate(filepath)
 		if err != nil {
 			res.StatusCode = http.StatusInternalServerError

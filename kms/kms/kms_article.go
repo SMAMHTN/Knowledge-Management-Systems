@@ -348,7 +348,8 @@ func ShowArticle(c echo.Context) error {
 		res.Data = err
 		return c.JSON(http.StatusInternalServerError, res)
 	}
-	if TrueRead || TrueUpdate {
+	permission, _, _ := Check_Admin_Permission_API(c)
+	if TrueRead || TrueUpdate || permission {
 		res.StatusCode = http.StatusOK
 		res.Data = u
 		return c.JSON(http.StatusOK, res)
@@ -400,7 +401,8 @@ func AddArticle(c echo.Context) error {
 		res.Data = err
 		return c.JSON(http.StatusForbidden, res)
 	}
-	if TrueCreate {
+	permission, _, _ := Check_Admin_Permission_API(c)
+	if TrueCreate || permission {
 		_, err = u.Create()
 		if err != nil {
 			res.StatusCode = http.StatusBadRequest
@@ -483,7 +485,8 @@ func EditArticle(c echo.Context) error {
 		res.Data = err
 		return c.JSON(http.StatusForbidden, res)
 	}
-	if TrueUpdate {
+	permission, _, _ := Check_Admin_Permission_API(c)
+	if TrueUpdate || permission {
 		resulta, err := u.ConvForSolr()
 		if err != nil {
 			res.StatusCode = http.StatusBadRequest
@@ -549,7 +552,8 @@ func DeleteArticle(c echo.Context) error {
 		res.Data = err
 		return c.JSON(http.StatusForbidden, res)
 	}
-	if TrueDelete {
+	permission, _, _ := Check_Admin_Permission_API(c)
+	if TrueDelete || permission {
 		err = u.Delete()
 		if err != nil {
 			res.StatusCode = http.StatusBadRequest
