@@ -98,22 +98,13 @@ export async function CoreAPIGET(path) {
   try {
     un = cookieStore.get("username")?.value;
     pwd = cookieStore.get("password")?.value;
-    console.log(un);
-    console.log(typeof(un));
-    console.log(pwd);
-    console.log(typeof(pwd));
     if (un == undefined || pwd == undefined) {
       throw new Error("You must log in.");
     }
   } catch (error) {
     throw error;
   }
-  console.log(un);
-  console.log(typeof(un));
-  console.log(pwd);
-  console.log(typeof(pwd));
   const credentials = generateCoreCred(un, pwd);
-  console.log(credentials); 
   try {
     const response = await fetch(conf.core_link + path, {
       method: "GET",
