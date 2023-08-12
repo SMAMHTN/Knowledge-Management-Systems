@@ -62,7 +62,7 @@ export async function CoreAPI(method, path, data) {
     un = cookieStore.get("username")?.value;
     pwd = cookieStore.get("password")?.value;
 
-    if (un == undefined || pwd == undefined) {
+    if (!un || !pwd) {
       throw new Error("You must log in.");
     }
   } catch (error) {
