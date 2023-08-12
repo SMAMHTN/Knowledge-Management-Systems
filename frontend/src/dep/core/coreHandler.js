@@ -59,8 +59,8 @@ export async function CoreAPI(method, path, data) {
   const cookieStore = cookies();
   let un, pwd;
   try {
-    let un = cookieStore.get("username")?.value;
-    let pwd = cookieStore.get("password")?.value;
+    un = cookieStore.get("username")?.value;
+    pwd = cookieStore.get("password")?.value;
 
     if (un == undefined || pwd == undefined) {
       throw new Error("You must log in.");
@@ -96,16 +96,24 @@ export async function CoreAPIGET(path) {
   const cookieStore = cookies();
   let un, pwd;
   try {
-    let un = cookieStore.get("username")?.value;
-    let pwd = cookieStore.get("password")?.value;
-
+    un = cookieStore.get("username")?.value;
+    pwd = cookieStore.get("password")?.value;
+    console.log(un);
+    console.log(typeof(un));
+    console.log(pwd);
+    console.log(typeof(pwd));
     if (un == undefined || pwd == undefined) {
       throw new Error("You must log in.");
     }
   } catch (error) {
     throw error;
   }
+  console.log(un);
+  console.log(typeof(un));
+  console.log(pwd);
+  console.log(typeof(pwd));
   const credentials = generateCoreCred(un, pwd);
+  console.log(credentials); 
   try {
     const response = await fetch(conf.core_link + path, {
       method: "GET",
