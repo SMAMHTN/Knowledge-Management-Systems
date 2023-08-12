@@ -59,10 +59,10 @@ export async function CoreAPI(method, path, data) {
   const cookieStore = cookies();
   let un, pwd;
   try {
-    un = cookieStore.get("username").value;
-    pwd = cookieStore.get("password").value;
+    let un = cookieStore.get("username")?.value;
+    let pwd = cookieStore.get("password")?.value;
 
-    if (!un || !pwd) {
+    if (un == undefined || pwd == undefined) {
       throw new Error("You must log in.");
     }
   } catch (error) {
@@ -96,10 +96,10 @@ export async function CoreAPIGET(path) {
   const cookieStore = cookies();
   let un, pwd;
   try {
-    un = cookieStore.get("username").value;
-    pwd = cookieStore.get("password").value;
+    let un = cookieStore.get("username")?.value;
+    let pwd = cookieStore.get("password")?.value;
 
-    if (!un || !pwd) {
+    if (un == undefined || pwd == undefined) {
       throw new Error("You must log in.");
     }
   } catch (error) {
