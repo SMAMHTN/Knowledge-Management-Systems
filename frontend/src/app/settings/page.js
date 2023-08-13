@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CoreAPI, CoreAPIGET } from "../../dep/core/coreHandler";
 import AddTheme from "./AddTheme";
 import ShowLogo from "./ShowLogo";
+import LogoUpload from "./LogoUpload";
 
 function SystemSetting() {
   const router = useRouter();
@@ -145,8 +146,12 @@ function SystemSetting() {
      });
      
    };
-   
-
+  // Define a callback function to handle the uploaded data
+  const handleLogoUpload = (base64String) => {
+    // Update the data state with the uploaded logo
+    setData({ ...data, CompanyLogo: base64String });
+  };
+  
   return (
     <>
       <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
@@ -165,6 +170,7 @@ function SystemSetting() {
                 />
               </div>
               <ShowLogo/>
+              <LogoUpload onUpload={handleLogoUpload} />
               <div className="mb-4">
                 <label className="block font-semibold mb-1">CompanyLogo</label>
                 <input
