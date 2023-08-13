@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { KmsAPIGET } from "@/dep/kms/kmsHandler";
+import { KmsAPIGET, KmsAPI } from "@/dep/kms/kmsHandler";
 import AddDocument from "./AddDocument";
 
 function DocTable() {
@@ -18,6 +18,21 @@ function DocTable() {
       setError(null);
     } catch (error) {
       setError(error.message);
+    }
+  };
+
+  const handleDelete = async (ArticleID) => {
+    try {
+      // Send the delete request to the server
+      await KmsAPI("DELETE", "article", { ArticleID });
+
+      // Remove the deleted category from the data state
+      const updatedData = data.filter(
+        (article) => article.ArticleID !== ArticleID
+      );
+      setData(updatedData);
+    } catch (error) {
+      console.error("Error deleting category:", error);
     }
   };
 
@@ -84,7 +99,10 @@ function DocTable() {
                       >
                         View
                       </button>
-                      <button className="bg-red-500 text-white rounded px-2 py-1 ml-2">
+                      <button
+                        onClick={() => handleDelete(article.ArticleID)}
+                        className="bg-red-500 text-white rounded px-2 py-1 ml-2"
+                      >
                         Delete
                       </button>
                     </td>
