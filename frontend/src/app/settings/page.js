@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CoreAPI, CoreAPIGET } from "../../dep/core/coreHandler";
 import AddTheme from "./AddTheme";
+import ShowLogo from "./ShowLogo";
 
 function SystemSetting() {
   const router = useRouter();
@@ -142,8 +143,10 @@ function SystemSetting() {
        primary: colors.primary_color || "",
        secondary: colors.secondary_color || "",
      });
+     
    };
- 
+   
+
   return (
     <>
       <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
@@ -161,6 +164,7 @@ function SystemSetting() {
                   }
                 />
               </div>
+              <ShowLogo/>
               <div className="mb-4">
                 <label className="block font-semibold mb-1">CompanyLogo</label>
                 <input
@@ -172,6 +176,7 @@ function SystemSetting() {
                   }
                 />
               </div>
+
               <div className="mb-4">
                 <label className="block font-semibold mb-1">
                   CompanyAddress
