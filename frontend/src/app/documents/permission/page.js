@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from 'next/navigation'
-import { KmsAPIGET } from "@/dep/kms/kmsHandler";
+import { useRouter } from "next/navigation";
+import { KmsAPIGET, KmsAPI } from "@/dep/kms/kmsHandler";
 import AddPermission from "./AddPermission";
 
 function PerTable() {
@@ -17,6 +17,20 @@ function PerTable() {
       setError(null);
     } catch (error) {
       setError(error.message);
+    }
+  };
+
+  const handleDelete = async (PermissionID) => {
+    try {
+      // Send the delete request to the server
+      await KmsAPI("DELETE", "permission", { PermissionID });
+
+      const updatedData = data.filter(
+        (permission) => permission.PermissionID !== PermissionID
+      );
+      setData(updatedData);
+    } catch (error) {
+      console.error("Error deleting permission:", error);
     }
   };
 
@@ -44,7 +58,7 @@ function PerTable() {
           <div className="max-w-3xl mx-auto p-4">
             <h2 className="text-2xl font-bold mb-4">permission Table</h2>
             <div className="my-2">
-              <AddPermission fetchData={fetchData}/>
+              <AddPermission fetchData={fetchData} />
             </div>
             <table className="w-full border">
               <thead>
@@ -80,7 +94,10 @@ function PerTable() {
                       >
                         View
                       </button>
-                      <button className="bg-red-500 text-white rounded px-2 py-1 ml-2">
+                      <button
+                        onClick={() => handleDelete(permission.PermissionID)}
+                        className="bg-red-500 text-white rounded px-2 py-1 ml-2"
+                      >
                         Delete
                       </button>
                     </td>
