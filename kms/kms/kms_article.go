@@ -475,6 +475,10 @@ func AddArticle(c echo.Context) error {
 		// }
 		res.StatusCode = http.StatusOK
 		res.Data = u
+		err = RecordHistory(c, "Article", "Added Article : "+u.Title+"("+strconv.Itoa(u.ArticleID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record article change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -567,6 +571,10 @@ func EditArticle(c echo.Context) error {
 		}
 		res.StatusCode = http.StatusOK
 		res.Data = u
+		err = RecordHistory(c, "Article", "Edited Article : "+u.Title+"("+strconv.Itoa(u.ArticleID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record article change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -627,6 +635,10 @@ func DeleteArticle(c echo.Context) error {
 		// }
 		res.StatusCode = http.StatusOK
 		res.Data = u
+		err = RecordHistory(c, "Article", "Deleted Article : "+u.Title+"("+strconv.Itoa(u.ArticleID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record article change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden

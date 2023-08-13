@@ -334,6 +334,10 @@ func AddCategory(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
+		err = RecordHistory(c, "Category", "Added Category : "+u.CategoryName+"("+strconv.Itoa(u.CategoryID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record category change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -365,6 +369,10 @@ func EditCategory(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
+		err = RecordHistory(c, "Category", "Edited Category : "+u.CategoryName+"("+strconv.Itoa(u.CategoryID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record category change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -399,6 +407,10 @@ func DeleteCategory(c echo.Context) error {
 		}
 		res.StatusCode = http.StatusOK
 		res.Data = "DELETED CATEGORY " + strconv.Itoa(u.CategoryID)
+		err = RecordHistory(c, "Category", "Deleted Category : "+u.CategoryName+"("+strconv.Itoa(u.CategoryID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record category change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden

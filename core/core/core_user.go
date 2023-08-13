@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -358,10 +357,7 @@ func ListUser(c echo.Context) error {
 }
 
 func LoginUser(c echo.Context) error {
-	_, userpass, _ := c.Request().BasicAuth()
-	cred := strings.Split(userpass, "&&")
-	now_user := User{Username: dependency.GetElementString(cred, 0), Password: dependency.GetElementString(cred, 1)}
-	now_user.ReadLogin()
+	_, now_user, _ := Check_Permission_API(c)
 	res := Response{}
 	res.StatusCode = http.StatusOK
 	res.Data = now_user
@@ -369,7 +365,7 @@ func LoginUser(c echo.Context) error {
 }
 
 func ShowUser(c echo.Context) error {
-	permission, _, _ := Check_Permission_API(c)
+	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
 	u := new(User)
@@ -380,10 +376,6 @@ func ShowUser(c echo.Context) error {
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	_, userpass, _ := c.Request().BasicAuth()
-	cred := strings.Split(userpass, "&&")
-	now_user := User{Username: dependency.GetElementString(cred, 0), Password: dependency.GetElementString(cred, 1)}
-	now_user.Read()
 	if u.UserID == now_user.UserID {
 		res.StatusCode = http.StatusOK
 		res.Data = now_user

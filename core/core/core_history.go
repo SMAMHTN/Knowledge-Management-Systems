@@ -6,7 +6,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"strings"
 	t "time"
 
 	"github.com/labstack/echo/v4"
@@ -161,10 +160,7 @@ func AddHistory(c echo.Context) error {
 	var err error
 	u := new(HistoryAPI)
 	r := EmptyHistory()
-	_, userpass, _ := c.Request().BasicAuth()
-	cred := strings.Split(userpass, "&&")
-	now_user := User{Username: dependency.GetElementString(cred, 0), Password: dependency.GetElementString(cred, 1)}
-	now_user.Read()
+	_, now_user, _ := Check_Permission_API(c)
 	err = c.Bind(u)
 	if err != nil {
 		log.Println("WARNING " + err.Error())
@@ -215,10 +211,7 @@ func ListHistory(c echo.Context) error {
 
 func RecordHistory(c echo.Context, ActivityType string, Changes string) error {
 	r := EmptyHistory()
-	_, userpass, _ := c.Request().BasicAuth()
-	cred := strings.Split(userpass, "&&")
-	now_user := User{Username: dependency.GetElementString(cred, 0), Password: dependency.GetElementString(cred, 1)}
-	now_user.Read()
+	_, now_user, _ := Check_Permission_API(c)
 	r.ActivityType = ActivityType
 	r.Changes = Changes
 	r.UserID = now_user.UserID

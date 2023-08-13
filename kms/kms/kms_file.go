@@ -305,6 +305,10 @@ func AddFile(c echo.Context) error {
 
 		res.StatusCode = http.StatusOK
 		res.Data = DBFile
+		err = RecordHistory(c, "File", "Added File : "+DBFile.FileLoc+"("+strconv.Itoa(DBFile.FileID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record File change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusUnauthorized
@@ -367,5 +371,9 @@ func DeleteFile(c echo.Context) error {
 	}
 	res.StatusCode = http.StatusOK
 	res.Data = "DELETED FILE"
+	err = RecordHistory(c, "File", "Deleted File : "+u.FileLoc+"("+strconv.Itoa(u.FileID)+")")
+	if err != nil {
+		log.Println("WARNING failed to record File change history " + err.Error())
+	}
 	return c.JSON(http.StatusOK, res)
 }

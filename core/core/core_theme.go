@@ -194,9 +194,9 @@ func AddTheme(c echo.Context) error {
 	res.StatusCode = http.StatusOK
 	res.Data = u
 	_, now_user, _ := Check_Permission_API(c)
-	err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Added Theme : "+u.AppthemeName)
+	err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Added Theme : "+u.AppthemeName+"("+strconv.Itoa(u.AppthemeID)+")")
 	if err != nil {
-		log.Println("WARNING failed to record history " + err.Error())
+		log.Println("WARNING failed to record theme change history " + err.Error())
 	}
 	return c.JSON(http.StatusOK, res)
 }
@@ -224,9 +224,9 @@ func EditTheme(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
-		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Edited Theme : "+u.AppthemeName)
+		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Edited Theme : "+u.AppthemeName+"("+strconv.Itoa(u.AppthemeID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record history " + err.Error())
+			log.Println("WARNING failed to record theme change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {
@@ -257,9 +257,9 @@ func DeleteTheme(c echo.Context) error {
 		}
 		res.StatusCode = http.StatusOK
 		res.Data = "DELETED THEME " + strconv.Itoa(u.AppthemeID)
-		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Deleted Theme : "+u.AppthemeName)
+		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Deleted Theme : "+u.AppthemeName+"("+strconv.Itoa(u.AppthemeID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record history " + err.Error())
+			log.Println("WARNING failed to record theme change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {

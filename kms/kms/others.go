@@ -2,10 +2,45 @@ package kms
 
 import (
 	"dependency"
-	"time"
+	"log"
+
+	"github.com/labstack/echo/v4"
 )
 
-func GetTime() time.Time {
-	outputTime, _ := dependency.GetTime("Asia/Jakarta")
-	return outputTime
+type History struct {
+	ActivityType string
+	UserID       int
+	Changes      string
+	IPAddress    string
+}
+
+func RecordHistory(c echo.Context, ActivityType string, Changes string) error {
+	var err error
+	r := History{
+		ActivityType: ActivityType,
+		UserID:       0,
+		Changes:      Changes,
+		IPAddress:    "",
+	}
+	_, now_user, _ := Check_Admin_Permission_API(c)
+	r.ActivityType = ActivityType
+	r.Changes = Changes
+	r.UserID, err = dependency.InterfaceToInt(now_user["UserID"])
+	if err != nil {
+		log.Println("WARNING " + err.Error())
+	}
+	username, err := dependency.InterfaceToString(now_user["Username"])
+	if err != nil {
+		log.Println("WARNING " + err.Error())
+	}
+	password, err := dependency.InterfaceToString(now_user["Password"])
+	if err != nil {
+		log.Println("WARNING " + err.Error())
+	}
+	r.IPAddress = c.RealIP()
+	_, err = CallCoreAPI("POST", "setting", r, username, password)
+	if err != nil {
+		log.Println("WARNING " + err.Error())
+	}
+	return nil
 }

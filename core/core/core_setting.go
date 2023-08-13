@@ -225,7 +225,7 @@ func EditSetting(c echo.Context) error {
 		res.Data = u
 		err = RecordHistory(c, "Setting", "User "+now_user.Name+"("+now_user.Username+") Changed Setting")
 		if err != nil {
-			log.Println("WARNING failed to record history " + err.Error())
+			log.Println("WARNING failed to record setting change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {

@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -227,10 +226,7 @@ func ShowRole(c echo.Context) error {
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	_, userpass, _ := c.Request().BasicAuth()
-	cred := strings.Split(userpass, "&&")
-	now_user := User{Username: dependency.GetElementString(cred, 0), Password: dependency.GetElementString(cred, 1)}
-	now_user.ReadLogin()
+	_, now_user, _ := Check_Permission_API(c)
 	if u.RoleID == now_user.RoleID {
 		err = u.Read()
 		if err != nil {
@@ -283,9 +279,9 @@ func AddRole(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
-		err = RecordHistory(c, "Role", "User "+now_user.Name+"("+now_user.Username+") Added Role : "+u.RoleName)
+		err = RecordHistory(c, "Role", "User "+now_user.Name+"("+now_user.Username+") Added Role : "+u.RoleName+"("+strconv.Itoa(u.RoleID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record history " + err.Error())
+			log.Println("WARNING failed to record role change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {
@@ -318,9 +314,9 @@ func EditRole(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
-		err = RecordHistory(c, "Role", "User "+now_user.Name+"("+now_user.Username+") Edited Role : "+u.RoleName)
+		err = RecordHistory(c, "Role", "User "+now_user.Name+"("+now_user.Username+") Edited Role : "+u.RoleName+"("+strconv.Itoa(u.RoleID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record history " + err.Error())
+			log.Println("WARNING failed to record role change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {
@@ -357,9 +353,9 @@ func DeleteRole(c echo.Context) error {
 		}
 		res.StatusCode = http.StatusOK
 		res.Data = "DELETED ROLE " + strconv.Itoa(u.RoleID)
-		err = RecordHistory(c, "Role", "User "+now_user.Name+"("+now_user.Username+") Deleted Role : "+u.RoleName)
+		err = RecordHistory(c, "Role", "User "+now_user.Name+"("+now_user.Username+") Deleted Role : "+u.RoleName+"("+strconv.Itoa(u.RoleID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record history " + err.Error())
+			log.Println("WARNING failed to record role change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {
@@ -381,10 +377,7 @@ func ListRoleChild(c echo.Context) error {
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	_, userpass, _ := c.Request().BasicAuth()
-	cred := strings.Split(userpass, "&&")
-	now_user := User{Username: dependency.GetElementString(cred, 0), Password: dependency.GetElementString(cred, 1)}
-	now_user.ReadLogin()
+	_, now_user, _ := Check_Permission_API(c)
 	if u.RoleID == now_user.RoleID {
 		listchild, err := u.ListAllChild()
 		if err != nil {
