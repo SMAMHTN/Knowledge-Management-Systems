@@ -409,24 +409,24 @@ func AddArticle(c echo.Context) error {
 			res.Data = "CREATE ERROR : " + err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		resulta, err := u.ConvForSolr()
-		if err != nil {
-			res.StatusCode = http.StatusBadRequest
-			res.Data = "UPDATE ERROR : " + err.Error()
-			return c.JSON(http.StatusBadRequest, res)
-		}
-		err = resulta.PrepareSolrData(c)
-		if err != nil {
-			res.StatusCode = http.StatusBadRequest
-			res.Data = "UPDATE ERROR : " + err.Error()
-			return c.JSON(http.StatusBadRequest, res)
-		}
-		_, _, err = SolrCallUpdate("POST", resulta)
-		if err != nil {
-			res.StatusCode = http.StatusBadRequest
-			res.Data = "UPDATE ERROR : " + err.Error()
-			return c.JSON(http.StatusBadRequest, res)
-		}
+		// resulta, err := u.ConvForSolr()
+		// if err != nil {
+		// 	res.StatusCode = http.StatusBadRequest
+		// 	res.Data = "UPDATE ERROR : " + err.Error()
+		// 	return c.JSON(http.StatusBadRequest, res)
+		// }
+		// err = resulta.PrepareSolrData(c)
+		// if err != nil {
+		// 	res.StatusCode = http.StatusBadRequest
+		// 	res.Data = "UPDATE ERROR : " + err.Error()
+		// 	return c.JSON(http.StatusBadRequest, res)
+		// }
+		// _, _, err = SolrCallUpdate("POST", resulta)
+		// if err != nil {
+		// 	res.StatusCode = http.StatusBadRequest
+		// 	res.Data = "UPDATE ERROR : " + err.Error()
+		// 	return c.JSON(http.StatusBadRequest, res)
+		// }
 		res.StatusCode = http.StatusOK
 		res.Data = u
 		return c.JSON(http.StatusOK, res)
@@ -487,24 +487,24 @@ func EditArticle(c echo.Context) error {
 	}
 	permission, _, _ := Check_Admin_Permission_API(c)
 	if TrueUpdate || permission {
-		resulta, err := u.ConvForSolr()
-		if err != nil {
-			res.StatusCode = http.StatusBadRequest
-			res.Data = "UPDATE ERROR : " + err.Error()
-			return c.JSON(http.StatusBadRequest, res)
-		}
-		err = resulta.PrepareSolrData(c)
-		if err != nil {
-			res.StatusCode = http.StatusBadRequest
-			res.Data = "UPDATE ERROR : " + err.Error()
-			return c.JSON(http.StatusBadRequest, res)
-		}
-		_, _, err = SolrCallUpdate("POST", resulta)
-		if err != nil {
-			res.StatusCode = http.StatusBadRequest
-			res.Data = "UPDATE ERROR : " + err.Error()
-			return c.JSON(http.StatusBadRequest, res)
-		}
+		// resulta, err := u.ConvForSolr()
+		// if err != nil {
+		// 	res.StatusCode = http.StatusBadRequest
+		// 	res.Data = "UPDATE ERROR : " + err.Error()
+		// 	return c.JSON(http.StatusBadRequest, res)
+		// }
+		// err = resulta.PrepareSolrData(c)
+		// if err != nil {
+		// 	res.StatusCode = http.StatusBadRequest
+		// 	res.Data = "UPDATE ERROR : " + err.Error()
+		// 	return c.JSON(http.StatusBadRequest, res)
+		// }
+		// _, _, err = SolrCallUpdate("POST", resulta)
+		// if err != nil {
+		// 	res.StatusCode = http.StatusBadRequest
+		// 	res.Data = "UPDATE ERROR : " + err.Error()
+		// 	return c.JSON(http.StatusBadRequest, res)
+		// }
 		err = u.Update()
 		if err != nil {
 			res.StatusCode = http.StatusBadRequest
@@ -560,12 +560,12 @@ func DeleteArticle(c echo.Context) error {
 			res.Data = "DELETE ERROR : " + err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		err = DeleteSolrDocument(strconv.Itoa(u.ArticleID))
-		if err != nil {
-			res.StatusCode = http.StatusBadRequest
-			res.Data = "DELETE ERROR : " + err.Error()
-			return c.JSON(http.StatusBadRequest, res)
-		}
+		// err = DeleteSolrDocument(strconv.Itoa(u.ArticleID))
+		// if err != nil {
+		// 	res.StatusCode = http.StatusBadRequest
+		// 	res.Data = "DELETE ERROR : " + err.Error()
+		// 	return c.JSON(http.StatusBadRequest, res)
+		// }
 		res.StatusCode = http.StatusOK
 		res.Data = u
 		return c.JSON(http.StatusOK, res)
