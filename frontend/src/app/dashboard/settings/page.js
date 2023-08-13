@@ -1,9 +1,28 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import { CoreAPI,CoreAPIGET } from "../../../dep/core/coreHandler";
 
-const SettingUser = ({ imageUrl, username }) => {
+function SettingUser ({ imageUrl, username }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     try {
+  //       const response = await CoreAPIGET("user?UserID=" + params.id);
+  //       console.log(response);
+  //       const jsonData = response.body.Data;
+
+  //       setData(jsonData);
+  //       console.log(data);
+  //     } catch (error) {
+  //       // Handle errors here
+  //       console.error("Error fetching user data:", error);
+  //     }
+  //   };
+
+  //   fetchUserData();
+  // }, [params.id]);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -14,6 +33,8 @@ const SettingUser = ({ imageUrl, username }) => {
         setIsOpen(false);
       }
     };
+
+    
 
     document.addEventListener("click", handleOutsideClick);
 

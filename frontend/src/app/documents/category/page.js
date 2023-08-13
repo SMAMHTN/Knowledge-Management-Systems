@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { KmsAPIGET } from "@/dep/kms/kmsHandler";
+import { KmsAPI, KmsAPIGET } from "@/dep/kms/kmsHandler";
 import AddCategory from "./AddCategory";
 
 function handleChange() {
@@ -21,6 +21,21 @@ function CatTable() {
       setError(null);
     } catch (error) {
       setError(error.message);
+    }
+  };
+
+  const handleDelete = async (CategoryID) => {
+    try {
+      // Send the delete request to the server
+      await KmsAPI("DELETE", "category", { CategoryID });
+
+      // Remove the deleted category from the data state
+      const updatedData = data.filter(
+        (category) => category.CategoryID !== CategoryID
+      );
+      setData(updatedData);
+    } catch (error) {
+      console.error("Error deleting category:", error);
     }
   };
 
@@ -48,7 +63,7 @@ function CatTable() {
           <div className="max-w-3xl mx-auto p-4">
             <h2 className="text-2xl font-bold mb-4">category Table</h2>
             <div className="my-2">
-              <AddCategory fetchData={fetchData}/>
+              <AddCategory fetchData={fetchData} />
             </div>
             <table className="w-full border">
               <thead>
@@ -76,7 +91,10 @@ function CatTable() {
                       >
                         View
                       </button>
-                      <button className="bg-red-500 text-white rounded px-2 py-1 ml-2">
+                      <button
+                        onClick={() => handleDelete(category.CategoryID)}
+                        className="bg-red-500 text-white rounded px-2 py-1 ml-2"
+                      >
                         Delete
                       </button>
                     </td>
