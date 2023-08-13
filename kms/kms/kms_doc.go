@@ -5,6 +5,7 @@ import (
 	"dependency"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path"
@@ -26,6 +27,7 @@ func ReadDoc(args string) ([]Doc, error) {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return []Doc{}, err
 	}
 	defer database.Close()
@@ -36,6 +38,7 @@ func ReadDoc(args string) ([]Doc, error) {
 	}
 
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return results, err
 	}
 	defer sqlresult.Close()
@@ -43,6 +46,7 @@ func ReadDoc(args string) ([]Doc, error) {
 		var result = Doc{}
 		var err = sqlresult.Scan(&result.DocID, &result.DocLoc, &result.CategoryID, &result.DocType)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return results, err
 		}
 		results = append(results, result)
@@ -54,16 +58,19 @@ func (data *Doc) Create() (int, error) {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	defer database.Close()
 	ins, err := database.Prepare("INSERT INTO kms_doc(DocLoc, CategoryID, DocType) VALUES(?, ?, ?)")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	defer ins.Close()
 	resproc, err := ins.Exec(data.DocLoc, data.CategoryID, data.DocType)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	lastid, _ := resproc.LastInsertId()
@@ -74,6 +81,7 @@ func (data *Doc) Create() (int, error) {
 func (data *Doc) Read() error {
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -85,6 +93,7 @@ func (data *Doc) Read() error {
 		return errors.New("please insert docid or docloc")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -94,16 +103,19 @@ func (data Doc) Update() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
 	upd, err := database.Prepare("UPDATE kms.kms_doc SET DocLoc=?, CategoryID=?, DocType=? WHERE DocID=?;")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer upd.Close()
 	_, err = upd.Exec(data.DocLoc, data.CategoryID, data.DocType, data.DocID)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -113,10 +125,12 @@ func (data Doc) Delete() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	del, err := database.Prepare("DELETE FROM kms_doc WHERE `DocID`=?")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	if data.DocID != 0 {
@@ -125,6 +139,7 @@ func (data Doc) Delete() error {
 		return errors.New("docid needed")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -135,10 +150,12 @@ func UploadDoc(c echo.Context) error {
 	res := Response{}
 	file, err := c.FormFile("data")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	src, err := file.Open()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer src.Close()
@@ -146,12 +163,14 @@ func UploadDoc(c echo.Context) error {
 	// Destination
 	dst, err := os.Create(file.Filename)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer dst.Close()
 
 	// Copy
 	if _, err = io.Copy(dst, src); err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	res.StatusCode = http.StatusOK
@@ -180,12 +199,14 @@ func ShowDoc(c echo.Context) error {
 	u := new(Doc)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	err = u.Read()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DOC NOT FOUND"
 		return c.JSON(http.StatusBadRequest, res)
@@ -193,12 +214,14 @@ func ShowDoc(c echo.Context) error {
 	permission, user, _ := Check_Admin_Permission_API(c)
 	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	_, TrueRead, TrueUpdate, _, err := GetTruePermission(c, u.CategoryID, role_id)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusForbidden
 		res.Data = err
 		return c.JSON(http.StatusForbidden, res)
@@ -225,6 +248,7 @@ func AddDoc(c echo.Context) error {
 	category_id64, err := strconv.ParseInt(category_id_pure, 10, 0)
 	category_id := int(category_id64)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -232,12 +256,14 @@ func AddDoc(c echo.Context) error {
 	permission, user, _ := Check_Admin_Permission_API(c)
 	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	TrueCreate, _, _, _, err := GetTruePermission(c, category_id, role_id)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusForbidden
 		res.Data = err
 		return c.JSON(http.StatusForbidden, res)
@@ -249,18 +275,21 @@ func AddDoc(c echo.Context) error {
 	}
 	AllowedFileType, err = GetAllDocTypePermission(c, category_id, role_id)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err.Error()
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	file, err := c.FormFile("File")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	src, err := file.Open()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -275,6 +304,7 @@ func AddDoc(c echo.Context) error {
 	} else if dependency.CheckValueExistString(AllowedFileType, "*") || dependency.CheckValueExistString(AllowedFileType, filepathext) || permission {
 		dst, filepath, err := dependency.CreateEmptyFileDuplicate(filepath)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusInternalServerError
 			res.Data = err.Error()
 			return c.JSON(http.StatusInternalServerError, res)
@@ -283,6 +313,7 @@ func AddDoc(c echo.Context) error {
 
 		// Copy
 		if _, err = io.Copy(dst, src); err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusInternalServerError
 			res.Data = err.Error()
 			return c.JSON(http.StatusInternalServerError, res)
@@ -297,6 +328,7 @@ func AddDoc(c echo.Context) error {
 
 		_, err = DBDoc.Create()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusInternalServerError
 			res.Data = err.Error()
 			return c.JSON(http.StatusInternalServerError, res)
@@ -318,12 +350,14 @@ func DeleteDoc(c echo.Context) error {
 	u := new(Doc)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	err = u.Read()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DOC NOT FOUND ON DATABASE"
 		return c.JSON(http.StatusBadRequest, res)
@@ -331,12 +365,14 @@ func DeleteDoc(c echo.Context) error {
 	_, user, _ := Check_Admin_Permission_API(c)
 	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	_, _, _, TrueDelete, err := GetTruePermission(c, u.CategoryID, role_id)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusForbidden
 		res.Data = err
 		return c.JSON(http.StatusForbidden, res)
@@ -348,12 +384,14 @@ func DeleteDoc(c echo.Context) error {
 	}
 	err = os.Remove(u.DocLoc)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err.Error()
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	err = u.Delete()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err.Error()
 		return c.JSON(http.StatusInternalServerError, res)

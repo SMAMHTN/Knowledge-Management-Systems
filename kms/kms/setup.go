@@ -4,6 +4,7 @@ import (
 	"dependency"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 var Conf dependency.Configuration
 
 func init() {
+	var err error
 	fmt.Println("---------------------------------------")
 	fmt.Println("BEGIN PREPARING TO START KMS")
 	fmt.Println("---------------------------------------")
@@ -19,9 +21,9 @@ func init() {
 	fmt.Println("---------------------------------------")
 	fmt.Println("BEGIN READING FILE CONF")
 	fmt.Println("---------------------------------------")
-	var err error
 	Conf, err = dependency.Read_conf(ConfigurationFile)
 	if err != nil {
+		log.Panic("FATAL CONFIGURATION FILE ERROR : " + err.Error())
 		panic("CONFIGURATION FILE ERROR : " + err.Error())
 	}
 	fmt.Println("Read Configuration")
@@ -37,6 +39,11 @@ func init() {
 	}
 	fmt.Println("---------------------------------------")
 	fmt.Println("READING FILE CONF DONE\n---------------------------------------")
+	err = dependency.Init_log(Conf.Log_Location)
+	if err != nil {
+		log.Panic("FATAL " + err.Error())
+		panic(err)
+	}
 	Check_DB_Exist()
 	Check_Filestore_Exist()
 }
@@ -62,10 +69,12 @@ func Create_Filestore_Default() string {
 	pathfile := dependency.Get_Parent_Path() + "filestore/doc"
 	err := os.MkdirAll(pathdoc, 0777)
 	if err != nil {
+		log.Panic("FATAL " + err.Error())
 		panic(err)
 	}
 	err = os.MkdirAll(pathfile, 0777)
 	if err != nil {
+		log.Panic("FATAL " + err.Error())
 		panic(err)
 	}
 	return dependency.Get_Parent_Path() + "filestore/"
@@ -98,6 +107,7 @@ func Check_DB_Exist() {
 		fmt.Println("DB NOT FOUND\nINSTALLING DB FOR KMS\n---------------------------------------")
 		err = dependency.Execute_sql_file(Conf, InstallDatabase, Conf.Appname)
 		if err != nil {
+			log.Panic("FATAL " + err.Error())
 			panic(err)
 		}
 	}

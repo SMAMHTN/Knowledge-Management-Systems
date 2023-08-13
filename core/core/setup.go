@@ -3,6 +3,7 @@ package core
 import (
 	"dependency"
 	"fmt"
+	"log"
 	"reflect"
 	"strconv"
 )
@@ -17,15 +18,18 @@ func Check_DB_Exist() {
 		fmt.Println("DB NOT FOUND\nINSTALLING DB FOR CORE\n---------------------------------------")
 		err = dependency.Execute_sql_file(Conf, InstallDatabase, Conf.Appname)
 		if err != nil {
+			log.Panic(err)
 			panic(err)
 		}
 		addphoto := User{UserID: 1}
 		err = addphoto.Read()
 		if err != nil {
+			log.Panic(err)
 			panic(err)
 		}
 		image, err := dependency.FilepathToByteArray("Aldi Mulyawan.jpg")
 		if err != nil {
+			log.Panic(err)
 			panic(err)
 		}
 		addphoto.UserPhoto = image
@@ -42,10 +46,10 @@ func init() {
 	fmt.Println("---------------------------------------")
 	fmt.Println("BEGIN READING FILE CONF")
 	fmt.Println("---------------------------------------")
-	defer fmt.Println("READING FILE CONF DONE\n---------------------------------------")
 	var err error
 	Conf, err = dependency.Read_conf(ConfigurationFile)
 	if err != nil {
+		log.Panic(err)
 		panic("CONFIGURATION FILE ERROR : " + err.Error())
 	}
 	fmt.Println("Read Configuration")
@@ -60,6 +64,12 @@ func init() {
 
 		fmt.Printf("%s: %v\n", fieldName, fieldValue)
 	}
+	err = dependency.Init_log(Conf.Log_Location)
+	if err != nil {
+		log.Panic("FATAL " + err.Error())
+		panic(err)
+	}
+	fmt.Println("READING FILE CONF DONE\n---------------------------------------")
 	Check_DB_Exist()
 	// db.Execute_sql_file("core.sql", Appname)
 }

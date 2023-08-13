@@ -12,5 +12,6 @@
   "solr_password": "SMAM",
   "tika_link": "http://tika:9998",
   "filestore": "/kms/filestore/",
+  "log_location":"LogKMS.log",
   "max_upload": "10G"
 }

@@ -3,6 +3,7 @@ package core
 import (
 	"dependency"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -36,6 +37,7 @@ func Check_Permission_API(c echo.Context) (bool, User, error) {
 	now_user := User{Username: dependency.GetElementString(cred, 0), Password: dependency.GetElementString(cred, 1)}
 	err := now_user.ReadLogin()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return false, now_user, err
 	}
 	if now_user.IsSuperAdmin == 0 {
@@ -73,7 +75,7 @@ func Test_api() {
 		AllowOrigins: []string{"*"},
 	}))
 	e.Use(middleware.BodyLimit("6M"))
-
+	e.IPExtractor = echo.ExtractIPFromXFFHeader()
 
 	// Define a protected route that requires Basic Authentication
 	e.GET("/login", Login, basicAuthMiddleware)

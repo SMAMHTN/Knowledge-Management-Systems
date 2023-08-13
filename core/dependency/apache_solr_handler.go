@@ -3,6 +3,7 @@ package dependency
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -20,6 +21,9 @@ func SolrCallUpdate(apimethod string, SolrV2URL string, username string, passwor
 	reqheader = append(reqheader, headerconnection)
 	payload, err := json.Marshal(data)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
+		log.Print(err)
+
 		return nil, nil, err
 	}
 	resp, err := ApiCallWithBasicAuth(apimethod, SolrV2URL, username, password, payload, reqheader)
@@ -27,6 +31,7 @@ func SolrCallUpdate(apimethod string, SolrV2URL string, username string, passwor
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return body, resp, err
 		}
 		return body, resp, err
@@ -34,6 +39,7 @@ func SolrCallUpdate(apimethod string, SolrV2URL string, username string, passwor
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return body, resp, err
 	}
 	return body, resp, nil
@@ -53,6 +59,7 @@ func SolrCallUpdateFromJSONString(apimethod string, SolrV2URL string, username s
 	reqheader = append(reqheader, headerconnection)
 	payload, err := json.Marshal(data)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return nil, nil, err
 	}
 	payloadstring := "[" + string(payload) + "]"
@@ -62,6 +69,7 @@ func SolrCallUpdateFromJSONString(apimethod string, SolrV2URL string, username s
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return body, resp, err
 		}
 		return body, resp, err
@@ -69,6 +77,7 @@ func SolrCallUpdateFromJSONString(apimethod string, SolrV2URL string, username s
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return body, resp, err
 	}
 	return body, resp, nil
@@ -80,6 +89,7 @@ func SolrCallQuery(url string, username string, password string) ([]byte, *http.
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return body, resp, err
 		}
 		return body, resp, err
@@ -87,6 +97,7 @@ func SolrCallQuery(url string, username string, password string) ([]byte, *http.
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return body, resp, err
 	}
 	return body, resp, nil

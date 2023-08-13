@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"dependency"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -23,6 +24,7 @@ func ReadCategory(args string) ([]Category, error) {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return []Category{}, err
 	}
 	defer database.Close()
@@ -33,6 +35,7 @@ func ReadCategory(args string) ([]Category, error) {
 	}
 
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return results, err
 	}
 	defer sqlresult.Close()
@@ -40,6 +43,7 @@ func ReadCategory(args string) ([]Category, error) {
 		var result = Category{}
 		var err = sqlresult.Scan(&result.CategoryID, &result.CategoryName, &result.CategoryParentID, &result.CategoryDescription)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return results, err
 		}
 		results = append(results, result)
@@ -51,16 +55,19 @@ func (data *Category) Create() (int, error) {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	defer database.Close()
 	ins, err := database.Prepare("INSERT INTO kms_category(CategoryName, CategoryParentID, CategoryDescription) VALUES(?, ?, ?)")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	defer ins.Close()
 	resproc, err := ins.Exec(data.CategoryName, data.CategoryParentID, data.CategoryDescription)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	lastid, _ := resproc.LastInsertId()
@@ -71,6 +78,7 @@ func (data *Category) Create() (int, error) {
 func (data *Category) Read() error {
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -80,6 +88,7 @@ func (data *Category) Read() error {
 		return errors.New("please insert categoryid")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -89,16 +98,19 @@ func (data Category) Update() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
 	upd, err := database.Prepare("UPDATE kms.kms_category SET CategoryName=?, CategoryParentID=?, CategoryDescription=? WHERE CategoryID=?;")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer upd.Close()
 	_, err = upd.Exec(data.CategoryName, data.CategoryParentID, data.CategoryDescription, data.CategoryID)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -108,10 +120,12 @@ func (data Category) Delete() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	del, err := database.Prepare("DELETE FROM kms_category WHERE `CategoryID`=?")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	if data.CategoryID != 0 {
@@ -120,6 +134,7 @@ func (data Category) Delete() error {
 		return errors.New("categoryid needed")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -131,6 +146,7 @@ func (data Category) ListAllCategoryParent() ([]int, error) {
 	var parents = []int{}
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return parents, err
 	}
 	defer database.Close()
@@ -145,12 +161,14 @@ func (data Category) ListAllCategoryParent() ([]int, error) {
 			SELECT CategoryID FROM categoryparents
 		`, data.CategoryID)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return parents, err
 		}
 		for rows.Next() {
 			var categoryid int
 			err := rows.Scan(&categoryid)
 			if err != nil {
+				log.Println("WARNING " + err.Error())
 				return parents, err
 			}
 			parents = append(parents, categoryid)
@@ -166,6 +184,7 @@ func (data Category) ListAllCategoryChild() ([]int, error) {
 	var Child = []int{}
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return nil, err
 	}
 	defer database.Close()
@@ -180,12 +199,14 @@ func (data Category) ListAllCategoryChild() ([]int, error) {
 			SELECT CategoryID FROM categoryparents
 		`, data.CategoryID)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return nil, err
 		}
 		for rows.Next() {
 			var categoryid int
 			err := rows.Scan(&categoryid)
 			if err != nil {
+				log.Println("WARNING " + err.Error())
 				return nil, err
 			}
 			Child = append(Child, categoryid)
@@ -218,12 +239,14 @@ func ListCategoryParent(c echo.Context) error {
 	u := new(Category)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	parents, err := u.ListAllCategoryParent()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusNotFound
 		// res.Data = "CATEGORY NOT FOUND"
 		res.Data = err.Error()
@@ -240,12 +263,14 @@ func ListCategoryChild(c echo.Context) error {
 	u := new(Category)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	parents, err := u.ListAllCategoryChild()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusNotFound
 		// res.Data = "CATEGORY NOT FOUND"
 		res.Data = err.Error()
@@ -263,6 +288,7 @@ func ShowCategory(c echo.Context) error {
 	u := new(Category)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -270,6 +296,7 @@ func ShowCategory(c echo.Context) error {
 	if permission {
 		err = u.Read()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusNotFound
 			res.Data = "CATEGORY NOT FOUND"
 			return c.JSON(http.StatusNotFound, res)
@@ -291,6 +318,7 @@ func AddCategory(c echo.Context) error {
 	u := new(Category)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -298,6 +326,7 @@ func AddCategory(c echo.Context) error {
 	if permission {
 		_, err = u.Create()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
@@ -320,6 +349,7 @@ func EditCategory(c echo.Context) error {
 	u := new(Category)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -327,6 +357,7 @@ func EditCategory(c echo.Context) error {
 	if permission {
 		err = u.Update()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
@@ -349,6 +380,7 @@ func DeleteCategory(c echo.Context) error {
 	u := new(Category)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -360,6 +392,7 @@ func DeleteCategory(c echo.Context) error {
 	if permission {
 		err = u.Delete()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
