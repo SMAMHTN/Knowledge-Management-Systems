@@ -4,5 +4,6 @@
     "app_password": "aldim",
     "db_link": "core-db",
     "db_username": "root",
-    "db_password": "aldim"
+    "db_password": "aldim",
+    "log_location":"LogCore.log"
 }
