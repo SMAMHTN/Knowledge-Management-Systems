@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"dependency"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -24,6 +25,7 @@ func ReadRole(args string) ([]Role, error) {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return []Role{}, err
 	}
 	defer database.Close()
@@ -34,6 +36,7 @@ func ReadRole(args string) ([]Role, error) {
 	}
 
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return results, err
 	}
 	defer sqlresult.Close()
@@ -41,6 +44,7 @@ func ReadRole(args string) ([]Role, error) {
 		var result = Role{}
 		var err = sqlresult.Scan(&result.RoleID, &result.RoleName, &result.RoleParentID, &result.RoleDescription)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return results, err
 		}
 		results = append(results, result)
@@ -52,16 +56,19 @@ func (data *Role) Create() (int, error) {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	defer database.Close()
 	ins, err := database.Prepare("INSERT INTO core_role(RoleName, RoleParentID, RoleDescription) VALUES(?, ?, ?)")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	defer ins.Close()
 	resproc, err := ins.Exec(data.RoleName, data.RoleParentID, data.RoleDescription)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	lastid, _ := resproc.LastInsertId()
@@ -72,6 +79,7 @@ func (data *Role) Create() (int, error) {
 func (data *Role) Read() error {
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -81,6 +89,7 @@ func (data *Role) Read() error {
 		return errors.New("please insert roleid")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -89,6 +98,7 @@ func (data *Role) Read() error {
 func (data Role) CheckExist() error {
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -98,6 +108,7 @@ func (data Role) CheckExist() error {
 		return errors.New("please insert roleid")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -107,16 +118,19 @@ func (data Role) Update() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
 	upd, err := database.Prepare("UPDATE core.core_role SET RoleName=?, RoleParentID=?, RoleDescription=? WHERE RoleID=?;")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer upd.Close()
 	_, err = upd.Exec(data.RoleName, data.RoleParentID, data.RoleDescription, data.RoleID)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -126,10 +140,12 @@ func (data Role) Delete() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	del, err := database.Prepare("DELETE FROM core_role WHERE `RoleID`=?")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	if data.RoleID != 0 {
@@ -138,6 +154,7 @@ func (data Role) Delete() error {
 		return errors.New("roleid needed")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -149,6 +166,7 @@ func (data Role) ListAllChild() ([]int, error) {
 	var childs = []int{}
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return childs, err
 	}
 	defer database.Close()
@@ -163,12 +181,14 @@ func (data Role) ListAllChild() ([]int, error) {
 			SELECT RoleID FROM rolechilds
 		`, data.RoleID)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return childs, err
 		}
 		for rows.Next() {
 			var roleid int
 			err := rows.Scan(&roleid)
 			if err != nil {
+				log.Println("WARNING " + err.Error())
 				return childs, err
 			}
 			childs = append(childs, roleid)
@@ -202,6 +222,7 @@ func ShowRole(c echo.Context) error {
 	u := new(Role)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -213,6 +234,7 @@ func ShowRole(c echo.Context) error {
 	if u.RoleID == now_user.RoleID {
 		err = u.Read()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusNotFound
 			res.Data = "ROLE NOT FOUND"
 			return c.JSON(http.StatusNotFound, res)
@@ -223,6 +245,7 @@ func ShowRole(c echo.Context) error {
 	} else if permission {
 		err = u.Read()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusNotFound
 			res.Data = "ROLE NOT FOUND"
 			return c.JSON(http.StatusNotFound, res)
@@ -238,12 +261,13 @@ func ShowRole(c echo.Context) error {
 }
 
 func AddRole(c echo.Context) error {
-	permission, _, _ := Check_Permission_API(c)
+	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
 	u := new(Role)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -251,6 +275,7 @@ func AddRole(c echo.Context) error {
 	if permission {
 		_, err = u.Create()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
@@ -258,6 +283,10 @@ func AddRole(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
+		err = RecordHistory(c, "Role", "User "+now_user.Name+"("+now_user.Username+") Added Role : "+u.RoleName)
+		if err != nil {
+			log.Println("WARNING failed to record history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -267,12 +296,13 @@ func AddRole(c echo.Context) error {
 }
 
 func EditRole(c echo.Context) error {
-	permission, _, _ := Check_Permission_API(c)
+	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
 	u := new(Role)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -280,6 +310,7 @@ func EditRole(c echo.Context) error {
 	if permission {
 		err = u.Update()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
@@ -287,6 +318,10 @@ func EditRole(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
+		err = RecordHistory(c, "Role", "User "+now_user.Name+"("+now_user.Username+") Edited Role : "+u.RoleName)
+		if err != nil {
+			log.Println("WARNING failed to record history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -296,12 +331,13 @@ func EditRole(c echo.Context) error {
 }
 
 func DeleteRole(c echo.Context) error {
-	permission, _, _ := Check_Permission_API(c)
+	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
 	u := new(Role)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -314,12 +350,17 @@ func DeleteRole(c echo.Context) error {
 	if permission {
 		err = u.Delete()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
 		}
 		res.StatusCode = http.StatusOK
 		res.Data = "DELETED ROLE " + strconv.Itoa(u.RoleID)
+		err = RecordHistory(c, "Role", "User "+now_user.Name+"("+now_user.Username+") Deleted Role : "+u.RoleName)
+		if err != nil {
+			log.Println("WARNING failed to record history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -335,6 +376,7 @@ func ListRoleChild(c echo.Context) error {
 	u := new(Role)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -346,6 +388,7 @@ func ListRoleChild(c echo.Context) error {
 	if u.RoleID == now_user.RoleID {
 		listchild, err := u.ListAllChild()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusNotFound
 			res.Data = "ROLE NOT FOUND"
 			return c.JSON(http.StatusNotFound, res)
@@ -356,6 +399,7 @@ func ListRoleChild(c echo.Context) error {
 	} else if permission {
 		listchild, err := u.ListAllChild()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusNotFound
 			res.Data = "ROLE NOT FOUND"
 			return c.JSON(http.StatusNotFound, res)
@@ -376,12 +420,14 @@ func CheckRoleExist(c echo.Context) error {
 	u := new(Role)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	err = u.CheckExist()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusNotFound
 		return c.JSON(http.StatusNotFound, res)
 	}

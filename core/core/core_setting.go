@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"dependency"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -35,6 +36,7 @@ func ReadSetting(args string) ([]Setting, error) {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return []Setting{}, err
 	}
 	defer database.Close()
@@ -45,6 +47,7 @@ func ReadSetting(args string) ([]Setting, error) {
 	}
 
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return results, err
 	}
 	defer sqlresult.Close()
@@ -52,6 +55,7 @@ func ReadSetting(args string) ([]Setting, error) {
 		var result = Setting{}
 		var err = sqlresult.Scan(&result.CompanyID, &result.CompanyName, &result.CompanyLogo, &result.CompanyAddress, &result.TimeZone, &result.AppthemeID)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return results, err
 		}
 		results = append(results, result)
@@ -63,16 +67,19 @@ func (data Setting) Create() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
 	ins, err := database.Prepare("INSERT INTO core_setting(CompanyName, CompanyLogo, CompanyAddress, Timezone, AppthemeID) VALUES(?, ?, ?, ?, ?)")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer ins.Close()
 	_, err = ins.Exec(data.CompanyName, data.CompanyLogo, data.CompanyAddress, data.TimeZone, data.AppthemeID)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -81,6 +88,7 @@ func (data Setting) Create() error {
 func (data *Setting) Read() error {
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -90,6 +98,7 @@ func (data *Setting) Read() error {
 		return errors.New("please insert companyid")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -105,10 +114,12 @@ func (data *Setting) UpdateAPI() error {
 	var err error
 	data.CompanyLogo, err = dependency.Base64ToBytes(data.CompanyLogoBase64)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	err = data.Update()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -118,20 +129,24 @@ func (data Setting) Update() error {
 	var err error
 	_, err = dependency.GetTime(data.TimeZone)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
 	upd, err := database.Prepare("UPDATE core.core_setting SET CompanyName=?, CompanyLogo=?, CompanyAddress=?, Timezone=?, AppthemeID=? WHERE CompanyID=?;")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer upd.Close()
 	_, err = upd.Exec(data.CompanyName, data.CompanyLogo, data.CompanyAddress, data.TimeZone, data.AppthemeID, data.CompanyID)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -141,10 +156,12 @@ func (data Setting) Delete() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	del, err := database.Prepare("DELETE FROM core_setting WHERE `CompanyID`=?")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	if data.CompanyID != 0 {
@@ -153,6 +170,7 @@ func (data Setting) Delete() error {
 		return errors.New("settingid needed")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -165,13 +183,13 @@ func ShowSetting(c echo.Context) error {
 	u := new(Setting)
 	u.CompanyID = 1
 	// err = c.Bind(u)
-	// if err != nil {
+	// if err != nil { log.Println("WARNING " + err.Error())
 	// 	res.StatusCode = http.StatusBadRequest
 	// res.Data = err.Error()
 	// 	return c.JSON(http.StatusBadRequest, res)
 	// }
 	_ = u.ReadAPI()
-	// if err != nil {
+	// if err != nil { log.Println("WARNING " + err.Error())
 	// 	res.StatusCode = http.StatusNotFound
 	// 	res.Data = "THEME NOT FOUND"
 	// 	return c.JSON(http.StatusNotFound, res)
@@ -182,12 +200,13 @@ func ShowSetting(c echo.Context) error {
 }
 
 func EditSetting(c echo.Context) error {
-	permission, _, _ := Check_Permission_API(c)
+	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
 	u := new(Setting)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -196,6 +215,7 @@ func EditSetting(c echo.Context) error {
 	if permission {
 		err = u.UpdateAPI()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
@@ -203,6 +223,10 @@ func EditSetting(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
+		err = RecordHistory(c, "Setting", "User "+now_user.Name+"("+now_user.Username+") Changed Setting")
+		if err != nil {
+			log.Println("WARNING failed to record history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden

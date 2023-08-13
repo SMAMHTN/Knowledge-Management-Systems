@@ -4,6 +4,7 @@ import (
 	"dependency"
 	"errors"
 	"io"
+	"log"
 )
 
 func CallCoreAPI(method string, dynamicpath string, body interface{}, username string, password string) (result map[string]interface{}, err error) {
@@ -20,10 +21,12 @@ func CallCoreAPI(method string, dynamicpath string, body interface{}, username s
 	defer resp.Body.Close()
 	bodyresp, err := io.ReadAll(resp.Body)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return nil, err
 	}
 	mapbody, err := dependency.JsonToMap(string(bodyresp))
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return mapbody, errors.New("response is not json")
 	}
 	mapbodydata, isexist := mapbody["Data"].(map[string]interface{})
@@ -48,10 +51,12 @@ func CallCoreAPIPure(method string, dynamicpath string, body interface{}, userna
 	defer resp.Body.Close()
 	bodyresp, err := io.ReadAll(resp.Body)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return nil, err
 	}
 	mapbody, err := dependency.JsonToMap(string(bodyresp))
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return mapbody, errors.New("response is not json")
 	}
 	return mapbody, nil

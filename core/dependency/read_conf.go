@@ -3,6 +3,7 @@ package dependency
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"os"
 	// "reflect"
 )
@@ -17,10 +18,12 @@ type Configuration struct {
 	Db_username   string `json:"db_username"`
 	Db_password   string `json:"db_password"`
 	Filestore     string `json:"filestore"`
+	Log_Location  string `json:"log_location"`
 	Tika_link     string `json:"tika_link"`
 	Solr_link     string `json:"solr_link"`
 	Solr_username string `json:"solr_username"`
 	Solr_password string `json:"solr_password"`
+	Max_upload    string `json:"max_upload"`
 }
 
 func fixpath(path string) string {
@@ -33,6 +36,7 @@ func fixpath(path string) string {
 func Get_Parent_Path() string {
 	parent, a := os.Getwd()
 	if a != nil {
+		log.Println("FATAL " + a.Error())
 		panic(a)
 	}
 	parent = fixpath(parent)
@@ -47,6 +51,7 @@ func Read_conf(ConfFile string) (Configuration, error) {
 		path := parent + ConfFile
 		file, err = os.Open(path)
 		if err != nil {
+			log.Println("FATAL " + err.Error())
 			return Configuration, errors.New("conf file not found")
 		}
 	}
@@ -54,6 +59,7 @@ func Read_conf(ConfFile string) (Configuration, error) {
 	decoder := json.NewDecoder(file)
 	err = decoder.Decode(&Configuration)
 	if err != nil {
+		log.Println("FATAL " + err.Error())
 		return Configuration, err
 	}
 	return Configuration, nil

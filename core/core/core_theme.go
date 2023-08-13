@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"dependency"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -22,6 +23,7 @@ func ReadTheme(args string) ([]Theme, error) {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return []Theme{}, err
 	}
 	defer database.Close()
@@ -32,6 +34,7 @@ func ReadTheme(args string) ([]Theme, error) {
 	}
 
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return results, err
 	}
 	defer sqlresult.Close()
@@ -39,6 +42,7 @@ func ReadTheme(args string) ([]Theme, error) {
 		var result = Theme{}
 		var err = sqlresult.Scan(&result.AppthemeID, &result.AppthemeName, &result.AppthemeValue)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return results, err
 		}
 		results = append(results, result)
@@ -50,16 +54,19 @@ func (data *Theme) Create() (int, error) {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	defer database.Close()
 	ins, err := database.Prepare("INSERT INTO core_theme(AppthemeName, AppthemeValue) VALUES(?, ?)")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	defer ins.Close()
 	resproc, err := ins.Exec(data.AppthemeName, data.AppthemeValue)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	lastid, _ := resproc.LastInsertId()
@@ -70,6 +77,7 @@ func (data *Theme) Create() (int, error) {
 func (data *Theme) Read() error {
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -79,6 +87,7 @@ func (data *Theme) Read() error {
 		return errors.New("please insert appthemeid")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -88,16 +97,19 @@ func (data Theme) Update() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
 	upd, err := database.Prepare("UPDATE core.core_theme SET AppthemeName=?, AppthemeValue=? WHERE AppthemeID=?;")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer upd.Close()
 	_, err = upd.Exec(data.AppthemeName, data.AppthemeValue, data.AppthemeID)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -107,10 +119,12 @@ func (data Theme) Delete() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	del, err := database.Prepare("DELETE FROM core_theme WHERE `AppthemeID`=?")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	if data.AppthemeID != 0 {
@@ -119,6 +133,7 @@ func (data Theme) Delete() error {
 		return errors.New("appthemeid needed")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -140,12 +155,14 @@ func ShowTheme(c echo.Context) error {
 	u := new(Theme)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	err = u.Read()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusNotFound
 		res.Data = "THEME NOT FOUND"
 		return c.JSON(http.StatusNotFound, res)
@@ -161,12 +178,14 @@ func AddTheme(c echo.Context) error {
 	u := new(Theme)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	_, err = u.Create()
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusConflict
 		res.Data = err.Error()
 		return c.JSON(http.StatusConflict, res)
@@ -174,16 +193,22 @@ func AddTheme(c echo.Context) error {
 	u.Read()
 	res.StatusCode = http.StatusOK
 	res.Data = u
+	_, now_user, _ := Check_Permission_API(c)
+	err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Added Theme : "+u.AppthemeName)
+	if err != nil {
+		log.Println("WARNING failed to record history " + err.Error())
+	}
 	return c.JSON(http.StatusOK, res)
 }
 
 func EditTheme(c echo.Context) error {
-	permission, _, _ := Check_Permission_API(c)
+	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
 	u := new(Theme)
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -191,6 +216,7 @@ func EditTheme(c echo.Context) error {
 	if permission {
 		err = u.Update()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
@@ -198,6 +224,10 @@ func EditTheme(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
+		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Edited Theme : "+u.AppthemeName)
+		if err != nil {
+			log.Println("WARNING failed to record history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -207,7 +237,7 @@ func EditTheme(c echo.Context) error {
 }
 
 func DeleteTheme(c echo.Context) error {
-	permission, _, _ := Check_Permission_API(c)
+	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
 	u := new(Theme)
@@ -220,12 +250,17 @@ func DeleteTheme(c echo.Context) error {
 	if permission {
 		err = u.Delete()
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
 		}
 		res.StatusCode = http.StatusOK
 		res.Data = "DELETED THEME " + strconv.Itoa(u.AppthemeID)
+		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Deleted Theme : "+u.AppthemeName)
+		if err != nil {
+			log.Println("WARNING failed to record history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden

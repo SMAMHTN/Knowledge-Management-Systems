@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"dependency"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 	t "time"
@@ -30,7 +31,7 @@ type HistoryAPI struct {
 }
 
 func EmptyHistory() History {
-	return History{HistoryID: 0, ActivityType: "Test", Time: t.Now(), UserID: 1, Changes: "Test", IPAddress: "21120119120026"}
+	return History{HistoryID: 0, ActivityType: "Test", Time: GetTime(), UserID: 1, Changes: "Test", IPAddress: "21120119120026"}
 }
 
 func ReadHistory(args string) ([]History, error) {
@@ -39,6 +40,7 @@ func ReadHistory(args string) ([]History, error) {
 	var err error
 	database, err := dependency.Db_Connect_custom(Conf, DatabaseName, "parseTime=true")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return []History{}, err
 	}
 	defer database.Close()
@@ -49,6 +51,7 @@ func ReadHistory(args string) ([]History, error) {
 	}
 
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return results, err
 	}
 	defer sqlresult.Close()
@@ -56,6 +59,7 @@ func ReadHistory(args string) ([]History, error) {
 		var result = History{}
 		var err = sqlresult.Scan(&result.HistoryID, &result.ActivityType, &result.Time, &result.UserID, &result.Changes, &result.IPAddress)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			return results, err
 		}
 		results = append(results, result)
@@ -67,16 +71,19 @@ func (data History) Create() (int, error) {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	defer database.Close()
 	ins, err := database.Prepare("INSERT INTO core_history(ActivityType, `Time`, UserID, Changes, IPAddress) VALUES(?, ?, ?, ?, ?)")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	defer ins.Close()
 	resproc, err := ins.Exec(data.ActivityType, data.Time, data.UserID, data.Changes, data.IPAddress)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return 0, err
 	}
 	lastid, _ := resproc.LastInsertId()
@@ -86,6 +93,7 @@ func (data History) Create() (int, error) {
 func (data *History) Read() error {
 	database, err := dependency.Db_Connect_custom(Conf, DatabaseName, "parseTime=true")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -95,6 +103,7 @@ func (data *History) Read() error {
 		return errors.New("please insert historyid")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -104,16 +113,19 @@ func (data History) Update() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
 	upd, err := database.Prepare("UPDATE core.core_history SET ActivityType=?, `Time`=?, UserID=?, Changes=?, IPAddress=? WHERE HistoryID=?;")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer upd.Close()
 	_, err = upd.Exec(data.ActivityType, data.Time, data.UserID, data.Changes, data.IPAddress, data.HistoryID)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	return nil
@@ -123,10 +135,12 @@ func (data History) Delete() error {
 	var err error
 	database, err := dependency.Db_Connect(Conf, DatabaseName)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	del, err := database.Prepare("DELETE FROM core_history WHERE `HistoryID`=?")
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	if data.HistoryID != 0 {
@@ -135,6 +149,7 @@ func (data History) Delete() error {
 		return errors.New("HistoryID Needed")
 	}
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer database.Close()
@@ -152,6 +167,7 @@ func AddHistory(c echo.Context) error {
 	now_user.Read()
 	err = c.Bind(u)
 	if err != nil {
+		log.Println("WARNING " + err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -167,6 +183,7 @@ func AddHistory(c echo.Context) error {
 	if u.Time != "" {
 		r.Time, err = t.Parse(t.RFC3339, u.Time)
 		if err != nil {
+			log.Println("WARNING " + err.Error())
 			res.StatusCode = http.StatusUnsupportedMediaType
 			res.Data = "Please use time format RFC3339"
 			return c.JSON(http.StatusUnsupportedMediaType, res)
@@ -194,4 +211,21 @@ func ListHistory(c echo.Context) error {
 		res.Data = "ONLY SUPERADMIN HAVE THIS PERMISSION"
 		return c.JSON(http.StatusForbidden, res)
 	}
+}
+
+func RecordHistory(c echo.Context, ActivityType string, Changes string) error {
+	r := EmptyHistory()
+	_, userpass, _ := c.Request().BasicAuth()
+	cred := strings.Split(userpass, "&&")
+	now_user := User{Username: dependency.GetElementString(cred, 0), Password: dependency.GetElementString(cred, 1)}
+	now_user.Read()
+	r.ActivityType = ActivityType
+	r.Changes = Changes
+	r.UserID = now_user.UserID
+	r.IPAddress = c.RealIP()
+	_, err := r.Create()
+	if err != nil {
+		log.Println("WARNING " + err.Error())
+	}
+	return nil
 }
