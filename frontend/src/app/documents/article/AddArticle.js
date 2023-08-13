@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { KmsAPI } from "../../../dep/kms/kmsHandler";
 
-const AddDocument = ({ fetchData }) => {
+const AddArticle = ({ fetchData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     OwnerID: 7,
@@ -229,7 +229,7 @@ const AddDocument = ({ fetchData }) => {
   );
 };
 
-export default AddDocument;
+export default AddArticle;
 
 // "use client";
 // import React, { useState } from "react";
