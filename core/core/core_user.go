@@ -421,9 +421,9 @@ func AddUser(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
-		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Added User : "+u.Name+"("+u.Username+")")
+		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Added User : "+u.Name+"("+u.Username+")"+"("+strconv.Itoa(u.UserID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record history " + err.Error())
+			log.Println("WARNING failed to record user change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {
@@ -461,9 +461,9 @@ func EditUser(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
-		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Edited User : "+u.Name+"("+u.Username+")")
+		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Edited User : "+u.Name+"("+u.Username+")"+"("+strconv.Itoa(u.UserID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record history " + err.Error())
+			log.Println("WARNING failed to record user change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {
@@ -494,9 +494,9 @@ func DeleteUser(c echo.Context) error {
 		}
 		res.StatusCode = http.StatusOK
 		res.Data = "DELETED USER " + strconv.Itoa(u.UserID)
-		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Deleted User : "+u.Name+"("+u.Username+")")
+		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Deleted User : "+u.Name+"("+u.Username+")"+"("+strconv.Itoa(u.UserID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record history " + err.Error())
+			log.Println("WARNING failed to record user change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {
