@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CoreAPI, CoreAPIGET } from "../../dep/core/coreHandler";
 import AddTheme from "./AddTheme";
-import ShowLogo from "./ShowLogo";
+import ShowLogo from "../../components/ShowLogo";
 import LogoUpload from "./LogoUpload";
 
 function SystemSetting() {
@@ -151,7 +151,7 @@ function SystemSetting() {
     // Update the data state with the uploaded logo
     setData({ ...data, CompanyLogo: base64String });
   };
-  
+
   return (
     <>
       <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
@@ -169,7 +169,9 @@ function SystemSetting() {
                   }
                 />
               </div>
+              <div className="mb-4">
               <ShowLogo/>
+              </div>
               <LogoUpload onUpload={handleLogoUpload} />
               <div className="mb-4">
                 <label className="block font-semibold mb-1">CompanyLogo</label>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CoreAPIGET } from "../../dep/core/coreHandler";
+import { CoreAPIGET } from "../dep/core/coreHandler";
 
 function ShowLogo() {
   const [error, setError] = useState("");
@@ -21,11 +21,6 @@ function ShowLogo() {
   useEffect(() => {
     fetchData();
   }, []);
-
-  // Function to handle changes to the CompanyLogo input field
-  const handleCompanyLogoChange = (e) => {
-    setData({ ...data, CompanyLogo: e.target.value });
-  };
 
   // Function to check if a string is a valid base64 string
   const isValidBase64 = (str) => {
@@ -51,9 +46,7 @@ function ShowLogo() {
 
   return (
     <div>
-      <div className="mb-4">
       <div>{renderCompanyLogo()}</div>
-      </div>
     </div>
   );
 }
