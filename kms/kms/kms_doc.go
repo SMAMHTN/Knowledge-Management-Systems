@@ -336,6 +336,10 @@ func AddDoc(c echo.Context) error {
 
 		res.StatusCode = http.StatusOK
 		res.Data = DBDoc
+		err = RecordHistory(c, "Doc", "Added Doc : "+DBDoc.DocLoc+"("+strconv.Itoa(DBDoc.DocID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record doc change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusUnauthorized
@@ -398,5 +402,9 @@ func DeleteDoc(c echo.Context) error {
 	}
 	res.StatusCode = http.StatusOK
 	res.Data = "DELETED DOCUMENT"
+	err = RecordHistory(c, "Doc", "Deleted Doc : "+u.DocLoc+"("+strconv.Itoa(u.DocID)+")")
+	if err != nil {
+		log.Println("WARNING failed to record doc change history " + err.Error())
+	}
 	return c.JSON(http.StatusOK, res)
 }

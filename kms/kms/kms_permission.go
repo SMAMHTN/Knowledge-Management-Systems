@@ -240,6 +240,10 @@ func AddPermission(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
+		err = RecordHistory(c, "Permission", "Added Permission : ("+strconv.Itoa(u.PermissionID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record permission change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -291,6 +295,10 @@ func EditPermission(c echo.Context) error {
 		u.Read()
 		res.StatusCode = http.StatusOK
 		res.Data = u
+		err = RecordHistory(c, "Permission", "Edited Permission : ("+strconv.Itoa(u.PermissionID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record permission change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -321,6 +329,10 @@ func DeletePermission(c echo.Context) error {
 		}
 		res.StatusCode = http.StatusOK
 		res.Data = "DELETED KMS PERMISSION " + strconv.Itoa(u.PermissionID)
+		err = RecordHistory(c, "Permission", "Deleted Permission : ("+strconv.Itoa(u.PermissionID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record permission change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
