@@ -3,30 +3,27 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { KmsAPIGET } from "@/dep/kms/kmsHandler";
+import AddDocument from "./AddDocument";
 
 function DocTable() {
-  // Sample data for the table
   const router = useRouter();
   const [data, setData] = useState([]);
   const [error, setError] = useState("");
+
+  const fetchData = async () => {
+    try {
+      const response = await KmsAPIGET("listarticle");
+      const jsonData = response.body.Data;
+      setData(jsonData);
+      setError(null);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await KmsAPIGET("listarticle");
-
-        console.log(response);
-        console.log(response.body.StatusCode);
-        const jsonData = response.body.Data; // Update this line
-        setData(jsonData);
-        setError(null);
-        console.log(data);
-      } catch (error) {
-        setError(error.message);
-      }
-    };
-
     fetchData();
-  }, []);
+  }, [router.pathname]);
 
   const truncateText = (text, length) => {
     if (text.length > length) {
@@ -47,6 +44,8 @@ function DocTable() {
         <div className="max-w-md ml-14 p-4 mt-9">
           <div className="max-w-3xl mx-auto p-4">
             <h2 className="text-2xl font-bold mb-4">Doc Table</h2>
+            <div className="my-2"><AddDocument fetchData={fetchData}/></div>
+            
             <table className="w-full border">
               <thead>
                 <tr className="bg-gray-100">

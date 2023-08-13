@@ -3,31 +3,27 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation'
 import { CoreAPIGET } from "../../../dep/core/coreHandler";
+import AddUser from "./AddUser";
 
 function UserTable() {
-  // Sample data for the table
-  const router = useRouter()
+  const router = useRouter();
   const [data, setData] = useState([]);
   const [error, setError] = useState("");
+
+  const fetchData = async () => {
+    try {
+      const response = await CoreAPIGET("listuser");
+      const jsonData = response.body.Data;
+      setData(jsonData);
+      setError(null);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   useEffect(() => {
-    console.log("useEffect executed");
-    const fetchData = async () => {
-      try {
-        const response = await CoreAPIGET("listuser");
-
-        console.log(response);
-        console.log(response.body.StatusCode);
-        const jsonData = response.body.Data; // Update this line
-        setData(jsonData);
-        setError(null);
-        console.log(data);
-      } catch (error) {
-        setError(error.message);
-      }
-    };
-
     fetchData();
-  }, []);
+  }, [router.pathname]);
 
 
   const truncateText = (text, length) => {
@@ -48,9 +44,13 @@ function UserTable() {
         <div className="max-w-md ml-14 p-4 mt-9">
           <div className="max-w-3xl mx-auto p-4">
             <h2 className="text-2xl font-bold mb-4">User Table</h2>
+            <div className="my-2">
+              <AddUser fetchData={fetchData}/>
+            </div>
             <table className="w-full border">
               <thead>
                 <tr className="bg-gray-100">
+                <th className="px-4 py-2">UserID</th>
                   <th className="px-4 py-2">Username</th>
                   <th className="px-4 py-2">Full Name</th>
                   <th className="px-4 py-2">Status</th>
@@ -62,6 +62,7 @@ function UserTable() {
               <tbody>
                 {data.map((user) => (
                   <tr key={user.UserID}>
+                    <td className="px-4 py-2">{user.UserID}</td>
                     <td className="px-4 py-2">{user.Username}</td>
                     <td className="px-4 py-2 whitespace-nowrap overflow-hidden overflow-ellipsis">
                       {truncateText(user.Name, 15)}
