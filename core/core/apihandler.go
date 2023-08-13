@@ -74,7 +74,7 @@ func Test_api() {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 	}))
-	e.Use(middleware.BodyLimit("6M"))
+	e.Use(middleware.BodyLimit("8M"))
 	e.IPExtractor = echo.ExtractIPFromXFFHeader()
 
 	// Define a protected route that requires Basic Authentication
