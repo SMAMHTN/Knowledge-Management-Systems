@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation'
-import { CoreAPIGET } from "../../../dep/core/coreHandler";
+import { CoreAPIGET, CoreAPI } from "../../../dep/core/coreHandler";
 import AddUser from "./AddUser";
 
 function UserTable() {
@@ -18,6 +18,21 @@ function UserTable() {
       setError(null);
     } catch (error) {
       setError(error.message);
+    }
+  };
+
+  const handleDelete = async (UserID) => {
+    try {
+      // Send the delete request to the server
+      await CoreAPI("DELETE", "user", { UserID });
+
+      // Remove the deleted category from the data state
+      const updatedData = data.filter(
+        (user) => user.UserID !== UserID
+      );
+      setData(updatedData);
+    } catch (error) {
+      console.error("Error deleting category:", error);
     }
   };
 
@@ -81,7 +96,10 @@ function UserTable() {
                       >
                         View
                       </button>
-                      <button className="bg-red-500 text-white rounded px-2 py-1 ml-2">
+                      <button
+                        onClick={() => handleDelete(user.UserID)}
+                        className="bg-red-500 text-white rounded px-2 py-1 ml-2"
+                      >
                         Delete
                       </button>
                     </td>

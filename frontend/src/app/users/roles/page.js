@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CoreAPIGET } from "../../../dep/core/coreHandler";
+import { CoreAPIGET, CoreAPI } from "../../../dep/core/coreHandler";
 import AddRole from "./AddRole";
 
 function RoleTable() {
@@ -19,7 +19,20 @@ function RoleTable() {
       setError(error.message);
     }
   };
+  const handleDelete = async (RoleID) => {
+    try {
+      // Send the delete request to the server
+      await CoreAPI("DELETE", "role", { RoleID });
 
+      // Remove the deleted category from the data state
+      const updatedData = data.filter(
+        (role) => role.RoleID !== RoleID
+      );
+      setData(updatedData);
+    } catch (error) {
+      console.error("Error deleting category:", error);
+    }
+  };
   useEffect(() => {
     fetchData();
   }, [router.pathname]);
@@ -33,7 +46,7 @@ function RoleTable() {
     <>
       <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
         {/* buat s.admin */}
-        <div className="max-w-md mx-auto p-4 mt-9">
+        <div className="max-w-md ml-14  p-4 mt-9">
           <div className="max-w-3xl mx-auto p-4">
             <h2 className="text-2xl font-bold mb-4">Roles Table</h2>
             <div className="my-2">
@@ -63,7 +76,10 @@ function RoleTable() {
                         
                         Edit
                       </button>
-                      <button className="bg-red-500 text-white rounded px-2 py-1 ml-2">
+                      <button
+                        onClick={() => handleDelete(role.RoleID)}
+                        className="bg-red-500 text-white rounded px-2 py-1 ml-2"
+                      >
                         Delete
                       </button>
                     </td>
