@@ -64,7 +64,7 @@ func init() {
 
 		fmt.Printf("%s: %v\n", fieldName, fieldValue)
 	}
-	err = dependency.Init_log(Conf.Log_Location)
+	err = dependency.Init_log(Conf.Log_Location, GetTimeZone())
 	if err != nil {
 		log.Panic("FATAL " + err.Error())
 		panic(err)

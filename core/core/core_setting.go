@@ -30,6 +30,14 @@ func GetTime() time.Time {
 	return Timenow
 }
 
+func GetTimeZone() string{
+	var TimeZone string
+	database, _ := dependency.Db_Connect(Conf, DatabaseName)
+	defer database.Close()
+	database.QueryRow("SELECT TimeZone FROM core_setting WHERE CompanyID = 1").Scan(&TimeZone)
+	return TimeZone
+}
+
 func ReadSetting(args string) ([]Setting, error) {
 	var results []Setting
 	var sqlresult *sql.Rows
