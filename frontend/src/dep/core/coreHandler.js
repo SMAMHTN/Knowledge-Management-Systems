@@ -125,7 +125,7 @@ export async function CoreAPIGET(path) {
   }
 }
 
-export async function CoreAPIBlob(method, path, data) {
+export async function CoreAPIBlob(method, path, CategoryID, File) {
   const conf = readConf("frontend_conf.json");
   const cookieStore = cookies();
   let un, pwd;
@@ -162,9 +162,8 @@ export async function CoreAPIBlob(method, path, data) {
       };
     } else if (method === "POST") {
       const formData = new FormData();
-      formData.append('file', data); // Assuming "data" is the File object
-
-      headers["Content-Type"] = "multipart/form-data";
+      formData.append('CategoryID', CategoryID);
+      formData.append('File', File);
 
       response = await fetch(conf.core_link + path, {
         method: method,
