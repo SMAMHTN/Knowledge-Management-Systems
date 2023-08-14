@@ -1,16 +1,17 @@
-"use client";
-import { useState, useEffect } from "react";
-import { useRouter } from 'next/navigation'
-import { Login, CoreAPIGET } from "../../dep/core/coreHandler";
-import Image from "next/image"; // Import the Next.js Image component
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image'; // Import the Next.js Image component
+import { Login, CoreAPIGET } from '../../dep/core/coreHandler';
 // import { KmsAPIGET, KmsAPI } from "../../dep/kms/kmsHandler";
 
 export default function Page() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [nextlink, setNextlink] = useState("/tes");
-  const router = useRouter()
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [nextlink, setNextlink] = useState('/tes');
+  const router = useRouter();
   // const [a, setA] = useState({
   //   Data: {
   //     CategoryID: 0,
@@ -50,20 +51,20 @@ export default function Page() {
       //   },
       // });
 
-      if (response == true) {
-        const response2 = await CoreAPIGET("loginuser")
+      if (response === true) {
+        const response2 = await CoreAPIGET('loginuser');
         // setNextlink("/tes/tes2/" + response2.body.Data.UserID)
-        router.push("/tes/tes2/" + response2.body.Data.UserID)
-        setMessage("Login successful!");
+        router.push(`/tes/tes2/${response2.body.Data.UserID}`);
+        setMessage('Login successful!');
         // Perform any additional actions after successful login
       } else {
         // setNextlink("/tes")
-        setMessage("Login failed!");
+        setMessage('Login failed!');
         // Handle login failure
       }
     } catch (error) {
       // console.log(error);
-      setMessage("An error occurred during login.");
+      setMessage('An error occurred during login.');
       // Handle error
     }
   };
@@ -74,6 +75,8 @@ export default function Page() {
           <div id="logo" className="flex flex-col mb-6 mx-auto">
             <Image
               className=" object-scale-down h-24 w-24"
+              height={500}
+              width={500}
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/LEGO_logo.svg/1024px-LEGO_logo.svg.png"
               alt="Test2"
             />

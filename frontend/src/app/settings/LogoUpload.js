@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import Image from "next/image"; // Import the Next.js Image component
+import React, { useState } from 'react';
+import Image from 'next/image'; // Import the Next.js Image component
 
 function LogoUpload({ onUpload }) {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -22,17 +22,17 @@ function LogoUpload({ onUpload }) {
       // Convert the selected image to base64
       const reader = new FileReader();
       reader.onload = () => {
-        const base64String = reader.result.split(",")[1];
+        const base64String = reader.result.split(',')[1];
         // Call the provided onUpload function with the base64 string
-        if (onUpload && typeof onUpload === "function") {
+        if (onUpload && typeof onUpload === 'function') {
           onUpload(base64String);
         } else {
-          console.error("onUpload is not a valid function.");
+          console.error('onUpload is not a valid function.');
         }
       };
       reader.readAsDataURL(selectedFile);
     } else {
-      console.log("No file selected.");
+      console.log('No file selected.');
     }
   };
 
@@ -58,13 +58,13 @@ function LogoUpload({ onUpload }) {
       <button
         onClick={handleUpload}
         style={{
-          backgroundColor: "#007BFF",
-          color: "white",
-          border: "none",
-          padding: "8px 16px",
-          borderRadius: "4px",
-          cursor: "pointer",
-          marginTop: "10px",
+          backgroundColor: '#007BFF',
+          color: 'white',
+          border: 'none',
+          padding: '8px 16px',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          marginTop: '10px',
         }}
       >
         Upload

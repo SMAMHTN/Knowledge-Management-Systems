@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { KmsAPIGET, KmsAPI } from "@/dep/kms/kmsHandler";
-import AddArticle from "./AddArticle";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { KmsAPIGET, KmsAPI } from '@/dep/kms/kmsHandler';
+import AddArticle from './AddArticle';
 
 function DocTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const fetchData = async () => {
     try {
-      const response = await KmsAPIGET("listarticle");
+      const response = await KmsAPIGET('listarticle');
       const jsonData = response.body.Data;
       setData(jsonData);
       setError(null);
@@ -24,15 +24,15 @@ function DocTable() {
   const handleDelete = async (ArticleID) => {
     try {
       // Send the delete request to the server
-      await KmsAPI("DELETE", "article", { ArticleID });
+      await KmsAPI('DELETE', 'article', { ArticleID });
 
       // Remove the deleted category from the data state
       const updatedData = data.filter(
-        (article) => article.ArticleID !== ArticleID
+        (article) => article.ArticleID !== ArticleID,
       );
       setData(updatedData);
     } catch (error) {
-      console.error("Error deleting category:", error);
+      console.error('Error deleting category:', error);
     }
   };
 
@@ -42,7 +42,7 @@ function DocTable() {
 
   const truncateText = (text, length) => {
     if (text.length > length) {
-      return text.slice(0, length - 3) + "...";
+      return `${text.slice(0, length - 3)}...`;
     }
     return text;
   };
@@ -53,68 +53,67 @@ function DocTable() {
   };
 
   return (
-    <>
-      <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-        {/* buat s.admin */}
-        <div className="max-w-md ml-14 p-4 mt-9">
-          <div className="max-w-3xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">Doc Table</h2>
-            <div className="my-2"><AddArticle fetchData={fetchData}/></div>
-            
-            <table className="w-full border">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2">OwnerID</th>
-                  <th className="px-4 py-2">LastEditedByID</th>
-                  <th className="px-4 py-2">LastEditedTime</th>
-                  <th className="px-4 py-2">Tag</th>
-                  <th className="px-4 py-2">Title</th>
-                  <th className="px-4 py-2">CategoryID</th>
-                  <th className="px-4 py-2">Article</th>
-                  <th className="px-4 py-2">Active</th>
-                  <th className="px-4 py-2">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((article) => (
-                  <tr key={article.ArticleID}>
-                    <td className="px-4 py-2">{article.OwnerID}</td>
-                    <td className="px-4 py-2">{article.LastEditedByID}</td>
-                    <td className="px-4 py-2">{article.LastEditedTime}</td>
-                    <td className="px-4 py-2">{article.Tag}</td>
-                    <td className="px-4 py-2">{article.Title}</td>
-                    <td className="px-4 py-2">{article.CategoryID}</td>
-                    <td className="px-4 py-2">{article.Article}</td>
-                    <td className="px-4 py-2">{article.IsActive}</td>
-                    {/* <td className="px-4 py-2 whitespace-nowrap overflow-hidden overflow-ellipsis">
+    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
+      {/* buat s.admin */}
+      <div className="max-w-md ml-14 p-4 mt-9">
+        <div className="max-w-3xl mx-auto p-4">
+          <h2 className="text-2xl font-bold mb-4">Doc Table</h2>
+          <div className="my-2"><AddArticle fetchData={fetchData} /></div>
+
+          <table className="w-full border">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2">OwnerID</th>
+                <th className="px-4 py-2">LastEditedByID</th>
+                <th className="px-4 py-2">LastEditedTime</th>
+                <th className="px-4 py-2">Tag</th>
+                <th className="px-4 py-2">Title</th>
+                <th className="px-4 py-2">CategoryID</th>
+                <th className="px-4 py-2">Article</th>
+                <th className="px-4 py-2">Active</th>
+                <th className="px-4 py-2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((article) => (
+                <tr key={article.ArticleID}>
+                  <td className="px-4 py-2">{article.OwnerID}</td>
+                  <td className="px-4 py-2">{article.LastEditedByID}</td>
+                  <td className="px-4 py-2">{article.LastEditedTime}</td>
+                  <td className="px-4 py-2">{article.Tag}</td>
+                  <td className="px-4 py-2">{article.Title}</td>
+                  <td className="px-4 py-2">{article.CategoryID}</td>
+                  <td className="px-4 py-2">{article.Article}</td>
+                  <td className="px-4 py-2">{article.IsActive}</td>
+                  {/* <td className="px-4 py-2 whitespace-nowrap overflow-hidden overflow-ellipsis">
                       {truncateText(article.DocType, 15)}
                     </td>
                     <td className="px-4 py-2">
                       {truncateText(article.DocLoc, 20)}
                     </td> */}
-                    <td className="px-4 py-2 flex justify-end items-center">
-                      <button
-                        onClick={() => handleNavigate(article.ArticleID)}
-                        className="bg-yellow-500 text-white rounded px-2 py-1"
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => handleDelete(article.ArticleID)}
-                        className="bg-red-500 text-white rounded px-2 py-1 ml-2"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  <td className="px-4 py-2 flex justify-end items-center">
+                    <button
+                      onClick={() => handleNavigate(article.ArticleID)}
+                      className="bg-yellow-500 text-white rounded px-2 py-1"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => handleDelete(article.ArticleID)}
+                      className="bg-red-500 text-white rounded px-2 py-1 ml-2"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {/* buat user biasa */}
+      </div>
+      {/* buat user biasa */}
 
-        {/* <div className="h-full mt-14">
+      {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
             <h1 className="text-white text-2xl font-bold mb-4">Dashboard</h1>
           </div>
@@ -357,8 +356,7 @@ function DocTable() {
             </div>
           </div>
         </div> */}
-      </section>
-    </>
+    </section>
   );
 }
 

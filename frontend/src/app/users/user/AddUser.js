@@ -1,19 +1,19 @@
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { CoreAPI } from "../../../dep/core/coreHandler";
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { CoreAPI } from '../../../dep/core/coreHandler';
 
-const AddUser = ({ fetchData }) => {
+function AddUser({ fetchData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    Username: "smam",
-    Password: "smam",
-    Name: "Aldi Mulyawan",
-    Email: "aldismartkid@gmail.com",
-    Address: "Blora",
-    Phone: "081350488901",
+    Username: 'smam',
+    Password: 'smam',
+    Name: 'Aldi Mulyawan',
+    Email: 'aldismartkid@gmail.com',
+    Address: 'Blora',
+    Phone: '081350488901',
     RoleID: 3,
     AppthemeID: 1,
-    Note: "INI PERCOBAAN",
+    Note: 'INI PERCOBAAN',
     IsSuperAdmin: 0,
     IsActive: 1,
   });
@@ -27,20 +27,20 @@ const AddUser = ({ fetchData }) => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const {
+      name, value, type, checked,
+    } = e.target;
     let parsedValue;
 
     // Handle checkbox input
-    if (type === "checkbox") {
+    if (type === 'checkbox') {
       parsedValue = checked ? 1 : 0;
+    } else if (name === 'DocType' || name === 'FileType') {
+      parsedValue = value === '' ? '[]' : `[${value}]`;
+    } else if (name === 'CategoryID' || name === 'RoleID') {
+      parsedValue = value === '' ? 0 : parseInt(value, 10);
     } else {
-      if (name === "DocType" || name === "FileType") {
-        parsedValue = value === "" ? "[]" : `[${value}]`;
-      } else if (name === "CategoryID" || name === "RoleID") {
-        parsedValue = value === "" ? 0 : parseInt(value, 10);
-      } else {
-        parsedValue = value === "" ? 0 : value;
-      }
+      parsedValue = value === '' ? 0 : value;
     }
 
     setFormData((prevData) => ({
@@ -54,13 +54,13 @@ const AddUser = ({ fetchData }) => {
     console.log(formData);
     try {
       // Make the API call to save the data
-      await CoreAPI("POST", "user", formData);
+      await CoreAPI('POST', 'user', formData);
 
       // Refresh the page after successfully saving the data
       fetchData();
-      console.log("Data saved successfully.");
+      console.log('Data saved successfully.');
     } catch (error) {
-      console.log("Error occurred:", error);
+      console.log('Error occurred:', error);
       // Handle error, show a message, etc.
     }
 
@@ -80,15 +80,15 @@ const AddUser = ({ fetchData }) => {
       {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
-          isModalOpen ? "visible" : "invisible"
+          isModalOpen ? 'visible' : 'invisible'
         }`}
         onClick={closeModal}
-      ></div>
+      />
 
       {/* Modal */}
       <div
         className={`fixed inset-0 flex justify-center items-center ${
-          isModalOpen ? "visible" : "invisible"
+          isModalOpen ? 'visible' : 'invisible'
         }`}
       >
         <div className="bg-white rounded-lg p-6 shadow-md relative z-10">
@@ -107,7 +107,7 @@ const AddUser = ({ fetchData }) => {
                 strokeLinejoin="round"
                 strokeWidth="2"
                 d="M6 18L18 6M6 6l12 12"
-              ></path>
+              />
             </svg>
           </button>
           <h2 className="text-2xl font-semibold mb-4">Add User</h2>
@@ -209,30 +209,30 @@ const AddUser = ({ fetchData }) => {
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="font-medium">
-                <input
-                  type="checkbox"
-                  name="IsSuperAdmin"
-                  checked={formData.IsSuperAdmin === 1}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                />
-                IsSuperAdmin
-              </label>
-            </div>
-            <div>
-              <label className="font-medium">
-                <input
-                  type="checkbox"
-                  name="IsActive"
-                  checked={formData.IsActive === 1}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                />
-                IsActive
-              </label>
-            </div>
+              <div>
+                <label className="font-medium">
+                  <input
+                    type="checkbox"
+                    name="IsSuperAdmin"
+                    checked={formData.IsSuperAdmin === 1}
+                    onChange={handleInputChange}
+                    className="mr-2"
+                  />
+                  IsSuperAdmin
+                </label>
+              </div>
+              <div>
+                <label className="font-medium">
+                  <input
+                    type="checkbox"
+                    name="IsActive"
+                    checked={formData.IsActive === 1}
+                    onChange={handleInputChange}
+                    className="mr-2"
+                  />
+                  IsActive
+                </label>
+              </div>
             </div>
 
             <button
@@ -246,7 +246,7 @@ const AddUser = ({ fetchData }) => {
       </div>
     </div>
   );
-};
+}
 
 export default AddUser;
 

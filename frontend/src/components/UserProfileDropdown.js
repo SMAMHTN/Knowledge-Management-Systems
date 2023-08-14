@@ -1,9 +1,10 @@
-"use client";
-import React, { useState } from "react";
-import Link from "next/link";
-import Image from "next/image"; // Import the Next.js Image component
+'use client';
 
-const UserProfile = ({ imageUrl, username }) => {
+import React, { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image'; // Import the Next.js Image component
+
+function UserProfile({ imageUrl, username }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -69,9 +70,9 @@ const UserProfile = ({ imageUrl, username }) => {
       )}
     </div>
   );
-};
+}
 
-const CustomLink = ({ href, text }) => {
+function CustomLink({ href, text }) {
   return (
     <Link href={href}>
       <div
@@ -82,14 +83,14 @@ const CustomLink = ({ href, text }) => {
       </div>
     </Link>
   );
-};
+}
 
-const UserProfileDropdown = () => {
+function UserProfileDropdown() {
   return (
     <div className="flex justify-center items-center">
       <UserProfile username="John Doe" />
     </div>
   );
-};
+}
 
 export default UserProfileDropdown;

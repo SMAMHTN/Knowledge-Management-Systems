@@ -1,33 +1,29 @@
-
-import Link from "next/link";
-
+import Link from 'next/link';
 
 export default function Home() {
   return (
-    <>
-      <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-        {/* buat s.admin */}
-        <div className="max-w-md mx-auto p-4 mt-9">
-      <h2 className="text-2xl font-bold mb-4">Document</h2>
-      <div className="space-y-4">
+    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
+      {/* buat s.admin */}
+      <div className="max-w-md mx-auto p-4 mt-9">
+        <h2 className="text-2xl font-bold mb-4">Document</h2>
+        <div className="space-y-4">
           <Link href="documents/article" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-            Article 
+            Article
           </Link>
           <Link href="documents/category" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
             Category
           </Link>
-          <Link  href="documents/permission" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-           Permission
+          <Link href="documents/permission" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
+            Permission
           </Link>
-          <Link  href="documents/document" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-           Document & File List
+          <Link href="documents/document" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
+            Document & File List
           </Link>
+        </div>
       </div>
-    </div>
-{/* buat user biasa */}
+      {/* buat user biasa */}
 
-
-        {/* <div className="h-full mt-14">
+      {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
             <h1 className="text-white text-2xl font-bold mb-4">Dashboard</h1>
           </div>
@@ -270,7 +266,6 @@ export default function Home() {
             </div>
           </div>
         </div> */}
-      </section>
-    </>
+    </section>
   );
 }

@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { KmsAPI } from "../../../dep/kms/kmsHandler";
+import React, { useState } from 'react';
+import { KmsAPI } from '../../../dep/kms/kmsHandler';
 
-const AddArticle = ({ fetchData }) => {
+function AddArticle({ fetchData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     OwnerID: 7,
     LastEditedByID: 7,
-    LastEditedTime: "2023-03-24T13:47:51Z",
-    Tag: "[Game,Kuliah,Suffering]",
-    Title: "Kesalahan a",
+    LastEditedTime: '2023-03-24T13:47:51Z',
+    Tag: '[Game,Kuliah,Suffering]',
+    Title: 'Kesalahan a',
     CategoryID: 1,
-    Article: "Gua Menyesal apa",
-    FileID: "[]",
-    DocID: "[]",
+    Article: 'Gua Menyesal apa',
+    FileID: '[]',
+    DocID: '[]',
     IsActive: 1,
   });
 
@@ -26,20 +25,20 @@ const AddArticle = ({ fetchData }) => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const {
+      name, value, type, checked,
+    } = e.target;
     let parsedValue;
 
     // Handle checkbox input
-    if (type === "checkbox") {
+    if (type === 'checkbox') {
       parsedValue = checked ? 1 : 0;
+    } else if (name === 'DocID' || name === 'FileID') {
+      parsedValue = value === '' ? '[]' : `[${value}]`;
+    } else if (name === 'OwnerID' || name === 'LastEditedByID' || name === 'CategoryID') {
+      parsedValue = value === '' ? 0 : parseInt(value, 10);
     } else {
-      if (name === "DocID" || name === "FileID") {
-        parsedValue = value === "" ? "[]" : `[${value}]`;
-      } else if (name === "OwnerID" || name === "LastEditedByID" || name === "CategoryID") {
-        parsedValue = value === "" ? 0 : parseInt(value, 10);
-      } else {
-        parsedValue = value;
-      }
+      parsedValue = value;
     }
 
     setFormData((prevData) => ({
@@ -53,13 +52,13 @@ const AddArticle = ({ fetchData }) => {
     console.log(formData);
     try {
       // Make the API call to save the data
-      await KmsAPI("POST", "article", formData);
+      await KmsAPI('POST', 'article', formData);
 
       // Refresh the page after successfully saving the data
       fetchData();
-      console.log("Data saved successfully.");
+      console.log('Data saved successfully.');
     } catch (error) {
-      console.log("Error occurred:", error);
+      console.log('Error occurred:', error);
       // Handle error, show a message, etc.
     }
 
@@ -69,137 +68,139 @@ const AddArticle = ({ fetchData }) => {
 
   return (
     <div>
-  <button
-    onClick={openModal}
-    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-  >
-    Add New +
-  </button>
-
-  {/* Overlay */}
-  <div
-    className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
-      isModalOpen ? "visible" : "invisible"
-    }`}
-    onClick={closeModal}
-  ></div>
-
-  {/* Modal */}
-  <div
-    className={`fixed inset-0 flex justify-center items-center ${
-      isModalOpen ? "visible" : "invisible"
-    }`}
-  >
-    <div className="bg-white rounded-lg p-6 shadow-md relative z-10">
       <button
-        className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-        onClick={closeModal}
+        onClick={openModal}
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M6 18L18 6M6 6l12 12"
-          ></path>
-        </svg>
+        Add New +
       </button>
-      <h2 className="text-2xl font-semibold mb-4">Add Document</h2>
-      <form onSubmit={handleSave} className="grid grid-cols-2 gap-4">
-        <div className="mb-4">
-          <label className="block font-semibold mb-1">Title</label>
-          <input
-            type="text"
-            name="Title"
-            value={formData.Title}
-            onChange={handleInputChange}
-            className="border px-2 py-1 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block font-semibold mb-1">Article</label>
-          <input
-            type="text"
-            name="Article"
-            value={formData.Article}
-            onChange={handleInputChange}
-            className="border px-2 py-1 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block font-semibold mb-1">CategoryID</label>
-          <input
-            type="text"
-            name="CategoryID"
-            value={formData.CategoryID}
-            onChange={handleInputChange}
-            className="border px-2 py-1 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block font-semibold mb-1">OwnerID</label>
-          <input
-            type="text"
-            name="OwnerID"
-            value={formData.OwnerID}
-            onChange={handleInputChange}
-            className="border px-2 py-1 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block font-semibold mb-1">LastEditedByID</label>
-          <input
-            type="text"
-            name="LastEditedByID"
-            value={formData.LastEditedByID}
-            onChange={handleInputChange}
-            className="border px-2 py-1 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block font-semibold mb-1">LastEditedTime</label>
-          <input
-            type="text"
-            name="LastEditedTime"
-            value={formData.LastEditedTime}
-            onChange={handleInputChange}
-            className="border px-2 py-1 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block font-semibold mb-1">Tag</label>
-          <input
-            type="text"
-            name="Tag"
-            value={formData.Tag}
-            onChange={handleInputChange}
-            className="border px-2 py-1 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block font-semibold mb-1">FileID</label>
-          <input
-            type="text"
-            name="FileID"
-            value={formData.FileID}
-            onChange={handleInputChange}
-            className="border px-2 py-1 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block font-semibold mb-1">DocID</label>
-          <input
-            type="text"
-            name="DocID"
-            value={formData.DocID}
-            onChange={handleInputChange}
-            className="border px-2 py-1 w-full"
-          />
+
+      {/* Overlay */}
+      <div
+        className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
+          isModalOpen ? 'visible' : 'invisible'
+        }`}
+        onClick={closeModal}
+      />
+
+      {/* Modal */}
+      <div
+        className={`fixed inset-0 flex justify-center items-center ${
+          isModalOpen ? 'visible' : 'invisible'
+        }`}
+      >
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-10">
+          <button
+            className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+            onClick={closeModal}
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <h2 className="text-2xl font-semibold mb-4">Add Document</h2>
+          <form onSubmit={handleSave} className="grid grid-cols-2 gap-4">
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Title</label>
+              <input
+                type="text"
+                name="Title"
+                value={formData.Title}
+                onChange={handleInputChange}
+                className="border px-2 py-1 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Article</label>
+              <input
+                type="text"
+                name="Article"
+                value={formData.Article}
+                onChange={handleInputChange}
+                className="border px-2 py-1 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">CategoryID</label>
+              <input
+                type="text"
+                name="CategoryID"
+                value={formData.CategoryID}
+                onChange={handleInputChange}
+                className="border px-2 py-1 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">OwnerID</label>
+              <input
+                type="text"
+                name="OwnerID"
+                value={formData.OwnerID}
+                onChange={handleInputChange}
+                className="border px-2 py-1 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">LastEditedByID</label>
+              <input
+                type="text"
+                name="LastEditedByID"
+                value={formData.LastEditedByID}
+                onChange={handleInputChange}
+                className="border px-2 py-1 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">
+                LastEditedTime
+                <input
+                  type="text"
+                  name="LastEditedTime"
+                  value={formData.LastEditedTime}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 w-full"
+                />
+              </label>
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Tag</label>
+              <input
+                type="text"
+                name="Tag"
+                value={formData.Tag}
+                onChange={handleInputChange}
+                className="border px-2 py-1 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">FileID</label>
+              <input
+                type="text"
+                name="FileID"
+                value={formData.FileID}
+                onChange={handleInputChange}
+                className="border px-2 py-1 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">DocID</label>
+              <input
+                type="text"
+                name="DocID"
+                value={formData.DocID}
+                onChange={handleInputChange}
+                className="border px-2 py-1 w-full"
+              />
             </div>
             <div>
               <label className="font-medium">
@@ -214,8 +215,6 @@ const AddArticle = ({ fetchData }) => {
               </label>
             </div>
 
-
-
             <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -227,7 +226,7 @@ const AddArticle = ({ fetchData }) => {
       </div>
     </div>
   );
-};
+}
 
 export default AddArticle;
 

@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from 'next/navigation'
-import { CoreAPIGET, CoreAPI } from "../../../dep/core/coreHandler";
-import AddUser from "./AddUser";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { CoreAPIGET, CoreAPI } from '../../../dep/core/coreHandler';
+import AddUser from './AddUser';
 
 function UserTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const fetchData = async () => {
     try {
-      const response = await CoreAPIGET("listuser");
+      const response = await CoreAPIGET('listuser');
       const jsonData = response.body.Data;
       setData(jsonData);
       setError(null);
@@ -21,18 +21,22 @@ function UserTable() {
     }
   };
 
+  useEffect(() => {
+    console.log(data); // Log the 'data' value after it updates
+  }, [data]);
+
   const handleDelete = async (UserID) => {
     try {
       // Send the delete request to the server
-      await CoreAPI("DELETE", "user", { UserID });
+      await CoreAPI('DELETE', 'user', { UserID });
 
       // Remove the deleted category from the data state
       const updatedData = data.filter(
-        (user) => user.UserID !== UserID
+        (user) => user.UserID !== UserID,
       );
       setData(updatedData);
     } catch (error) {
-      console.error("Error deleting category:", error);
+      console.error('Error deleting category:', error);
     }
   };
 
@@ -40,10 +44,9 @@ function UserTable() {
     fetchData();
   }, [router.pathname]);
 
-
   const truncateText = (text, length) => {
     if (text.length > length) {
-      return text.slice(0, length - 3) + "...";
+      return `${text.slice(0, length - 3)}...`;
     }
     return text;
   };
@@ -53,29 +56,29 @@ function UserTable() {
   };
 
   return (
-    <>
-      <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-        {/* buat s.admin */}
-        <div className="max-w-md ml-14 p-4 mt-9">
-          <div className="max-w-3xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">User Table</h2>
-            <div className="my-2">
-              <AddUser fetchData={fetchData}/>
-            </div>
-            <table className="w-full border">
-              <thead>
-                <tr className="bg-gray-100">
+    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
+      {/* buat s.admin */}
+      <div className="max-w-md ml-14 p-4 mt-9">
+        <div className="max-w-3xl mx-auto p-4">
+          <h2 className="text-2xl font-bold mb-4">User Table</h2>
+          <div className="my-2">
+            <AddUser fetchData={fetchData} />
+          </div>
+          <table className="w-full border">
+            <thead>
+              <tr className="bg-gray-100">
                 <th className="px-4 py-2">UserID</th>
-                  <th className="px-4 py-2">Username</th>
-                  <th className="px-4 py-2">Full Name</th>
-                  <th className="px-4 py-2">Status</th>
-                  <th className="px-4 py-2">Roles</th>
-                  <th className="px-4 py-2">Email</th>
-                  <th className="px-4 py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((user) => (
+                <th className="px-4 py-2">Username</th>
+                <th className="px-4 py-2">Full Name</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Roles</th>
+                <th className="px-4 py-2">Email</th>
+                <th className="px-4 py-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data ? (
+                data.map((user) => (
                   <tr key={user.UserID}>
                     <td className="px-4 py-2">{user.UserID}</td>
                     <td className="px-4 py-2">{user.Username}</td>
@@ -83,7 +86,7 @@ function UserTable() {
                       {truncateText(user.Name, 15)}
                     </td>
                     <td className="text-center">
-                      {user.IsActive === 1 ? "Active" : "Not Active"}
+                      {user.IsActive === 1 ? 'Active' : 'Not Active'}
                     </td>
                     <td className="text-center">{user.RoleID}</td>
                     <td className="px-4 py-2">
@@ -104,14 +107,18 @@ function UserTable() {
                       </button>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                ))) : (
+                  <tr>
+                    <td colSpan="7">Loading data...</td>
+                  </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-        {/* buat user biasa */}
+      </div>
+      {/* buat user biasa */}
 
-        {/* <div className="h-full mt-14">
+      {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
             <h1 className="text-white text-2xl font-bold mb-4">Dashboard</h1>
           </div>
@@ -354,8 +361,7 @@ function UserTable() {
             </div>
           </div>
         </div> */}
-      </section>
-    </>
+    </section>
   );
 }
 

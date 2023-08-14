@@ -1,17 +1,18 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { KmsAPIGET } from "@/dep/kms/kmsHandler";
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { KmsAPIGET } from '@/dep/kms/kmsHandler';
 
 function DocTable() {
   const router = useRouter();
   const [datadoc, setDatadoc] = useState([]);
   const [datafile, setDatafile] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const fetchDocData = async () => {
     try {
-      const response = await KmsAPIGET("listdoc");
+      const response = await KmsAPIGET('listdoc');
       const jsonData = response.body.Data;
       setDatadoc(jsonData);
       setError(null);
@@ -21,7 +22,7 @@ function DocTable() {
   };
   const fetchFileData = async () => {
     try {
-      const response = await KmsAPIGET("listfile");
+      const response = await KmsAPIGET('listfile');
       const jsonData = response.body.Data;
       setDatafile(jsonData);
       setError(null);
@@ -36,72 +37,71 @@ function DocTable() {
 
   const truncateText = (text, length) => {
     if (text.length > length) {
-      return text.slice(0, length - 3) + "...";
+      return `${text.slice(0, length - 3)}...`;
     }
     return text;
   };
 
   return (
-    <>
-      <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-        {/* buat s.admin */}
-        <div className="max-w-md ml-14 p-4 mt-9">
-          <div className="max-w-3xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">Document Table</h2>
-            <div className="my-2"></div>
-            <table className="w-full border">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2">DocID</th>
-                  <th className="px-4 py-2">DocLoc</th>
-                  <th className="px-4 py-2">CategoryID</th>
-                  <th className="px-4 py-2">DocType</th>
+    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
+      {/* buat s.admin */}
+      <div className="max-w-md ml-14 p-4 mt-9">
+        <div className="max-w-3xl mx-auto p-4">
+          <h2 className="text-2xl font-bold mb-4">Document Table</h2>
+          <div className="my-2" />
+          <table className="w-full border">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2">DocID</th>
+                <th className="px-4 py-2">DocLoc</th>
+                <th className="px-4 py-2">CategoryID</th>
+                <th className="px-4 py-2">DocType</th>
+              </tr>
+            </thead>
+            <tbody>
+              {datadoc.map((document) => (
+                <tr key={document.DocID}>
+                  <td className="px-4 py-2">{document.DocID}</td>
+                  <td className="px-4 py-2">{document.DocLoc}</td>
+                  <td className="px-4 py-2">{document.CategoryID}</td>
+                  <td className="px-4 py-2">
+                    {document.DocType}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {datadoc.map((document) => (
-                  <tr key={document.DocID}>
-                    <td className="px-4 py-2">{document.DocID}</td>
-                    <td className="px-4 py-2">{document.DocLoc}</td>
-                    <td className="px-4 py-2">{document.CategoryID}</td>
-                    <td className="px-4 py-2">
-                      {document.DocType}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="max-w-3xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">File Table</h2>
-            <div className="my-2"></div>
-            <table className="w-full border">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2">FileID</th>
-                  <th className="px-4 py-2">FileLoc</th>
-                  <th className="px-4 py-2">CategoryID</th>
-                  <th className="px-4 py-2">FileType</th>
-                </tr>
-              </thead>
-              <tbody>
-                {datafile.map((file) => (
-                  <tr key={file.FileID}>
-                    <td className="px-4 py-2">{file.FileID}</td>
-                    <td className="px-4 py-2">{file.FileLoc}</td>
-                    <td className="px-4 py-2">{file.CategoryID}</td>
-                    <td className="px-4 py-2">
-                      {file.FileType}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {/* buat user biasa */}
+        <div className="max-w-3xl mx-auto p-4">
+          <h2 className="text-2xl font-bold mb-4">File Table</h2>
+          <div className="my-2" />
+          <table className="w-full border">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2">FileID</th>
+                <th className="px-4 py-2">FileLoc</th>
+                <th className="px-4 py-2">CategoryID</th>
+                <th className="px-4 py-2">FileType</th>
+              </tr>
+            </thead>
+            <tbody>
+              {datafile.map((file) => (
+                <tr key={file.FileID}>
+                  <td className="px-4 py-2">{file.FileID}</td>
+                  <td className="px-4 py-2">{file.FileLoc}</td>
+                  <td className="px-4 py-2">{file.CategoryID}</td>
+                  <td className="px-4 py-2">
+                    {file.FileType}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {/* buat user biasa */}
 
-        {/* <div className="h-full mt-14">
+      {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
             <h1 className="text-white text-2xl font-bold mb-4">Dashboard</h1>
           </div>
@@ -344,8 +344,7 @@ function DocTable() {
             </div>
           </div>
         </div> */}
-      </section>
-    </>
+    </section>
   );
 }
 
