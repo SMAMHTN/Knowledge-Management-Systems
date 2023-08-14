@@ -12,10 +12,8 @@ function ArticleDetail({ params }) {
       try {
         const response = await KmsAPIGET("article?ArticleID=" + params.id);
         console.log(response);
-        const jsonData = response.body.Data;
 
-        setData(jsonData);
-        console.log(data);
+        setData(response.body.Data);
       } catch (error) {
         // Handle errors here
         console.error("Error fetching user data:", error);
@@ -24,6 +22,10 @@ function ArticleDetail({ params }) {
 
     fetchUserData();
   }, [params.id]);
+  
+  useEffect(() => {
+    console.log(data); // Log the 'data' value after it updates
+  }, [data]);
 
   const handleUpdate = async () => {
     try {

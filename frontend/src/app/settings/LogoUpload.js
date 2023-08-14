@@ -44,7 +44,7 @@ function LogoUpload({ onUpload }) {
       />
       {imagePreview && (
         <div>
-          <img src={imagePreview} alt="Preview" style={{ maxWidth: "200px" }} />
+          <Image src={imagePreview} alt="Preview" style={{ maxWidth: "200px" }} />
         </div>
       )}
       <button

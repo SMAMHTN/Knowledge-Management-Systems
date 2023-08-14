@@ -8,26 +8,25 @@ function HistoryTable() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-
     const fetchData = async () => {
       try {
         const response = await CoreAPIGET("listhistory");
-
+  
         console.log(response);
         console.log(response.body.StatusCode);
-        const jsonData = response.body.Data; // Update this line
-        setData(jsonData);
+  
+        // Update state with the fetched data
+        setData(response.body.Data); // Use response.body.Data directly
         setError(null);
-        console.log(data);
-
       } catch (error) {
         // Handle errors here
         console.error("Error fetching user data:", error);
       }
     };
-
+  
     fetchData();
-  }, []);
+  }, []); // Empty dependency array, so this effect runs once after initial render
+  
 
   return (
     <>

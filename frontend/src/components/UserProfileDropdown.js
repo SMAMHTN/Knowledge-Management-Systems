@@ -17,7 +17,7 @@ const UserProfile = ({ imageUrl, username }) => {
           onClick={toggleDropdown}
           className="group w-9 h-9 my-2 mr-4 md:mr-7 transition-colors duration-200 rounded-full shadow-md bg-blue-200 hover:bg-blue-200 dark:bg-gray-50 dark:hover:bg-gray-200 text-gray-900 focus:outline-none relative"
         >
-          <img className="flex rounded-full" src={imageUrl} alt={username} />
+          <Image className="flex rounded-full" src={imageUrl} alt={username} />
         </button>
       </div>
       {isOpen && (
