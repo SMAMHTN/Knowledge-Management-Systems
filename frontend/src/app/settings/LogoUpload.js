@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Image from "next/image"; // Import the Next.js Image component
 
 function LogoUpload({ onUpload }) {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -44,7 +45,14 @@ function LogoUpload({ onUpload }) {
       />
       {imagePreview && (
         <div>
-          <Image src={imagePreview} alt="Preview" style={{ maxWidth: "200px" }} />
+          {/* Use the Next.js Image component */}
+          <Image
+            src={imagePreview}
+            alt="Preview"
+            width={200} // Set the width
+            height={200} // Set the height
+            objectFit="contain" // Set the object fit mode
+          />
         </div>
       )}
       <button

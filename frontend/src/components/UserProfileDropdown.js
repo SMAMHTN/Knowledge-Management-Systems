@@ -85,7 +85,7 @@ const CustomLink = ({ href, text }) => {
 
 const UserProfileDropdown = () => {
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center">
       <UserProfile username="John Doe" />
     </div>
   );
