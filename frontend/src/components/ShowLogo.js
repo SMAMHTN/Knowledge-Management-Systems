@@ -37,7 +37,7 @@ function ShowLogo({maxWidth, maxHeight}) {
   const renderCompanyLogo = () => {
     if (isValidBase64(data.CompanyLogo)) {
       return (
-        <img
+        <Image
           src={`data:image;base64,${data.CompanyLogo}`}
           alt="Company Logo"
           style={{

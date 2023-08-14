@@ -12,10 +12,8 @@ function ArticleDetail({ params }) {
       try {
         const response = await KmsAPIGET("permission?PermissionID=" + params.id);
         console.log(response);
-        const jsonData = response.body.Data;
 
-        setData(jsonData);
-        console.log(data);
+        setData(response.body.Data);
       } catch (error) {
         // Handle errors here
         console.error("Error fetching user data:", error);
