@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation'
 import { Login, CoreAPIGET } from "../../dep/core/coreHandler";
+import Image from "next/image"; // Import the Next.js Image component
 // import { KmsAPIGET, KmsAPI } from "../../dep/kms/kmsHandler";
 
 export default function Page() {

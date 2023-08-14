@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from "react";
 import { CoreAPIGET } from "../dep/core/coreHandler";
+import Image from "next/image"; // Import the Next.js Image component
 
 function ShowLogo({maxWidth, maxHeight}) {
   const [error, setError] = useState("");

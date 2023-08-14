@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image"; // Import the Next.js Image component
 
 const UserProfile = ({ imageUrl, username }) => {
   const [isOpen, setIsOpen] = useState(false);
