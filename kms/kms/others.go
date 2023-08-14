@@ -2,6 +2,7 @@ package kms
 
 import (
 	"dependency"
+	"errors"
 	"log"
 
 	"github.com/labstack/echo/v4"
@@ -43,4 +44,16 @@ func RecordHistory(c echo.Context, ActivityType string, Changes string) error {
 		log.Println("WARNING " + err.Error())
 	}
 	return nil
+}
+
+func GetTimeZone() (timezone string, err error) {
+	response, err := CallCoreAPINoCred("GET", "tz", nil)
+	if err != nil {
+		log.Println("WARNING " + err.Error())
+	}
+	responsedata, isexist := response["Data"].(string)
+	if !isexist {
+		return "", errors.New("data not found")
+	}
+	return responsedata, nil
 }

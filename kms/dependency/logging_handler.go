@@ -7,9 +7,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 )
 
-func Init_log(LogFile string) (err error) {
+func Init_log(LogFile string, TimeZone string) (err error) {
 	fmt.Println("---------------------------------------")
 	fmt.Println("Preparing Logger")
 
@@ -30,8 +31,19 @@ func Init_log(LogFile string) (err error) {
 
 	// Set up the multi-writer with error handling
 	multiWriter := io.MultiWriter(file, os.Stdout)
-	log.SetFlags(log.Ldate | log.LUTC | log.Ltime | log.Llongfile)
+	log.SetFlags(log.Llongfile)
 	log.SetOutput(multiWriter)
+	desiredTimezone, err := time.LoadLocation(TimeZone)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Example: Create a logger
+
+	// Example: Log something with a timestamp in the desired timezone
+	current := time.Now().In(desiredTimezone)
+	a := fmt.Sprintf("%s ", current.Format("2006/01/02 15:04:05 MST"))
+	log.SetPrefix(a)
 
 	// Test log message
 

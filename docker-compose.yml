@@ -40,25 +40,27 @@ services:
     command: /bin/sh -c "while true; do sleep 100000; done"
     ports:
       - "5656:5656"
-  # frontend:
-  #   build: ./frontend
-  #   depends_on:
-  #     - core
-  #     - kms
-  #   ports:
-  #     - "3000:3000"
-  solr:
-    image: "solr:9.2.0"
-    ulimits:
-      nofile:
-        soft: 65000
-        hard: 65000
+  frontend:
+    build: ./frontend
     volumes:
-      - ./solr:/var/solr
+      - ./frontend:/frontend:rw
+    depends_on:
+      - core
+      - kms
     ports:
-      - "8983:8983"
-    user: root 
-    command: bash -c "chown -R 8983:8983 /var/solr && runuser -u solr -- solr-foreground"
+      - "3000:3000"
+  # solr:
+  #   image: "solr:9.2.0"
+  #   ulimits:
+  #     nofile:
+  #       soft: 65000
+  #       hard: 65000
+  #   volumes:
+  #     - ./solr:/var/solr
+  #   ports:
+  #     - "8983:8983"
+  #   user: root 
+  #   command: bash -c "chown -R 8983:8983 /var/solr && runuser -u solr -- solr-foreground"
   tika:
     image: "apache/tika:2.7.0.1-full"
     ports:

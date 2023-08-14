@@ -39,7 +39,12 @@ func init() {
 	}
 	fmt.Println("---------------------------------------")
 	fmt.Println("READING FILE CONF DONE\n---------------------------------------")
-	err = dependency.Init_log(Conf.Log_Location)
+	TimeZone, err := GetTimeZone()
+	if err != nil {
+		log.Panic("FATAL " + err.Error())
+		panic(err)
+	}
+	err = dependency.Init_log(Conf.Log_Location, TimeZone)
 	if err != nil {
 		log.Panic("FATAL " + err.Error())
 		panic(err)

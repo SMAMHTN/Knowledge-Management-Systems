@@ -103,6 +103,7 @@ func Test_api() {
 	e.GET("/setting", ShowSetting, basicAuthMiddleware)
 	e.PUT("/setting", EditSetting, basicAuthMiddleware)
 	e.GET("/checkserverrun", CheckServerRun)
+	e.GET("/tz", ExtractTimeZoneAPI)
 
 	// Start the server
 	fmt.Println(strconv.Itoa(Conf.Appport))

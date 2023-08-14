@@ -207,6 +207,13 @@ func ShowSetting(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+func ExtractTimeZoneAPI(c echo.Context) error {
+	res := Response{}
+	res.StatusCode = http.StatusOK
+	res.Data = GetTimeZone()
+	return c.JSON(http.StatusOK, res)
+}
+
 func EditSetting(c echo.Context) error {
 	permission, now_user, _ := Check_Permission_API(c)
 	var err error
