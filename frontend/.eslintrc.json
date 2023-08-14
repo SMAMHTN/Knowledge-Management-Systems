@@ -1,3 +1,17 @@
-{
-  "extends": "next/core-web-vitals"
+{    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "airbnb",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "rules": {
+        "max-len": ["error", { "code": 250 }],
+        "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+        "react/react-in-jsx-scope": "off",
+        "linebreak-style": ["error", "windows"]
+    }
+
 }
