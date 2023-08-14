@@ -1,12 +1,13 @@
+'use client'
 import { useState, useEffect } from "react";
 import { CoreAPIGET } from "../dep/core/coreHandler";
 
-function ShowLogo() {
+function ShowLogo({maxWidth, maxHeight}) {
   const [error, setError] = useState("");
   const [data, setData] = useState({
     CompanyLogo: "", // Initialize CompanyLogo with an empty string
   });
-
+  
   const fetchData = async () => {
     try {
       const response = await CoreAPIGET("setting");
@@ -33,15 +34,23 @@ function ShowLogo() {
     }
   };
 
-  // Function to render the CompanyLogo as an image
   const renderCompanyLogo = () => {
     if (isValidBase64(data.CompanyLogo)) {
       return (
-        <img src={`data:image;base64,${data.CompanyLogo}`} alt="Company Logo" />
+        <img
+          src={`data:image;base64,${data.CompanyLogo}`}
+          alt="Company Logo"
+          style={{
+            maxWidth: maxWidth || "100%",
+            maxHeight: maxHeight || "100%",
+            objectFit: "contain", // Add this line to control the image fit
+          }}
+        />
       );
     } else {
       return null; // If the CompanyLogo is not a valid base64 string, do not render the image
     }
+  
   };
 
   return (
