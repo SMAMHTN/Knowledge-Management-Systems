@@ -74,3 +74,62 @@ export async function KmsAPIGET(path) {
     throw error;
   }
 }
+
+export async function KmsAPIBlob(method, path, data) {
+  const conf = readConf("frontend_conf.json");
+  const cookieStore = cookies();
+  let un, pwd;
+  try {
+    un = cookieStore.get("username")?.value;
+    pwd = cookieStore.get("password")?.value;
+
+    if (!un || !pwd) {
+      throw new Error("You must log in.");
+    }
+  } catch (error) {
+    throw error;
+  }
+  const credentials = generateKmsCred(un, pwd);
+  try {
+    const headers = {
+      Authorization: `Basic ${credentials}`,
+      Accept: "*/*",
+      Connection: "keep-alive",
+    };
+
+    let response;
+    if (method === "GET") {
+      response = await fetch(conf.kms_link + path, {
+        method: method,
+        headers: headers,
+      });
+
+      const fileBlob = await response.blob();
+
+      return {
+        head: response.headers,
+        body: fileBlob,
+      };
+    } else if (method === "POST") {
+      const formData = new FormData();
+      formData.append('file', data); // Assuming "data" is the File object
+
+      headers["Content-Type"] = "multipart/form-data";
+
+      response = await fetch(conf.kms_link + path, {
+        method: method,
+        headers: headers,
+        body: formData,
+      });
+
+      const responseBody = await response.json();
+
+      return {
+        head: response.headers,
+        body: responseBody,
+      };
+    }
+  } catch (error) {
+    throw error;
+  }
+}
