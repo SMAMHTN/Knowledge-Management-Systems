@@ -5,6 +5,12 @@ const nextConfig = {
     serverActionsBodySizeLimit: '5gb',
   },
   output: 'standalone',
+  images: {
+    remotePatterns: [{
+      protocol: 'https',
+      hostname: 'upload.wikimedia.org',
+    }],
+  },
 };
 
 module.exports = nextConfig;
