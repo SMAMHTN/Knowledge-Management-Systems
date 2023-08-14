@@ -170,10 +170,10 @@ function SystemSetting() {
                 />
               </div>
               <div className="mb-4">
-              <ShowLogo/>
+              <ShowLogo maxWidth="100px" maxHeight="100px"/>
               </div>
               <LogoUpload onUpload={handleLogoUpload} />
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <label className="block font-semibold mb-1">CompanyLogo</label>
                 <input
                   type="text"
@@ -183,7 +183,7 @@ function SystemSetting() {
                     setData({ ...data, CompanyLogo: e.target.value })
                   }
                 />
-              </div>
+              </div> */}
 
               <div className="mb-4">
                 <label className="block font-semibold mb-1">
