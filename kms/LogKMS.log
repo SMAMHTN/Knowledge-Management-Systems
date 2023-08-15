@@ -4,3 +4,13 @@
 2023/08/14 05:00:21 /kms/dependency/api_handler.go:44: WARNING Get "http://core:6565/tz": dial tcp 172.18.0.5:6565: connect: connection refused
 2023/08/14 05:00:21 /kms/kms/others.go:53: WARNING Get "http://core:6565/tz": dial tcp 172.18.0.5:6565: connect: connection refused
 2023/08/14 12:12:19 WIB /kms/kms/setup.go:52: Test
+2023/08/14 15:39:33 WIB /kms/kms/kms_category.go:91: WARNING Error 1146 (42S02): Table 'kms.kms_category' doesn't exist
+2023/08/14 15:39:33 WIB /kms/kms/kms_article.go:444: WARNING permission not found
+2023/08/14 15:39:33 WIB /kms/kms/kms_permission.go:269: WARNING this isnt an array
+2023/08/14 15:39:33 WIB /kms/kms/others.go:44: WARNING HTTP request failed with status code 405
+2023/08/14 15:39:33 WIB /kms/kms/kms_article.go:444: WARNING permission not found
+2023/08/14 15:39:33 WIB /kms/kms/kms_article.go:444: WARNING permission not found
+2023/08/14 15:39:33 WIB /kms/kms/others.go:44: WARNING HTTP request failed with status code 405
+2023/08/14 15:39:33 WIB /kms/kms/kms_file.go:235: WARNING permission not found
+2023/08/14 15:39:33 WIB /kms/kms/others.go:44: WARNING HTTP request failed with status code 405
+2023/08/14 15:39:33 WIB /kms/kms/others.go:44: WARNING HTTP request failed with status code 405

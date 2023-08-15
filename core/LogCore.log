@@ -4,3 +4,49 @@
 Current time: 2023-08-14 09:26:34 WIB2023/08/14 02:26:34 /core/dependency/logging_handler.go:48: TEST
 2023-08-14 09:27:49 WIB /core/dependency/logging_handler.go:48: TEST
 2023/08/14 09:37:53 WIB /core/dependency/logging_handler.go:47: TEST
+2023/08/14 08:39:29 UTC /core/core/core_user.go:155: WARNING Error 1146 (42S02): Table 'core.core_user' doesn't exist
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set

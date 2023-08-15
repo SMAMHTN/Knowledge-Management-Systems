@@ -100,7 +100,7 @@ func Test_api() {
 	e.POST("/theme", AddTheme, basicAuthMiddleware)
 	e.PUT("/theme", EditTheme, basicAuthMiddleware)
 	e.DELETE("/theme", DeleteTheme, basicAuthMiddleware)
-	e.GET("/setting", ShowSetting, basicAuthMiddleware)
+	e.GET("/setting", ShowSetting)
 	e.PUT("/setting", EditSetting, basicAuthMiddleware)
 	e.GET("/checkserverrun", CheckServerRun)
 	e.GET("/tz", ExtractTimeZoneAPI)
