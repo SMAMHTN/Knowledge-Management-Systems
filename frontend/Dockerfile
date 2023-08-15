@@ -51,6 +51,11 @@ COPY --from=builder /app/public ./public
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY ./frontend_conf.json ./
+# COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+# COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# COPY --from=builder --chown=nextjs:nodejs /app/.next/cache ./.next/cache
 
 EXPOSE 3000
 
