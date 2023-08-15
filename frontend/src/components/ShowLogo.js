@@ -41,6 +41,8 @@ function ShowLogo({maxWidth, maxHeight}) {
         <Image
           src={`data:image;base64,${data.CompanyLogo}`}
           alt="Company Logo"
+          width={500}
+          height={500}
           style={{
             maxWidth: maxWidth || "100%",
             maxHeight: maxHeight || "100%",
