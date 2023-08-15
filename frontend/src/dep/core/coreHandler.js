@@ -3,6 +3,8 @@ import { readConf } from "../others/confHandler";
 import { generateCoreCred } from "../others/generateCred";
 import { cookies } from "next/headers";
 
+const LoginDynamicpath = "/tes"
+
 export async function Login(Username, Password) {
   const conf = readConf("frontend_conf.json");
   const credentials = generateCoreCred(Username, Password);
@@ -62,9 +64,10 @@ export async function CoreAPI(method, path, data) {
     un = cookieStore.get("username")?.value;
     pwd = cookieStore.get("password")?.value;
 
-    if (!un || !pwd) {
-      throw new Error("You must log in.");
-    }
+    if (un == undefined || pwd == undefined) {
+      un = "";
+      pwd = "";
+    };
   } catch (error) {
     throw error;
   }
@@ -80,6 +83,9 @@ export async function CoreAPI(method, path, data) {
       },
       body: JSON.stringify(data),
     });
+    if (response.status === 401){
+      redirect(LoginDynamicpath)
+    };
     const responseBody = await response.json();
 
     return {
@@ -99,8 +105,9 @@ export async function CoreAPIGET(path) {
     un = cookieStore.get("username")?.value;
     pwd = cookieStore.get("password")?.value;
     if (un == undefined || pwd == undefined) {
-      throw new Error("You must log in.");
-    }
+      un = "";
+      pwd = "";
+    };
   } catch (error) {
     throw error;
   }
@@ -114,6 +121,9 @@ export async function CoreAPIGET(path) {
         Connection: "keep-alive",
       },
     });
+    if (response.status === 401){
+      redirect(LoginDynamicpath)
+    };
     const responseBody = await response.json();
 
     return {
@@ -133,9 +143,10 @@ export async function CoreAPIBlob(method, path, CategoryID, File) {
     un = cookieStore.get("username")?.value;
     pwd = cookieStore.get("password")?.value;
 
-    if (!un || !pwd) {
-      throw new Error("You must log in.");
-    }
+    if (un == undefined || pwd == undefined) {
+      un = "";
+      pwd = "";
+    };
   } catch (error) {
     throw error;
   }
@@ -153,6 +164,9 @@ export async function CoreAPIBlob(method, path, CategoryID, File) {
         method: method,
         headers: headers,
       });
+      if (response.status === 401){
+        redirect(LoginDynamicpath)
+      };
 
       const fileBlob = await response.blob();
 
@@ -170,6 +184,9 @@ export async function CoreAPIBlob(method, path, CategoryID, File) {
         headers: headers,
         body: formData,
       });
+      if (response.status === 401){
+        redirect(LoginDynamicpath)
+      };
 
       const responseBody = await response.json();
 
@@ -181,4 +198,10 @@ export async function CoreAPIBlob(method, path, CategoryID, File) {
   } catch (error) {
     throw error;
   }
+}
+
+export async function getUserData(){
+  response = await CoreAPIGET('loginuser');
+  response2 = await CoreAPIGET('user?UserID='+response.body.Data.UserID);
+  return response2.body.Data
 }

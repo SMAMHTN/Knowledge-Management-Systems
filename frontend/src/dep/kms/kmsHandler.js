@@ -3,6 +3,8 @@ import { readConf } from "../others/confHandler";
 import { generateKmsCred } from "../others/generateCred";
 import { cookies } from "next/headers";
 
+const LoginDynamicpath = "/tes"
+
 export async function KmsAPI(method, path, data) {
   const conf = readConf("frontend_conf.json");
   const cookieStore = cookies();
@@ -11,9 +13,10 @@ export async function KmsAPI(method, path, data) {
     un = cookieStore.get("username")?.value;
     pwd = cookieStore.get("password")?.value;
 
-    if (!un || !pwd) {
-      throw new Error("You must log in.");
-    }
+    if (un == undefined || pwd == undefined) {
+      un = "";
+      pwd = "";
+    };
   } catch (error) {
     throw error;
   }
@@ -29,6 +32,9 @@ export async function KmsAPI(method, path, data) {
       },
       body: JSON.stringify(data),
     });
+    if (response.status === 401){
+      redirect(LoginDynamicpath)
+    };
     const responseBody = await response.json();
 
     return {
@@ -48,9 +54,10 @@ export async function KmsAPIGET(path) {
     un = cookieStore.get("username")?.value;
     pwd = cookieStore.get("password")?.value;
 
-    if (!un || !pwd) {
-      throw new Error("You must log in.");
-    }
+    if (un == undefined || pwd == undefined) {
+      un = "";
+      pwd = "";
+    };
   } catch (error) {
     throw error;
   }
@@ -64,6 +71,9 @@ export async function KmsAPIGET(path) {
         Connection: "keep-alive",
       },
     });
+    if (response.status === 401){
+      redirect(LoginDynamicpath)
+    };
     const responseBody = await response.json();
 
     return {
@@ -83,9 +93,10 @@ export async function KmsAPIBlob(method, path, CategoryID, File) {
     un = cookieStore.get("username")?.value;
     pwd = cookieStore.get("password")?.value;
 
-    if (!un || !pwd) {
-      throw new Error("You must log in.");
-    }
+    if (un == undefined || pwd == undefined) {
+      un = "";
+      pwd = "";
+    };
   } catch (error) {
     throw error;
   }
@@ -103,6 +114,9 @@ export async function KmsAPIBlob(method, path, CategoryID, File) {
         method: method,
         headers: headers,
       });
+      if (response.status === 401){
+        redirect(LoginDynamicpath)
+      };
 
       const fileBlob = await response.blob();
 
@@ -120,6 +134,9 @@ export async function KmsAPIBlob(method, path, CategoryID, File) {
         headers: headers,
         body: formData,
       });
+      if (response.status === 401){
+        redirect(LoginDynamicpath)
+      };
 
       const responseBody = await response.json();
 
