@@ -50,3 +50,17 @@ Current time: 2023-08-14 09:26:34 WIB2023/08/14 02:26:34 /core/dependency/loggin
 2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
 2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
 2023/08/14 08:39:29 UTC /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/15 11:48:17 WIB /core/core/core_user.go:386: WARNING please insert UserID or Username
+2023/08/15 11:48:17 WIB /core/core/core_user.go:386: WARNING please insert UserID or Username
+2023/08/15 11:48:17 WIB /core/core/core_user.go:386: WARNING please insert UserID or Username
+2023/08/15 11:48:17 WIB /core/core/core_user.go:386: WARNING please insert UserID or Username
+2023/08/15 11:48:17 WIB /core/core/core_user.go:443: WARNING code=400, message=Syntax error: offset=1, error=invalid character 'A' looking for beginning of value, internal=invalid character 'A' looking for beginning of value
+2023/08/15 11:48:17 WIB /core/core/core_user.go:443: WARNING code=400, message=Syntax error: offset=8, error=invalid character 'A' looking for beginning of object key string, internal=invalid character 'A' looking for beginning of object key string
+2023/08/15 11:48:17 WIB /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/15 11:48:17 WIB /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/15 11:48:17 WIB /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/15 11:48:17 WIB /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/15 11:48:17 WIB /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/15 11:48:17 WIB /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/15 11:48:17 WIB /core/core/core_user.go:225: WARNING sql: no rows in result set
+2023/08/15 11:48:17 WIB /core/core/core_user.go:225: WARNING sql: no rows in result set

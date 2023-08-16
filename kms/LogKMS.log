@@ -14,3 +14,13 @@
 2023/08/14 15:39:33 WIB /kms/kms/kms_file.go:235: WARNING permission not found
 2023/08/14 15:39:33 WIB /kms/kms/others.go:44: WARNING HTTP request failed with status code 405
 2023/08/14 15:39:33 WIB /kms/kms/others.go:44: WARNING HTTP request failed with status code 405
+2023/08/14 15:39:33 WIB /kms/kms/kms_doc.go:96: WARNING sql: no rows in result set
+2023/08/14 15:39:33 WIB /kms/kms/kms_article.go:189: WARNING sql: no rows in result set
+2023/08/14 15:39:33 WIB /kms/kms/kms_article.go:567: WARNING Article DocID Error : 2 sql: no rows in result set
+2023/08/14 15:39:33 WIB /kms/kms/kms_doc.go:96: WARNING sql: no rows in result set
+2023/08/14 15:39:33 WIB /kms/kms/kms_article.go:189: WARNING sql: no rows in result set
+2023/08/14 15:39:33 WIB /kms/kms/kms_article.go:567: WARNING Article DocID Error : 2 sql: no rows in result set
+2023/08/14 15:39:33 WIB /kms/kms/kms_doc.go:96: WARNING sql: no rows in result set
+2023/08/14 15:39:33 WIB /kms/kms/kms_article.go:189: WARNING sql: no rows in result set
+2023/08/14 15:39:33 WIB /kms/kms/kms_article.go:567: WARNING Article DocID Error : 2 sql: no rows in result set
+2023/08/14 15:39:33 WIB /kms/kms/others.go:44: WARNING HTTP request failed with status code 405

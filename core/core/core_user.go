@@ -376,9 +376,17 @@ func ShowUser(c echo.Context) error {
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	if u.UserID == now_user.UserID {
+	if u.UserID == now_user.UserID || u.UserID == 0 {
+		u.UserID = now_user.UserID
+		err = u.Read()
+		if err != nil {
+			log.Println("WARNING " + err.Error())
+			res.StatusCode = http.StatusNotFound
+			res.Data = "USER NOT FOUND"
+			return c.JSON(http.StatusNotFound, res)
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = now_user
+		res.Data = u
 		return c.JSON(http.StatusOK, res)
 	} else if permission {
 		err = u.Read()
@@ -445,9 +453,22 @@ func EditUser(c echo.Context) error {
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	if u.UserID == now_user.UserID {
+	if u.UserID == now_user.UserID || u.UserID == 0 {
+		u.UserID = now_user.UserID
+		err = u.UpdateFromAPI()
+		if err != nil {
+			log.Println("WARNING " + err.Error())
+			res.StatusCode = http.StatusConflict
+			res.Data = err.Error()
+			return c.JSON(http.StatusConflict, res)
+		}
+		u.Read()
 		res.StatusCode = http.StatusOK
-		res.Data = now_user
+		res.Data = u
+		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Edited User : "+u.Name+"("+u.Username+")"+"("+strconv.Itoa(u.UserID)+")")
+		if err != nil {
+			log.Println("WARNING failed to record user change history " + err.Error())
+		}
 		return c.JSON(http.StatusOK, res)
 	}
 	if permission {
