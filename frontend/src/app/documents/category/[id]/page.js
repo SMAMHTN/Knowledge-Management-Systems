@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { KmsAPI, KmsAPIGET } from "../../../../dep/kms/kmsHandler";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { KmsAPI, KmsAPIGET } from '../../../../dep/kms/kmsHandler';
 
 function ArticleDetail({ params }) {
   const [data, setData] = useState([]);
@@ -10,100 +10,92 @@ function ArticleDetail({ params }) {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await KmsAPIGET("category?CategoryID=" + params.id);
+        const response = await KmsAPIGET(`category?CategoryID=${params.id}`);
         console.log(response);
 
         setData(response.body.Data);
       } catch (error) {
         // Handle errors here
-        console.error("Error fetching user data:", error);
+        console.error('Error fetching user data:', error);
       }
     };
 
     fetchUserData();
   }, [params.id]);
-  
 
   const handleUpdate = async () => {
     try {
       console.log(data);
-      const response = await KmsAPI("PUT", "category", data);
+      const response = await KmsAPI('PUT', 'category', data);
     } catch (error) {
       console.log(error);
-      console.log("Ada error anjg");
+      console.log('Ada error anjg');
       // Handle error
     }
   };
 
   return (
-    <>
-      <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-        {/* buat s.admin */}
-        <div className="max-w-md ml-14 p-4 mt-9">
-          <div className="max-w-3xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">category  edit</h2>
-            <form action={handleUpdate}>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">CategoryID</label>
-                <input
-                  type="text"
-                  value={data.CategoryID || ""}
-                  className="border px-2 py-1 w-full"
-                  readOnly
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">CategoryName</label>
-                <input
-                  type="text"
-                  value={data.CategoryName || ""}
-                  className="border px-2 py-1 w-full"
-                  onChange={(e) =>
-                    setData({ ...data, CategoryName: e.target.value })
-                  }
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">
+    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
+      {/* buat s.admin */}
+      <div className="max-w-md ml-14 p-4 mt-9">
+        <div className="max-w-3xl mx-auto p-4">
+          <h2 className="text-2xl font-bold mb-4">category  edit</h2>
+          <form action={handleUpdate}>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">CategoryID</label>
+              <input
+                type="text"
+                value={data.CategoryID || ''}
+                className="border px-2 py-1 w-full"
+                readOnly
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">CategoryName</label>
+              <input
+                type="text"
+                value={data.CategoryName || ''}
+                className="border px-2 py-1 w-full"
+                onChange={(e) => setData({ ...data, CategoryName: e.target.value })}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">
                 CategoryParentID
-                </label>
-                <input
-                  type="text"
-                  value={data.CategoryParentID || ""}
-                  className="border px-2 py-1 w-full"
-                  onChange={(e) =>
-                    setData({
-                      ...data,
-                      CategoryParentID: parseInt(e.target.value, 10),
-                    })
-                  }
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">
+              </label>
+              <input
+                type="text"
+                value={data.CategoryParentID || ''}
+                className="border px-2 py-1 w-full"
+                onChange={(e) => setData({
+                  ...data,
+                  CategoryParentID: parseInt(e.target.value, 10),
+                })}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">
                 CategoryDescription
-                </label>
-                <input
-                  type="text"
-                  value={data.CategoryDescription || ""}
-                  className="border px-2 py-1 w-full"
-                  onChange={(e) =>
-                    setData({ ...data, CategoryDescription: e.target.value })
-                  }
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Update
-              </button>
-            </form>
-          </div>
+              </label>
+              <input
+                type="text"
+                value={data.CategoryDescription || ''}
+                className="border px-2 py-1 w-full"
+                onChange={(e) => setData({ ...data, CategoryDescription: e.target.value })}
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Update
+            </button>
+          </form>
         </div>
-        {/* buat user biasa */}
+      </div>
+      {/* buat user biasa */}
 
-        {/* <div className="h-full mt-14">
+      {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
             <h1 className="text-white text-2xl font-bold mb-4">Dashboard</h1>
           </div>
@@ -346,8 +338,7 @@ function ArticleDetail({ params }) {
             </div>
           </div>
         </div> */}
-      </section>
-    </>
+    </section>
   );
 }
 

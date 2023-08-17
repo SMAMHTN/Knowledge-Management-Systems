@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { KmsAPI } from '../../../dep/kms/kmsHandler';
+import { useOutsideClick, useModal } from '@/components/Feature';
 
 function AddCategory({ fetchData }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isModalOpen, openModal, closeModal } = useModal();
   const ref = useRef(null);
   const [formData, setFormData] = useState({
     CategoryName: '',
@@ -10,29 +11,7 @@ function AddCategory({ fetchData }) {
     CategoryDescription: '',
   });
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  useEffect(() => {
-    if (isModalOpen) {
-      const handleOutsideClick = (event) => {
-        if (ref.current && !ref.current.contains(event.target)) {
-          closeModal();
-        }
-      };
-
-      window.addEventListener('mousedown', handleOutsideClick);
-
-      return () => {
-        window.removeEventListener('mousedown', handleOutsideClick);
-      };
-    }
-  }, [isModalOpen, ref]);
+  useOutsideClick(ref, closeModal);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

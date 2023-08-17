@@ -1,22 +1,18 @@
-import React, { useState } from "react";
-import { CoreAPI } from "../../dep/core/coreHandler";
+import React, { useState, useRef } from 'react';
+import { CoreAPI } from '../../dep/core/coreHandler';
+import { useOutsideClick, useModal } from '@/components/Feature';
 
-const AddTheme = ({ fetchThemes }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+function AddTheme({ fetchThemes }) {
+  const { isModalOpen, openModal, closeModal } = useModal();
+  const ref = useRef(null);
   const [formData, setFormData] = useState({
-    AppthemeName: "",
-    AppthemeValue: "",
+    AppthemeName: '',
+    AppthemeValue: '',
   });
-  const [primaryColor, setPrimaryColor] = useState("#000000");
-  const [secondaryColor, setSecondaryColor] = useState("#000000");
+  const [primaryColor, setPrimaryColor] = useState('#000000');
+  const [secondaryColor, setSecondaryColor] = useState('#000000');
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  useOutsideClick(ref, closeModal);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -68,12 +64,12 @@ const AddTheme = ({ fetchThemes }) => {
         }),
       };
 
-      await CoreAPI("POST", "theme", updatedFormData);
+      await CoreAPI('POST', 'theme', updatedFormData);
 
       fetchThemes();
-      console.log("Data saved successfully.");
+      console.log('Data saved successfully.');
     } catch (error) {
-      console.log("Error occurred:", error);
+      console.log('Error occurred:', error);
     }
 
     closeModal();
@@ -90,18 +86,18 @@ const AddTheme = ({ fetchThemes }) => {
       {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
-          isModalOpen ? "visible" : "invisible"
+          isModalOpen ? 'visible z-20' : 'invisible'
         }`}
-        onClick={closeModal}
-      ></div>
+      />
 
       {/* Modal */}
       <div
         className={`fixed inset-0 flex justify-center items-center ${
-          isModalOpen ? "visible" : "invisible"
+          isModalOpen ? 'visible z-30' : 'invisible'
         }`}
+
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-10">
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={closeModal}
@@ -117,7 +113,7 @@ const AddTheme = ({ fetchThemes }) => {
                 strokeLinejoin="round"
                 strokeWidth="2"
                 d="M6 18L18 6M6 6l12 12"
-              ></path>
+              />
             </svg>
           </button>
           <h2 className="text-2xl font-semibold mb-4">New Theme</h2>
@@ -134,21 +130,21 @@ const AddTheme = ({ fetchThemes }) => {
                 />
               </div>
               <div className="mb-4">
-      <label className="block font-semibold mb-1">Primary Color</label>
-      <input
-        type="color"
-        value={formData.primaryColor}
-        onChange={handlePrimaryColorChange}
-      />
-    </div>
-    <div className="mb-4">
-      <label className="block font-semibold mb-1">Secondary Color</label>
-      <input
-        type="color"
-        value={formData.secondaryColor}
-        onChange={handleSecondaryColorChange}
-      />
-    </div>
+                <label className="block font-semibold mb-1">Primary Color</label>
+                <input
+                  type="color"
+                  value={formData.primaryColor}
+                  onChange={handlePrimaryColorChange}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">Secondary Color</label>
+                <input
+                  type="color"
+                  value={formData.secondaryColor}
+                  onChange={handleSecondaryColorChange}
+                />
+              </div>
             </div>
 
             <button
@@ -162,7 +158,7 @@ const AddTheme = ({ fetchThemes }) => {
       </div>
     </div>
   );
-};
+}
 
 export default AddTheme;
 

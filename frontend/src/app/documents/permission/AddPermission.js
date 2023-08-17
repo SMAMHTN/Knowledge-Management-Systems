@@ -1,43 +1,39 @@
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { KmsAPI } from "../../../dep/kms/kmsHandler";
+import React, { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { KmsAPI } from '../../../dep/kms/kmsHandler';
+import { useOutsideClick, useModal } from '@/components/Feature';
 
-const AddPermission = ({ fetchData }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+function AddPermission({ fetchData }) {
+  const { isModalOpen, openModal, closeModal } = useModal();
+  const ref = useRef(null);
   const [formData, setFormData] = useState({
-    CategoryID: "",
-    RoleID: "",
+    CategoryID: '',
+    RoleID: '',
     Create: 0,
     Read: 0,
     Update: 0,
     Delete: 0,
-    FileType: "[]",
-    DocType: "[]",
+    FileType: '[]',
+    DocType: '[]',
   });
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  useOutsideClick(ref, closeModal);
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const {
+      name, value, type, checked,
+    } = e.target;
     let parsedValue;
 
     // Handle checkbox input
-    if (type === "checkbox") {
+    if (type === 'checkbox') {
       parsedValue = checked ? 1 : 0;
+    } else if (name === 'DocType' || name === 'FileType') {
+      parsedValue = value === '' ? '[]' : `[${value}]`;
+    } else if (name === 'CategoryID' || name === 'RoleID') {
+      parsedValue = value === '' ? 0 : parseInt(value, 10);
     } else {
-      if (name === "DocType" || name === "FileType") {
-        parsedValue = value === "" ? "[]" : `[${value}]`;
-      } else if (name === "CategoryID" || name === "RoleID") {
-        parsedValue = value === "" ? 0 : parseInt(value, 10);
-      } else {
-        parsedValue = value === "" ? 0 : value;
-      }
+      parsedValue = value === '' ? 0 : value;
     }
 
     setFormData((prevData) => ({
@@ -51,13 +47,13 @@ const AddPermission = ({ fetchData }) => {
     console.log(formData);
     try {
       // Make the API call to save the data
-      await KmsAPI("POST", "permission", formData);
+      await KmsAPI('POST', 'permission', formData);
 
       // Refresh the page after successfully saving the data
       fetchData();
-      console.log("Data saved successfully.");
+      console.log('Data saved successfully.');
     } catch (error) {
-      console.log("Error occurred:", error);
+      console.log('Error occurred:', error);
       // Handle error, show a message, etc.
     }
 
@@ -77,18 +73,18 @@ const AddPermission = ({ fetchData }) => {
       {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
-          isModalOpen ? "visible" : "invisible"
+          isModalOpen ? 'visible z-20' : 'invisible'
         }`}
-        onClick={closeModal}
-      ></div>
+      />
 
       {/* Modal */}
       <div
         className={`fixed inset-0 flex justify-center items-center ${
-          isModalOpen ? "visible" : "invisible"
+          isModalOpen ? 'visible z-30' : 'invisible'
         }`}
+
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-10">
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={closeModal}
@@ -104,7 +100,7 @@ const AddPermission = ({ fetchData }) => {
                 strokeLinejoin="round"
                 strokeWidth="2"
                 d="M6 18L18 6M6 6l12 12"
-              ></path>
+              />
             </svg>
           </button>
           <h2 className="text-2xl font-semibold mb-4">Add Permission</h2>
@@ -209,7 +205,7 @@ const AddPermission = ({ fetchData }) => {
       </div>
     </div>
   );
-};
+}
 
 export default AddPermission;
 

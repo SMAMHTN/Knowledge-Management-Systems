@@ -1,25 +1,22 @@
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { CoreAPI } from "../../../dep/core/coreHandler";
+import React, { useState, useRef } from 'react';
+import { CoreAPI } from '../../../dep/core/coreHandler';
+import { useOutsideClick, useModal } from '@/components/Feature';
 
-const AddRole = ({ fetchData }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+function AddRole({ fetchData }) {
+  const { isModalOpen, openModal, closeModal } = useModal();
+  const ref = useRef(null);
   const [formData, setFormData] = useState({
-    RoleName: "testing23.3",
+    RoleName: 'testing23.3',
     RoleParentID: 3,
-    RoleDescription: "11/08/23",
+    RoleDescription: '11/08/23',
   });
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  useOutsideClick(ref, closeModal);
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const {
+      name, value, type, checked,
+    } = e.target;
     let parsedValue;
 
     setFormData((prevData) => ({
@@ -33,13 +30,13 @@ const AddRole = ({ fetchData }) => {
     console.log(formData);
     try {
       // Make the API call to save the data
-      await CoreAPI("POST", "role", formData);
+      await CoreAPI('POST', 'role', formData);
 
       // Refresh the page after successfully saving the data
       fetchData();
-      console.log("Data saved successfully.");
+      console.log('Data saved successfully.');
     } catch (error) {
-      console.log("Error occurred:", error);
+      console.log('Error occurred:', error);
       // Handle error, show a message, etc.
     }
 
@@ -59,18 +56,18 @@ const AddRole = ({ fetchData }) => {
       {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
-          isModalOpen ? "visible" : "invisible"
+          isModalOpen ? 'visible z-20' : 'invisible'
         }`}
-        onClick={closeModal}
-      ></div>
+      />
 
       {/* Modal */}
       <div
         className={`fixed inset-0 flex justify-center items-center ${
-          isModalOpen ? "visible" : "invisible"
+          isModalOpen ? 'visible z-30' : 'invisible'
         }`}
+
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-10">
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={closeModal}
@@ -86,7 +83,7 @@ const AddRole = ({ fetchData }) => {
                 strokeLinejoin="round"
                 strokeWidth="2"
                 d="M6 18L18 6M6 6l12 12"
-              ></path>
+              />
             </svg>
           </button>
           <h2 className="text-2xl font-semibold mb-4">Add Roles</h2>
@@ -132,7 +129,7 @@ const AddRole = ({ fetchData }) => {
       </div>
     </div>
   );
-};
+}
 
 export default AddRole;
 

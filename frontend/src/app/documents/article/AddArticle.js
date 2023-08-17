@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { KmsAPI } from '../../../dep/kms/kmsHandler';
+import { useOutsideClick, useModal } from '@/components/Feature';
 
 function AddArticle({ fetchData }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isModalOpen, openModal, closeModal } = useModal();
+  const ref = useRef(null);
   const [formData, setFormData] = useState({
     OwnerID: 7,
     LastEditedByID: 7,
@@ -16,13 +18,7 @@ function AddArticle({ fetchData }) {
     IsActive: 1,
   });
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  useOutsideClick(ref, closeModal);
 
   const handleInputChange = (e) => {
     const {
@@ -78,18 +74,18 @@ function AddArticle({ fetchData }) {
       {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
-          isModalOpen ? 'visible' : 'invisible'
+          isModalOpen ? 'visible z-20' : 'invisible'
         }`}
-        onClick={closeModal}
       />
 
       {/* Modal */}
       <div
         className={`fixed inset-0 flex justify-center items-center ${
-          isModalOpen ? 'visible' : 'invisible'
+          isModalOpen ? 'visible z-30' : 'invisible'
         }`}
+
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-10">
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={closeModal}
