@@ -37,7 +37,7 @@ function Home() {
           <Link href="/settings" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
             Settings
           </Link>
-          <Link href="/management-dokumen" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
+          <Link href="/documents" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
             Management Dokumen
           </Link>
           <Link href="/management-s-admin" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">

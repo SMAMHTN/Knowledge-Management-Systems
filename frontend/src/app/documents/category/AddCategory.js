@@ -1,14 +1,12 @@
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { KmsAPI } from "../../../dep/kms/kmsHandler";
+import React, { useState, useEffect, useRef } from 'react';
+import { KmsAPI } from '../../../dep/kms/kmsHandler';
 
-const AddCategory = ({ fetchData }) => {
-  
+function AddCategory({ fetchData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    CategoryName: "",
-    CategoryParentID: "",
-    CategoryDescription: "",
+    CategoryName: '',
+    CategoryParentID: '',
+    CategoryDescription: '',
   });
 
   const openModal = () => {
@@ -19,39 +17,57 @@ const AddCategory = ({ fetchData }) => {
     setIsModalOpen(false);
   };
 
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (isModalOpen) {
+      const handleOutsideClick = (event) => {
+        if (ref.current && !ref.current.contains(event.target)) {
+          closeModal();
+        }
+      };
+
+      window.addEventListener('mousedown', handleOutsideClick);
+
+      return () => {
+        window.removeEventListener('mousedown', handleOutsideClick);
+      };
+    }
+  }, [isModalOpen, ref]);
+
   const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  let parsedValue = value; // Initialize parsedValue with the original value
+    const { name, value } = e.target;
+    let parsedValue = value; // Initialize parsedValue with the original value
 
-  // Convert to integer if the input field name suggests it
-  if (name === "CategoryParentID") {
-    parsedValue = parseInt(value, 10);
-  }
+    // Convert to integer if the input field name suggests it
+    if (name === 'CategoryParentID') {
+      parsedValue = parseInt(value, 10);
+    }
 
-  setFormData((prevData) => ({
-    ...prevData,
-    [name]: parsedValue,
-  }));
-};
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: parsedValue,
+    }));
+  };
 
-const handleSave = async (e) => {
-  e.preventDefault(); // Prevent the default form submission behavior
+  const handleSave = async (e) => {
+    e.preventDefault(); // Prevent the default form submission behavior
 
-  try {
-    // Make the API call to save the data
-    await KmsAPI("POST", "category", formData);
+    try {
+      // Make the API call to save the data
+      await KmsAPI('POST', 'category', formData);
 
-    // Refresh the page after successfully saving the data
-    fetchData();
-    console.log("Data saved successfully.");
-  } catch (error) {
-    console.log("Error occurred:", error);
-    // Handle error, show a message, etc.
-  }
+      // Refresh the page after successfully saving the data
+      fetchData();
+      console.log('Data saved successfully.');
+    } catch (error) {
+      console.log('Error occurred:', error);
+      // Handle error, show a message, etc.
+    }
 
-  // Close the modal
-  closeModal();
-};
+    // Close the modal
+    closeModal();
+  };
 
   return (
     <div>
@@ -65,18 +81,18 @@ const handleSave = async (e) => {
       {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
-          isModalOpen ? "visible" : "invisible"
+          isModalOpen ? 'visible z-20' : 'invisible'
         }`}
-        onClick={closeModal}
-      ></div>
+      />
 
       {/* Modal */}
       <div
         className={`fixed inset-0 flex justify-center items-center ${
-          isModalOpen ? "visible" : "invisible"
+          isModalOpen ? 'visible z-30' : 'invisible'
         }`}
+
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-10">
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={closeModal}
@@ -92,10 +108,10 @@ const handleSave = async (e) => {
                 strokeLinejoin="round"
                 strokeWidth="2"
                 d="M6 18L18 6M6 6l12 12"
-              ></path>
+              />
             </svg>
           </button>
-          <h2 className="text-2xl font-semibold mb-4">Modal Title</h2>
+          <h2 className="text-2xl font-semibold mb-4">Add Category</h2>
           <form onSubmit={handleSave}>
             <div className="mb-4">
               <label className="block font-semibold mb-1">CategoryName</label>
@@ -142,7 +158,7 @@ const handleSave = async (e) => {
       </div>
     </div>
   );
-};
+}
 
 export default AddCategory;
 

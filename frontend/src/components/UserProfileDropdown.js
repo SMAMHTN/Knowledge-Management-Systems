@@ -13,9 +13,7 @@ function UserProfile({ maxWidth, maxHeight }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        console.log('Fetching user data...');
         const data = await getUserData();
-        console.log('User data fetched:', data);
         setUserData(data);
       } catch (error) {
         console.error('Error fetching user data:', error);
