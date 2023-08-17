@@ -3,7 +3,6 @@ package dependency
 import (
 	"errors"
 	"fmt"
-	"log"
 )
 
 func InterfaceToInt(val interface{}) (int, error) {
@@ -19,7 +18,7 @@ func InterfaceToInt(val interface{}) (int, error) {
 	case float32:
 		return int(val), nil
 	default:
-		log.Printf("Failed to convert this interface type %T to integer (Package dependency : interfacehandler.go)", val)
+		fmt.Printf("Failed to convert this interface type %T to integer (Package dependency : interfacehandler.go)", val)
 		return 0, errors.New("convert failed: failed to convert interface to int")
 	}
 }
@@ -47,7 +46,7 @@ func SliceInterfaceToInt(data []interface{}) ([]int, error) {
 		case float32:
 			result[i] = int(val)
 		default:
-			log.Printf("Failed to convert this interface type %T to integer (Package dependency : interfacehandler.go)", val)
+			fmt.Printf("Failed to convert this interface type %T to integer (Package dependency : interfacehandler.go)", val)
 			return result, errors.New("convert failed: failed to convert interface to int")
 		}
 	}

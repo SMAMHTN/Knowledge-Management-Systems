@@ -3,6 +3,7 @@ package dependency
 // import (
 // 	"fmt"
 // )
+var TimeZone string = "UTC"
 
 // var Conf Configuration
 

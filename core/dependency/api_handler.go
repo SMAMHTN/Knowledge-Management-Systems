@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -19,14 +18,14 @@ func ApiWithBasicAuthAndJSON(apimethod string, url string, username string, pass
 	// jsonData, err := MapToJson(data)
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return nil, err
 	}
 
 	// Create a new HTTP request with JSON data in the body
 	req, err := http.NewRequest(apimethod, url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -41,7 +40,7 @@ func ApiWithBasicAuthAndJSON(apimethod string, url string, username string, pass
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return nil, err
 	}
 
@@ -58,7 +57,7 @@ func ApiCall(apimethod string, url string, data []byte, Header []ApiHeader) (*ht
 	// Create a new HTTP request with JSON data in the body
 	req, err := http.NewRequest(apimethod, url, bytes.NewBuffer(data))
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return nil, err
 	}
 	for _, x := range Header {
@@ -69,7 +68,7 @@ func ApiCall(apimethod string, url string, data []byte, Header []ApiHeader) (*ht
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return nil, err
 	}
 
@@ -86,7 +85,7 @@ func ApiCallWithBasicAuth(apimethod string, url string, username string, passwor
 	// Create a new HTTP request with JSON data in the body
 	req, err := http.NewRequest(apimethod, url, bytes.NewBuffer(data))
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return nil, err
 	}
 	for _, x := range Header {
@@ -99,7 +98,7 @@ func ApiCallWithBasicAuth(apimethod string, url string, username string, passwor
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return nil, err
 	}
 

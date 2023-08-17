@@ -2,7 +2,6 @@ package dependency
 
 import (
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -12,7 +11,7 @@ func GetTextTika(tikaURL string, FilePath string) (string, *http.Response, error
 	// Read the file to be extracted
 	fileData, err := FilepathToByteArray(FilePath)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return "", nil, err
 	}
 
@@ -30,7 +29,7 @@ func GetTextTika(tikaURL string, FilePath string) (string, *http.Response, error
 	// Create a new HTTP client and execute the request
 	resp, err := ApiCall("PUT", tikaURL, fileData, reqheader)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return "", nil, err
 	}
 	defer resp.Body.Close()
@@ -43,7 +42,7 @@ func GetTextTika(tikaURL string, FilePath string) (string, *http.Response, error
 	// time.Sleep(time.Minute)
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return "", nil, err
 	}
 	return string(body), resp, nil

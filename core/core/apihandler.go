@@ -2,10 +2,7 @@ package core
 
 import (
 	"dependency"
-	"fmt"
-	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -37,7 +34,6 @@ func Check_Permission_API(c echo.Context) (bool, User, error) {
 	now_user := User{Username: dependency.GetElementString(cred, 0), Password: dependency.GetElementString(cred, 1)}
 	err := now_user.ReadLogin()
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return false, now_user, err
 	}
 	if now_user.IsSuperAdmin == 0 {
@@ -106,8 +102,5 @@ func Test_api() {
 	e.GET("/tz", ExtractTimeZoneAPI)
 
 	// Start the server
-	fmt.Println(strconv.Itoa(Conf.Appport))
-	fmt.Println(Conf.Appport)
-	fmt.Println(Port_conf)
 	e.Logger.Fatal(e.Start(Port_conf))
 }

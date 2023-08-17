@@ -3,7 +3,6 @@ package kms
 import (
 	"dependency"
 	"errors"
-	"log"
 
 	"github.com/labstack/echo/v4"
 )
@@ -28,20 +27,20 @@ func RecordHistory(c echo.Context, ActivityType string, Changes string) error {
 	r.Changes = Changes
 	r.UserID, err = dependency.InterfaceToInt(now_user["UserID"])
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		return err
 	}
 	username, err := dependency.InterfaceToString(now_user["Username"])
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		return err
 	}
 	password, err := dependency.InterfaceToString(now_user["Password"])
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		return err
 	}
 	r.IPAddress = c.RealIP()
 	_, err = CallCoreAPI("POST", "setting", r, username, password)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		return err
 	}
 	return nil
 }
@@ -49,7 +48,7 @@ func RecordHistory(c echo.Context, ActivityType string, Changes string) error {
 func GetTimeZone() (timezone string, err error) {
 	response, err := CallCoreAPINoCred("GET", "tz", nil)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		return "", err
 	}
 	responsedata, isexist := response["Data"].(string)
 	if !isexist {

@@ -3,14 +3,20 @@ package core
 import (
 	"dependency"
 	"fmt"
-	"log"
+	"path/filepath"
 	"reflect"
 	"strconv"
+
+	"go.uber.org/zap"
 )
 
 var Conf dependency.Configuration
 
-func Check_DB_Exist() {
+var Logger *zap.Logger
+
+func Check_DB_Exist() error {
+	ConfigurationFile = filepath.Join("config", "appconf", "core_conf.json")
+	InstallDatabase = filepath.Join("config", "db_base", "core.sql")
 	var err error
 	adminusertest := User{UserID: 1}
 	err = adminusertest.Read()
@@ -18,23 +24,21 @@ func Check_DB_Exist() {
 		fmt.Println("DB NOT FOUND\nINSTALLING DB FOR CORE\n---------------------------------------")
 		err = dependency.Execute_sql_file(Conf, InstallDatabase, Conf.Appname)
 		if err != nil {
-			log.Panic(err)
-			panic(err)
+			return err
 		}
 		addphoto := User{UserID: 1}
 		err = addphoto.Read()
 		if err != nil {
-			log.Panic(err)
-			panic(err)
+			return err
 		}
 		image, err := dependency.FilepathToByteArray("Aldi Mulyawan.jpg")
 		if err != nil {
-			log.Panic(err)
-			panic(err)
+			return err
 		}
 		addphoto.UserPhoto = image
 		addphoto.Update()
 	}
+	return nil
 }
 
 func init() {
@@ -49,7 +53,6 @@ func init() {
 	var err error
 	Conf, err = dependency.Read_conf(ConfigurationFile)
 	if err != nil {
-		log.Panic(err)
 		panic("CONFIGURATION FILE ERROR : " + err.Error())
 	}
 	fmt.Println("Read Configuration")
@@ -64,9 +67,8 @@ func init() {
 
 		fmt.Printf("%s: %v\n", fieldName, fieldValue)
 	}
-	err = dependency.Init_log(Conf.Log_Location, GetTimeZone())
+	Logger, err = dependency.InitZapLog(Conf.Error_Log_location, Conf.Log_location)
 	if err != nil {
-		log.Panic("FATAL " + err.Error())
 		panic(err)
 	}
 	fmt.Println("READING FILE CONF DONE\n---------------------------------------")

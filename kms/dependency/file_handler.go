@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
 	"os"
 	"path"
 	"strings"
@@ -14,13 +13,13 @@ func FilepathToByteArray(RelPathNoSlash string) ([]byte, error) {
 	var data []byte
 	file, err := os.Open(RelPathNoSlash)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return data, err
 	}
 	defer file.Close()
 	data, err = io.ReadAll(file)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return data, err
 	}
 	return data, err
@@ -43,7 +42,7 @@ func CreateEmptyFileDuplicate(filepath string) (*os.File, string, error) {
 			// file does not exist, create it
 			file, err := os.Create(filepath)
 			if err != nil {
-				log.Println("WARNING " + err.Error())
+
 				return file, filepath, err
 			}
 			return file, filepath, nil

@@ -25,7 +25,6 @@ func Init_log(LogFile string, TimeZone string) (err error) {
 	// Open the log file for writing
 	file, err := os.OpenFile(LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		log.Println("FATAL failed to open log file " + err.Error())
 		return errors.New("failed to open log file: " + err.Error())
 	}
 

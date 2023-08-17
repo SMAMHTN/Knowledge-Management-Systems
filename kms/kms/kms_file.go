@@ -1,11 +1,8 @@
 package kms
 
 import (
-	"database/sql"
 	"dependency"
-	"errors"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path"
@@ -13,138 +10,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 )
-
-type File struct {
-	FileID     int `json:"FileID" query:"FileID"`
-	FileLoc    string
-	CategoryID int
-	FileType   string
-}
-
-func ReadFile(args string) ([]File, error) {
-	var results []File
-	var sqlresult *sql.Rows
-	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return []File{}, err
-	}
-	defer database.Close()
-	if args != "" {
-		sqlresult, err = database.Query("SELECT * FROM kms_file" + " " + args)
-	} else {
-		sqlresult, err = database.Query("SELECT * FROM kms_file")
-	}
-
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return results, err
-	}
-	defer sqlresult.Close()
-	for sqlresult.Next() {
-		var result = File{}
-		var err = sqlresult.Scan(&result.FileID, &result.FileLoc, &result.CategoryID, &result.FileType)
-		if err != nil {
-			log.Println("WARNING " + err.Error())
-			return results, err
-		}
-		results = append(results, result)
-	}
-	return results, nil
-}
-
-func (data *File) Create() (int, error) {
-	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return 0, err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO kms_file(FileLoc, CategoryID, FileType) VALUES(?, ?, ?)")
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return 0, err
-	}
-	defer ins.Close()
-	resproc, err := ins.Exec(data.FileLoc, data.CategoryID, data.FileType)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return 0, err
-	}
-	lastid, _ := resproc.LastInsertId()
-	data.FileID = int(lastid)
-	return int(lastid), nil
-}
-
-func (data *File) Read() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	defer database.Close()
-	if data.FileID != 0 {
-		err = database.QueryRow("SELECT * FROM kms_file WHERE FileID = ?", data.FileID).Scan(&data.FileID, &data.FileLoc, &data.CategoryID, &data.FileType)
-	} else if data.FileLoc != "" {
-		err = database.QueryRow("SELECT * FROM kms_file WHERE FileLoc = ?", data.FileLoc).Scan(&data.FileID, &data.FileLoc, &data.CategoryID, &data.FileType)
-	} else {
-		return errors.New("please insert fileid or fileloc")
-	}
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	return nil
-}
-
-func (data File) Update() error {
-	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE kms.kms_file SET FileLoc=?, CategoryID=?, FileType=? WHERE FileID=?;")
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.FileLoc, data.CategoryID, data.FileType, data.FileID)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	return nil
-}
-
-func (data File) Delete() error {
-	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	del, err := database.Prepare("DELETE FROM kms_file WHERE `FileID`=?")
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	if data.FileID != 0 {
-		_, err = del.Exec(data.FileID)
-	} else {
-		return errors.New("fileid needed")
-	}
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	defer database.Close()
-	return nil
-}
 
 func ListFile(c echo.Context) error {
 	query := c.QueryParam("query")
@@ -168,14 +33,14 @@ func ShowFile(c echo.Context) error {
 	u := new(File)
 	err = c.Bind(u)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	err = u.Read()
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "FILE NOT FOUND"
 		return c.JSON(http.StatusBadRequest, res)
@@ -183,14 +48,14 @@ func ShowFile(c echo.Context) error {
 	permission, user, _ := Check_Admin_Permission_API(c)
 	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Error(err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	_, TrueRead, TrueUpdate, _, err := GetTruePermission(c, u.CategoryID, role_id)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusForbidden
 		res.Data = err
 		return c.JSON(http.StatusForbidden, res)
@@ -217,7 +82,7 @@ func AddFile(c echo.Context) error {
 	category_id64, err := strconv.ParseInt(category_id_pure, 10, 0)
 	category_id := int(category_id64)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -225,14 +90,14 @@ func AddFile(c echo.Context) error {
 	permission, user, _ := Check_Admin_Permission_API(c)
 	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Error(err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	TrueCreate, _, _, _, err := GetTruePermission(c, category_id, role_id)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusForbidden
 		res.Data = "YOU DONT HAVE PERMISSION TO UPLOAD IN THIS CATEGORY"
 		return c.JSON(http.StatusForbidden, res)
@@ -244,21 +109,21 @@ func AddFile(c echo.Context) error {
 	}
 	AllowedFileType, err = GetAllFileTypePermission(c, category_id, role_id)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Error(err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err.Error()
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	file, err := c.FormFile("File")
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	src, err := file.Open()
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -273,7 +138,7 @@ func AddFile(c echo.Context) error {
 	} else if dependency.CheckValueExistString(AllowedFileType, "*") || dependency.CheckValueExistString(AllowedFileType, filepathext) || permission {
 		dst, filepath, err := dependency.CreateEmptyFileDuplicate(filepath)
 		if err != nil {
-			log.Println("WARNING " + err.Error())
+			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
 			res.Data = err.Error()
 			return c.JSON(http.StatusInternalServerError, res)
@@ -282,7 +147,7 @@ func AddFile(c echo.Context) error {
 
 		// Copy
 		if _, err = io.Copy(dst, src); err != nil {
-			log.Println("WARNING " + err.Error())
+			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
 			res.Data = err.Error()
 			return c.JSON(http.StatusInternalServerError, res)
@@ -297,7 +162,7 @@ func AddFile(c echo.Context) error {
 
 		_, err = DBFile.Create()
 		if err != nil {
-			log.Println("WARNING " + err.Error())
+			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
 			res.Data = err.Error()
 			return c.JSON(http.StatusInternalServerError, res)
@@ -307,7 +172,7 @@ func AddFile(c echo.Context) error {
 		res.Data = DBFile
 		err = RecordHistory(c, "File", "Added File : "+DBFile.FileLoc+"("+strconv.Itoa(DBFile.FileID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record File change history " + err.Error())
+			Logger.Error("failed to record File change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {
@@ -323,14 +188,14 @@ func DeleteFile(c echo.Context) error {
 	u := new(File)
 	err = c.Bind(u)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	err = u.Read()
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "FILE NOT FOUND ON DATABASE"
 		return c.JSON(http.StatusBadRequest, res)
@@ -338,14 +203,14 @@ func DeleteFile(c echo.Context) error {
 	_, user, _ := Check_Admin_Permission_API(c)
 	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Error(err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	_, _, _, TrueDelete, err := GetTruePermission(c, u.CategoryID, role_id)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusForbidden
 		res.Data = err
 		return c.JSON(http.StatusForbidden, res)
@@ -357,14 +222,14 @@ func DeleteFile(c echo.Context) error {
 	}
 	err = os.Remove(u.FileLoc)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Error(err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err.Error()
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	err = u.Delete()
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Error(err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err.Error()
 		return c.JSON(http.StatusInternalServerError, res)
@@ -373,7 +238,7 @@ func DeleteFile(c echo.Context) error {
 	res.Data = "DELETED FILE"
 	err = RecordHistory(c, "File", "Deleted File : "+u.FileLoc+"("+strconv.Itoa(u.FileID)+")")
 	if err != nil {
-		log.Println("WARNING failed to record File change history " + err.Error())
+		Logger.Error("failed to record File change history " + err.Error())
 	}
 	return c.JSON(http.StatusOK, res)
 }

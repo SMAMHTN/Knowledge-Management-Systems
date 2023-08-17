@@ -5,7 +5,6 @@ import (
 	"dependency"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -57,7 +56,6 @@ func Check_Admin_Permission_API(c echo.Context) (bool, map[string]interface{}, e
 	}
 	IsSuperAdmin, err := dependency.InterfaceToInt(User["IsSuperAdmin"])
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return false, User, err
 	}
 	if IsSuperAdmin == 0 {
@@ -77,12 +75,10 @@ func GetNameUsername(c echo.Context, UserID int) (Name string, Username string, 
 	}
 	Name, err = dependency.InterfaceToString(User["Name"])
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return "", "", err
 	}
 	Username, err = dependency.InterfaceToString(User["Username"])
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return "", "", err
 	}
 	return Name, Username, nil
@@ -163,14 +159,13 @@ func DeleteSolrDocument(id string) error {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return err
 	}
 	defer resp.Body.Close()
 
 	// body, err := io.ReadAll(resp.Body)
 	// fmt.Println(string(body))
-	// if err != nil { log.Println("WARNING " + err.Error())
+	// if err != nil {
 	// 	return err
 	// }
 

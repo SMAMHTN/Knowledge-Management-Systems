@@ -2,7 +2,6 @@ package dependency
 
 import (
 	"encoding/base64"
-	"log"
 )
 
 func BytesToBase64(data []byte) string {
@@ -13,7 +12,7 @@ func BytesToBase64(data []byte) string {
 func Base64ToBytes(data string) ([]byte, error) {
 	res, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return nil, err
 	}
 	return res, nil

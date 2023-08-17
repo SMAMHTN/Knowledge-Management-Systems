@@ -3,7 +3,6 @@ package dependency
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 )
@@ -20,7 +19,7 @@ func ConvStringToStringArray(data string) (result []string, err error) {
 	for count, x := range splitStr {
 		if x != "" {
 			if err != nil {
-				log.Printf("WARNING index : %d with value %s not detected as string with error : %s", count, strings.ToLower(x), err.Error())
+
 				return nil, fmt.Errorf("index : %d with value %s not detected as string with error : %s", count, strings.ToLower(x), err.Error())
 			}
 			result = append(result, x)
@@ -32,7 +31,7 @@ func ConvStringToStringArray(data string) (result []string, err error) {
 func ConvStringToIntArray(data string) (result []int, err error) {
 	StringArray, err := ConvStringToStringArray(data)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return nil, err
 	}
 	for count, x := range StringArray {
@@ -40,7 +39,6 @@ func ConvStringToIntArray(data string) (result []int, err error) {
 			y64, err := strconv.ParseInt(x, 10, 0)
 			y := int(y64)
 			if err != nil {
-				log.Printf("WARNING index : %d with value %s not detected as integer with error : %s", count, strings.ToLower(x), err.Error())
 				return nil, fmt.Errorf("index : %d with value %s not detected as integer with error : %s", count, strings.ToLower(x), err.Error())
 			}
 			result = append(result, y)
@@ -53,7 +51,7 @@ func ConvStringToStringArrayUnique(data string) (result []string, err error) {
 	TmpStringArrayUnique := make(map[string]bool)
 	StringArray, err := ConvStringToStringArray(data)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+
 		return nil, err
 	}
 	for _, x := range StringArray {

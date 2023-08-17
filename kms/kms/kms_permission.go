@@ -1,11 +1,9 @@
 package kms
 
 import (
-	"database/sql"
 	"dependency"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,143 +11,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"golang.org/x/exp/slices"
 )
-
-type Permission struct {
-	PermissionID int `json:"PermissionID" query:"PermissionID"`
-	CategoryID   int
-	RoleID       int
-	PCreate      int    `json:"Create"`
-	PRead        int    `json:"Read"`
-	PUpdate      int    `json:"Update"`
-	PDelete      int    `json:"Delete"`
-	FileType     string //json
-	DocType      string //json
-}
-
-func ReadPermission(args string) ([]Permission, error) {
-	var results []Permission
-	var sqlresult *sql.Rows
-	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return []Permission{}, err
-	}
-	defer database.Close()
-	if args != "" {
-		sqlresult, err = database.Query("SELECT * FROM kms_permission" + " " + args)
-	} else {
-		sqlresult, err = database.Query("SELECT * FROM kms_permission")
-	}
-
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return results, err
-	}
-	defer sqlresult.Close()
-	for sqlresult.Next() {
-		var result = Permission{}
-		var err = sqlresult.Scan(&result.PermissionID, &result.CategoryID, &result.RoleID, &result.PCreate, &result.PRead, &result.PUpdate, &result.PDelete, &result.FileType, &result.DocType)
-		if err != nil {
-			log.Println("WARNING " + err.Error())
-			return results, err
-		}
-		results = append(results, result)
-	}
-	return results, nil
-}
-
-func (data *Permission) Create() (int, error) {
-	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return 0, err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO kms_permission(CategoryID, RoleID, `Create`, `Read`, `Update`, `Delete`, `FileType`, `DocType`) VALUES(?, ?, ?, ?, ?, ?, ?, ?)")
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return 0, err
-	}
-	defer ins.Close()
-	resproc, err := ins.Exec(data.CategoryID, data.RoleID, data.PCreate, data.PRead, data.PUpdate, data.PDelete, data.FileType, data.DocType)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return 0, err
-	}
-	lastid, _ := resproc.LastInsertId()
-	data.PermissionID = int(lastid)
-	return int(lastid), nil
-}
-
-func (data *Permission) Read() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	defer database.Close()
-	if data.PermissionID != 0 {
-		err = database.QueryRow("SELECT * FROM kms_permission WHERE PermissionID = ?", data.PermissionID).Scan(&data.PermissionID, &data.CategoryID, &data.RoleID, &data.PCreate, &data.PRead, &data.PUpdate, &data.PDelete, &data.FileType, &data.DocType)
-	} else if data.CategoryID != 0 && data.RoleID != 0 {
-		err = database.QueryRow("SELECT * FROM kms_permission WHERE CategoryID = ? AND RoleID = ?", data.CategoryID, data.RoleID).Scan(&data.PermissionID, &data.CategoryID, &data.RoleID, &data.PCreate, &data.PRead, &data.PUpdate, &data.PDelete, &data.FileType, &data.DocType)
-	} else {
-		return errors.New("please insert permissionid")
-	}
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	return nil
-}
-
-func (data Permission) Update() error {
-	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE kms.kms_permission SET CategoryID=?, RoleID=?, `Create`=?, `Read`=?, `Update`=?, `Delete`=?, `FileType`=?, `DocType`=? WHERE PermissionID=?;")
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.CategoryID, data.RoleID, data.PCreate, data.PRead, data.PUpdate, data.PDelete, data.FileType, data.DocType, data.PermissionID)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	return nil
-}
-
-func (data Permission) Delete() error {
-	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	del, err := database.Prepare("DELETE FROM kms_permission WHERE `PermissionID`=?")
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	if data.PermissionID != 0 {
-		_, err = del.Exec(data.PermissionID)
-	} else {
-		return errors.New("permissionid needed")
-	}
-	if err != nil {
-		log.Println("WARNING " + err.Error())
-		return err
-	}
-	defer database.Close()
-	return nil
-}
 
 func ListPermission(c echo.Context) error {
 	query := c.QueryParam("query")
@@ -174,7 +35,7 @@ func ShowPermission(c echo.Context) error {
 	u := new(Permission)
 	err = c.Bind(u)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -182,7 +43,7 @@ func ShowPermission(c echo.Context) error {
 	if permission {
 		err = u.Read()
 		if err != nil {
-			log.Println("WARNING " + err.Error())
+			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusNotFound
 			res.Data = "KMS PERMISSION NOT FOUND"
 			return c.JSON(http.StatusNotFound, res)
@@ -204,21 +65,21 @@ func AddPermission(c echo.Context) error {
 	u := new(Permission)
 	err = c.Bind(u)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	_, err = dependency.ConvStringToStringArray(u.FileType)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR FileType : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	_, err = dependency.ConvStringToStringArray(u.DocType)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR DocType : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -232,7 +93,7 @@ func AddPermission(c echo.Context) error {
 		}
 		_, err = u.Create()
 		if err != nil {
-			log.Println("WARNING " + err.Error())
+			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
@@ -242,7 +103,7 @@ func AddPermission(c echo.Context) error {
 		res.Data = u
 		err = RecordHistory(c, "Permission", "Added Permission : ("+strconv.Itoa(u.PermissionID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record permission change history " + err.Error())
+			Logger.Error("failed to record permission change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {
@@ -259,21 +120,21 @@ func EditPermission(c echo.Context) error {
 	u := new(Permission)
 	err = c.Bind(u)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	_, err = dependency.ConvStringToStringArray(u.FileType)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR FileType : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	_, err = dependency.ConvStringToStringArray(u.DocType)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR DocType : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -287,7 +148,7 @@ func EditPermission(c echo.Context) error {
 		}
 		err = u.Update()
 		if err != nil {
-			log.Println("WARNING " + err.Error())
+			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
@@ -297,7 +158,7 @@ func EditPermission(c echo.Context) error {
 		res.Data = u
 		err = RecordHistory(c, "Permission", "Edited Permission : ("+strconv.Itoa(u.PermissionID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record permission change history " + err.Error())
+			Logger.Error("failed to record permission change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {
@@ -314,7 +175,7 @@ func DeletePermission(c echo.Context) error {
 	u := new(Permission)
 	err = c.Bind(u)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
+		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
@@ -322,7 +183,7 @@ func DeletePermission(c echo.Context) error {
 	if permission {
 		err = u.Delete()
 		if err != nil {
-			log.Println("WARNING " + err.Error())
+			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
@@ -331,7 +192,7 @@ func DeletePermission(c echo.Context) error {
 		res.Data = "DELETED KMS PERMISSION " + strconv.Itoa(u.PermissionID)
 		err = RecordHistory(c, "Permission", "Deleted Permission : ("+strconv.Itoa(u.PermissionID)+")")
 		if err != nil {
-			log.Println("WARNING failed to record permission change history " + err.Error())
+			Logger.Error("failed to record permission change history " + err.Error())
 		}
 		return c.JSON(http.StatusOK, res)
 	} else {
@@ -352,7 +213,6 @@ func GetTruePermission(c echo.Context, CategoryID int, RoleID int) (Create bool,
 	SendData := map[string]interface{}{"RoleID": RoleID}
 	RoleIDListPure, err := CallCoreAPIPure("GET", "listrolechild", SendData, dependency.GetElementString(cred, 0), dependency.GetElementString(cred, 1))
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return Create, Read, Update, Delete, err
 	}
 	RoleIDListInterface, isexist := RoleIDListPure["Data"].([]interface{})
@@ -362,7 +222,6 @@ func GetTruePermission(c echo.Context, CategoryID int, RoleID int) (Create bool,
 
 	RoleIDList, err := dependency.SliceInterfaceToInt(RoleIDListInterface)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return Create, Read, Update, Delete, err
 	}
 
@@ -381,7 +240,6 @@ func GetTruePermission(c echo.Context, CategoryID int, RoleID int) (Create bool,
 	}
 	CategoryIDList, err := CategoryIDData.ListAllCategoryParent()
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return Create, Read, Update, Delete, err
 	}
 
@@ -428,7 +286,6 @@ func GetAllFileTypePermission(c echo.Context, CategoryID int, RoleID int) (FileT
 	SendData := map[string]interface{}{"RoleID": RoleID}
 	RoleIDListPure, err := CallCoreAPIPure("GET", "listrolechild", SendData, dependency.GetElementString(cred, 0), dependency.GetElementString(cred, 1))
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return nil, err
 	}
 	RoleIDListInterface, isexist := RoleIDListPure["Data"].([]interface{})
@@ -438,7 +295,6 @@ func GetAllFileTypePermission(c echo.Context, CategoryID int, RoleID int) (FileT
 
 	RoleIDList, err := dependency.SliceInterfaceToInt(RoleIDListInterface)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return nil, err
 	}
 
@@ -453,7 +309,6 @@ func GetAllFileTypePermission(c echo.Context, CategoryID int, RoleID int) (FileT
 	}
 	CategoryIDList, err := CategoryIDData.ListAllCategoryParent()
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return nil, err
 	}
 
@@ -467,7 +322,6 @@ func GetAllFileTypePermission(c echo.Context, CategoryID int, RoleID int) (FileT
 	for _, val := range PermissionList {
 		TmpFileTypeList, err := dependency.ConvStringToStringArrayUnique(val.FileType)
 		if err != nil {
-			log.Println("WARNING " + err.Error())
 			return nil, err
 		}
 		FileTypeList = append(FileTypeList, TmpFileTypeList...)
@@ -482,7 +336,6 @@ func GetAllDocTypePermission(c echo.Context, CategoryID int, RoleID int) (DocTyp
 	SendData := map[string]interface{}{"RoleID": RoleID}
 	RoleIDListPure, err := CallCoreAPIPure("GET", "listrolechild", SendData, dependency.GetElementString(cred, 0), dependency.GetElementString(cred, 1))
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return nil, err
 	}
 	RoleIDListInterface, isexist := RoleIDListPure["Data"].([]interface{})
@@ -492,7 +345,6 @@ func GetAllDocTypePermission(c echo.Context, CategoryID int, RoleID int) (DocTyp
 
 	RoleIDList, err := dependency.SliceInterfaceToInt(RoleIDListInterface)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return nil, err
 	}
 
@@ -507,7 +359,6 @@ func GetAllDocTypePermission(c echo.Context, CategoryID int, RoleID int) (DocTyp
 	}
 	CategoryIDList, err := CategoryIDData.ListAllCategoryParent()
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return nil, err
 	}
 
@@ -521,7 +372,6 @@ func GetAllDocTypePermission(c echo.Context, CategoryID int, RoleID int) (DocTyp
 	for _, val := range PermissionList {
 		TmpDocTypeList, err := dependency.ConvStringToStringArrayUnique(val.DocType)
 		if err != nil {
-			log.Println("WARNING " + err.Error())
 			return nil, err
 		}
 		DocTypeList = append(DocTypeList, TmpDocTypeList...)
@@ -536,7 +386,6 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 	SendData := map[string]interface{}{"RoleID": RoleID}
 	RoleIDListPure, err := CallCoreAPIPure("GET", "listrolechild", SendData, dependency.GetElementString(cred, 0), dependency.GetElementString(cred, 1))
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return CategoryIDList, err
 	}
 	RoleIDListInterface, isexist := RoleIDListPure["Data"].([]interface{})
@@ -546,7 +395,6 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 
 	RoleIDList, err := dependency.SliceInterfaceToInt(RoleIDListInterface)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return CategoryIDList, err
 	}
 
@@ -559,7 +407,6 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 	FinalQuery := fmt.Sprintf("WHERE RoleID IN (%s)", roleIDListString)
 	PermissionList, err := ReadPermission(FinalQuery)
 	if err != nil {
-		log.Println("WARNING " + err.Error())
 		return CategoryIDList, err
 	}
 	for _, val := range PermissionList {
@@ -568,7 +415,6 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 				CategoryTMP := Category{CategoryID: val.CategoryID}
 				CategoryParentTMP, err := CategoryTMP.ListAllCategoryChild()
 				if err != nil {
-					log.Println("WARNING " + err.Error())
 					return CategoryIDList, err
 				}
 				CategoryIDList = append(CategoryIDList, CategoryParentTMP...)
