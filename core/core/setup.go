@@ -15,8 +15,6 @@ var Conf dependency.Configuration
 var Logger *zap.Logger
 
 func Check_DB_Exist() error {
-	ConfigurationFile = filepath.Join("config", "appconf", "core_conf.json")
-	InstallDatabase = filepath.Join("config", "db_base", "core.sql")
 	var err error
 	adminusertest := User{UserID: 1}
 	err = adminusertest.Read()
@@ -42,6 +40,8 @@ func Check_DB_Exist() error {
 }
 
 func init() {
+	ConfigurationFile = filepath.Join("config", "appconf", "core_conf.json")
+	InstallDatabase = filepath.Join("config", "db_base", "core.sql")
 	// db.Execute_sql_file("core.sql", Appname)
 	fmt.Println("---------------------------------------")
 	fmt.Println("BEGIN PREPARING TO START CORE")
