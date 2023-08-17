@@ -3,6 +3,7 @@ import { KmsAPI } from '../../../dep/kms/kmsHandler';
 
 function AddCategory({ fetchData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const ref = useRef(null);
   const [formData, setFormData] = useState({
     CategoryName: '',
     CategoryParentID: '',
@@ -16,8 +17,6 @@ function AddCategory({ fetchData }) {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
-  const ref = useRef(null);
 
   useEffect(() => {
     if (isModalOpen) {

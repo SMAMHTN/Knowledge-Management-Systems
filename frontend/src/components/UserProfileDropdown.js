@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image'; // Import the Next.js Image component
 import { getUserData, Logout } from '../dep/core/coreHandler';
@@ -8,6 +8,7 @@ import { getUserData, Logout } from '../dep/core/coreHandler';
 function UserProfile({ maxWidth, maxHeight }) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState('');
+  const ref = useRef(null);
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
@@ -22,6 +23,22 @@ function UserProfile({ maxWidth, maxHeight }) {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      const handleOutsideClick = (event) => {
+        if (ref.current && !ref.current.contains(event.target)) {
+          setIsOpen(false);
+        }
+      };
+
+      window.addEventListener('mousedown', handleOutsideClick);
+
+      return () => {
+        window.removeEventListener('mousedown', handleOutsideClick);
+      };
+    }
+  }, [isOpen, ref]);
 
   // Function to check if a string is a valid base64 string
   const isValidBase64 = (str) => {
@@ -77,7 +94,7 @@ function UserProfile({ maxWidth, maxHeight }) {
         </button>
       </div>
       {isOpen && (
-        <div className="absolute right-0 group-focus:block my-1 mr-4 md:mr-7 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
+        <div className="absolute right-0 group-focus:block my-1 mr-4 md:mr-7 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" ref={ref}>
           <div className="px-4 py-3">
             {userData ? (
               <div>
