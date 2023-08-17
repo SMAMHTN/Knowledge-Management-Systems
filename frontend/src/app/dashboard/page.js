@@ -1,32 +1,53 @@
-import Link from "next/link";
+'use client';
 
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { getUserData, Logout } from '../../dep/core/coreHandler';
 
-export default function Home() {
+function Home() {
+  const [error, setError] = useState('');
+  const [userData, setUserData] = useState('');
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        console.log('Fetching user data...');
+        const data = await getUserData();
+        console.log('User data fetched:', data);
+        setUserData(data);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
   return (
-    <>
-      <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-        {/* buat s.admin */}
-        <div className="max-w-md mx-auto p-4 mt-9">
-      <h2 className="text-2xl font-bold mb-4">Navigation</h2>
-      <div className="space-y-4">
-          <Link href="/nama-pengguna" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-            Nama Pengguna dan Role Pengguna
-          </Link>
+    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
+      {/* buat s.admin */}
+      <div className="max-w-md mx-auto p-4 mt-9">
+        <h2 className="text-2xl font-bold mb-4">Navigation</h2>
+        <div className="space-y-4">
+          <h1>
+            Selamat datang
+            {' '}
+            {userData.Name}
+          </h1>
           <Link href="/settings" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
             Settings
           </Link>
-          <Link  href="/management-dokumen" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
+          <Link href="/management-dokumen" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
             Management Dokumen
           </Link>
           <Link href="/management-s-admin" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
             Management S.Admin
           </Link>
+        </div>
       </div>
-    </div>
-{/* buat user biasa */}
+      {/* buat user biasa */}
 
-
-        {/* <div className="h-full mt-14">
+      {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
             <h1 className="text-white text-2xl font-bold mb-4">Dashboard</h1>
           </div>
@@ -269,7 +290,7 @@ export default function Home() {
             </div>
           </div>
         </div> */}
-      </section>
-    </>
+    </section>
   );
 }
+export default Home;

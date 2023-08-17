@@ -1,66 +1,64 @@
-'use client'
-import React, { useState, useEffect } from "react";
-import { CoreAPIGET } from "../../../dep/core/coreHandler";
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { CoreAPIGET } from '../../../dep/core/coreHandler';
 
 function HistoryTable() {
   // Sample data for the table
   const [data, setData] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await CoreAPIGET("listhistory");
-  
-        console.log(response);
-        console.log(response.body.StatusCode);
-  
-        // Update state with the fetched data
-        setData(response.body.Data); // Use response.body.Data directly
+        const response = await CoreAPIGET('listhistory');
+
+        // Reverse the order of the data
+        const reversedData = response.body.Data.reverse();
+
+        // Update state with the fetched data in reverse order
+        setData(reversedData);
         setError(null);
       } catch (error) {
         // Handle errors here
-        console.error("Error fetching user data:", error);
+        console.error('Error fetching user data:', error);
       }
     };
-  
+
     fetchData();
   }, []); // Empty dependency array, so this effect runs once after initial render
-  
 
   return (
-    <>
-      <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-        {/* buat s.admin */}
-        <div className="max-w-md mx-auto p-4 mt-9">
-      <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Activity Log</h2>
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="px-4 py-2">ActivityType</th>
-            <th className="px-4 py-2">Changes</th>
-            <th className="px-4 py-2">UserID</th>
-            <th className="px-4 py-2">Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((history) => (
-            <tr key={history.id} className="border-b">
-              <td className="px-4 py-2">{history.ActivityType}</td>
-              <td className="px-4 py-2">{history.Changes}</td>
-              <td className="px-4 py-2">{history.UserID}</td>
-              <td className="px-4 py-2">{history.Time}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-    </div>
-{/* buat user biasa */}
+    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
+      {/* buat s.admin */}
+      <div className="max-w-md mx-auto p-4 mt-9">
+        <div className="max-w-3xl mx-auto p-4">
+          <h2 className="text-2xl font-bold mb-4">Activity Log</h2>
+          <table className="w-full border">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2">ActivityType</th>
+                <th className="px-4 py-2">Changes</th>
+                <th className="px-4 py-2">UserID</th>
+                <th className="px-4 py-2">Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((history) => (
+                <tr key={history.id} className="border-b">
+                  <td className="px-4 py-2">{history.ActivityType}</td>
+                  <td className="px-4 py-2">{history.Changes}</td>
+                  <td className="px-4 py-2">{history.UserID}</td>
+                  <td className="px-4 py-2">{history.Time}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {/* buat user biasa */}
 
-
-        {/* <div className="h-full mt-14">
+      {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
             <h1 className="text-white text-2xl font-bold mb-4">Dashboard</h1>
           </div>
@@ -303,9 +301,8 @@ function HistoryTable() {
             </div>
           </div>
         </div> */}
-      </section>
-    </>
+    </section>
   );
-      }
+}
 
 export default HistoryTable;
