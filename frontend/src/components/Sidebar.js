@@ -5,7 +5,7 @@ import DateTime from '@/components/DateTime.js';
 
 function Sidebar({ initialTime }) {
   return (
-    <div className="fixed flex flex-col top-14 left-0 w-14 hover:w-64 md:w-64 bg-blue-900 dark:bg-gray-900 h-full text-white transition-all duration-300 border-none z-10">
+    <div className="fixed flex flex-col top-14 left-0 w-14 hover:w-64 md:w-64 bg-neutral-50 dark:bg-neutral-50 h-full text-gray-700 transition-all duration-300 border-none z-10">
       <div className="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow mr-2">
         <ul className="flex flex-col py-4 space-y-1">
           <li className="px-5 hidden md:block">
@@ -18,7 +18,7 @@ function Sidebar({ initialTime }) {
           <li>
             <Link
               href="/dashboard"
-              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md hover:border-blue-500 dark:hover:border-gray-800 pr-6"
+              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-200 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md hover:border-blue-500 dark:hover:border-gray-800 pr-6"
             >
               <span className="inline-flex justify-center items-center ml-4">
                 <svg
@@ -44,7 +44,7 @@ function Sidebar({ initialTime }) {
           <li>
             <Link
               href="/users"
-              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md hover:border-blue-500 dark:hover:border-gray-800 pr-6"
+              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-200 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md hover:border-blue-500 dark:hover:border-gray-800 pr-6"
             >
               <span className="inline-flex justify-center items-center ml-4">
                 <svg
@@ -65,15 +65,15 @@ function Sidebar({ initialTime }) {
               <span className="ml-2 text-sm tracking-wide truncate">
                 Users
               </span>
-              <span className="hidden md:block px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-blue-500 bg-indigo-50 rounded-full">
+              {/* <span className="hidden md:block px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-blue-500 bg-indigo-50 rounded-full">
                 New
-              </span>
+              </span> */}
             </Link>
           </li>
           <li>
             <Link
               href="/documents"
-              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md hover:border-blue-500 dark:hover:border-gray-800 pr-6"
+              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-200 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md hover:border-blue-500 dark:hover:border-gray-800 pr-6"
             >
               <span className="inline-flex justify-center items-center ml-4">
                 <svg
@@ -99,7 +99,7 @@ function Sidebar({ initialTime }) {
           <li>
             <Link
               href="/settings"
-              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md  hover:border-blue-500 dark:hover:border-gray-800 pr-6"
+              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-200 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md  hover:border-blue-500 dark:hover:border-gray-800 pr-6"
             >
               <span className="inline-flex justify-center items-center ml-4">
                 <svg
@@ -139,7 +139,7 @@ function Sidebar({ initialTime }) {
           <li>
             <Link
               href="#"
-              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md  hover:border-blue-500 dark:hover:border-gray-800 pr-6"
+              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-200 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md  hover:border-blue-500 dark:hover:border-gray-800 pr-6"
             >
               <span className="inline-flex justify-center items-center ml-4">
                 <svg
@@ -165,7 +165,7 @@ function Sidebar({ initialTime }) {
           <li>
             <Link
               href="#"
-              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md  hover:border-blue-500 dark:hover:border-gray-800 pr-6"
+              className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-200 text-white-600 hover:text-white-800 border-l-4 border-transparent rounded-md  hover:border-blue-500 dark:hover:border-gray-800 pr-6"
             >
               <span className="inline-flex justify-center items-center ml-4">
                 <svg

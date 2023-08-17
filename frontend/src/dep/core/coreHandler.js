@@ -1,10 +1,11 @@
 'use server';
 
+import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { readConf } from '../others/confHandler';
 import { generateCoreCred } from '../others/generateCred';
 
-const LoginDynamicpath = '/tes';
+const LoginDynamicpath = '/';
 
 export async function Login(Username, Password) {
   const conf = readConf('frontend_conf.json');

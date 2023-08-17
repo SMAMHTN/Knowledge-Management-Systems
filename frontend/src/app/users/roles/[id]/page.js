@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { CoreAPI, CoreAPIGET } from "../../../../dep/core/coreHandler";
+import { useState, useEffect } from 'react';
+import { CoreAPI, CoreAPIGET } from '../../../../dep/core/coreHandler';
 
 function UserDetails({ params }) {
   const [data, setData] = useState([]);
@@ -9,13 +9,13 @@ function UserDetails({ params }) {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await CoreAPIGET("role?RoleID=" + params.id);
+        const response = await CoreAPIGET(`role?RoleID=${params.id}`);
         console.log(response);
 
         setData(response.body.Data);
       } catch (error) {
         // Handle errors here
-        console.error("Error fetching user data:", error);
+        console.error('Error fetching user data:', error);
       }
     };
 
@@ -24,15 +24,13 @@ function UserDetails({ params }) {
 
   const handleUpdate = async () => {
     try {
-      console.log("heran");
-
       console.log(data);
       console.log(params.id);
       data.RoleParentID = parseInt(data.RoleParentID);
-      const response = await CoreAPI("PUT", "role", data);
+      const response = await CoreAPI('PUT', 'role', data);
     } catch (error) {
       console.log(error);
-      console.log("Ada error anjg");
+      console.log('Ada error anjg');
       // Handle error
     }
   };
@@ -46,7 +44,7 @@ function UserDetails({ params }) {
               <label className="block font-semibold mb-1">Role ID</label>
               <input
                 type="text"
-                value={data.RoleID || ""}
+                value={data.RoleID || ''}
                 className="border px-2 py-1 w-full"
                 readOnly
               />
@@ -55,7 +53,7 @@ function UserDetails({ params }) {
               <label className="block font-semibold mb-1">Role Name</label>
               <input
                 type="text"
-                value={data.RoleName || ""}
+                value={data.RoleName || ''}
                 className="border px-2 py-1 w-full"
                 onChange={(e) => setData({ ...data, RoleName: e.target.value })}
               />
@@ -64,7 +62,7 @@ function UserDetails({ params }) {
               <label className="block font-semibold mb-1">Role Parent ID</label>
               <input
                 type="text"
-                value={data.RoleParentID || ""}
+                value={data.RoleParentID || ''}
                 className="border px-2 py-1 w-full"
                 onChange={(e) => setData({ ...data, RoleParentID: e.target.value })}
               />
@@ -74,12 +72,11 @@ function UserDetails({ params }) {
               <textarea
                 className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                 rows="4"
-                value={data.RoleDescription || ""}
+                value={data.RoleDescription || ''}
                 onChange={(e) => setData({ ...data, RoleDescription: e.target.value })}
               />
             </div>
 
-           
             <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded"

@@ -12,49 +12,15 @@ export default function Page() {
   const [message, setMessage] = useState('');
   const [nextlink, setNextlink] = useState('/tes');
   const router = useRouter();
-  // const [a, setA] = useState({
-  //   Data: {
-  //     CategoryID: 0,
-  //     CategoryName: "",
-  //     CategoryParentID: 0,
-  //     CategoryDescription: "",
-  //   },
-  // });
-  // const [statuscode, setStatusCode] = useState("");
-  // const jsonRequestData = {
-  //   UserID:1,
-  // }
 
-  // useEffect(() => {
-  //   CoreAPIGET("user?UserID=1").then(configuration => {
-  //     setA(configuration);
-  //   });
-  // }, []);
   const handleLogin = async () => {
-    // const credentials = btoa(`aldim:${username}&&${password}`);
-
     try {
       const response = await Login(username, password);
-      // KmsAPIGET("category?CategoryID=1").then((configuration) => {
-      //   setA(configuration);
-      // });
-      // let datasent = {
-      //   CategoryID: 13,
-      // };
-      // const response2 = await KmsAPI("DELETE", "category",datasent);
-      // setA(response2.body);
-      // console.log(response2);
-      // const response = await fetch('http://code.smam.my.id:6565/login', {
-      //   headers: {
-      //     Authorization: `Basic ${credentials}`,
-      //     Accept: '*/*',
-      //   },
-      // });
 
       if (response === true) {
         const response2 = await CoreAPIGET('loginuser');
         // setNextlink("/tes/tes2/" + response2.body.Data.UserID)
-        router.push(`/tes/tes2/${response2.body.Data.UserID}`);
+        router.push('/dashboard/');
         setMessage('Login successful!');
         // Perform any additional actions after successful login
       } else {

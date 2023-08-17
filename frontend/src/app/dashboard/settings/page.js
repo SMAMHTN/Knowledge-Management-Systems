@@ -1,28 +1,32 @@
-"use client";
-import React, { useState, useEffect, useRef } from "react";
-import { CoreAPI,CoreAPIGET } from "../../../dep/core/coreHandler";
+'use client';
 
-function SettingUser ({ imageUrl, username }) {
+import React, { useState, useEffect, useRef } from 'react';
+import { CoreAPIGET, CoreAPI } from '../../../dep/core/coreHandler';
+
+function SettingUser({ imageUrl, username }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [data, setData] = useState([]);
   const dropdownRef = useRef(null);
-  
-  // useEffect(() => {
-  //   const fetchUserData = async () => {
-  //     try {
-  //       const response = await CoreAPIGET("user?UserID=" + params.id);
-  //       console.log(response);
-  //       const jsonData = response.body.Data;
 
-  //       setData(jsonData);
-  //       console.log(data);
-  //     } catch (error) {
-  //       // Handle errors here
-  //       console.error("Error fetching user data:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const loginResponse = await CoreAPIGET('loginuser');
+        const userId = loginResponse.body.Data.UserID;
+        const response = await CoreAPIGET('user?UserID=2');
+        console.log(response);
+        const jsonData = response.body.Data;
 
-  //   fetchUserData();
-  // }, [params.id]);
+        setData(jsonData);
+        console.log(data);
+      } catch (error) {
+        // Handle errors here
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -34,104 +38,146 @@ function SettingUser ({ imageUrl, username }) {
       }
     };
 
-    
-
-    document.addEventListener("click", handleOutsideClick);
+    document.addEventListener('click', handleOutsideClick);
 
     return () => {
-      document.removeEventListener("click", handleOutsideClick);
+      document.removeEventListener('click', handleOutsideClick);
     };
   }, []);
 
+  const handleUpdate = async () => {
+    try {
+      console.log('heran');
+      console.log(data);
+      await CoreAPI('PUT', 'user', data);
+    } catch (error) {
+      console.log(error);
+      console.log('Ada error anjg');
+      // Handle error
+    }
+  };
   return (
-    <>
-      <section className="max-w-screen-xl h-screen relative mt-9">
+    <section className="max-w-screen-xl h-screen relative mt-9">
       <div className="max-w-md mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">User Settings</h2>
-      <form className="space-y-4">
-        <div>
-          <label className="block mb-1 font-semibold" htmlFor="username">
-            Username:
-          </label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            className="w-full border rounded px-2 py-1"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1 font-semibold" htmlFor="fullName">
-            Full Name:
-          </label>
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            className="w-full border rounded px-2 py-1"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1 font-semibold" htmlFor="email">
-            Email:
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            className="w-full border rounded px-2 py-1"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1 font-semibold" htmlFor="phoneNumber">
-            Phone Number:
-          </label>
-          <input
-            type="tel"
-            id="phoneNumber"
-            name="phoneNumber"
-            className="w-full border rounded px-2 py-1"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1 font-semibold" htmlFor="password">
-            Password:
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            className="w-full border rounded px-2 py-1"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1 font-semibold" htmlFor="theme">
-            Theme:
-          </label>
-          <select
-            id="theme"
-            name="theme"
-            className="w-full border rounded px-2 py-1"
-            required
+        <h2 className="text-2xl font-bold mb-4">User Settings</h2>
+        <form action={handleUpdate}>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Username</label>
+            <input
+              type="text"
+              value={data.Username || ''}
+              className="border px-2 py-1 w-full"
+              onChange={(e) => setData({ ...data, Username: e.target.value })}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Password</label>
+            <input
+              type="text"
+              value={data.Password || ''}
+              className="border px-2 py-1 w-full"
+              onChange={(e) => setData({ ...data, Password: e.target.value })}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Name</label>
+            <input
+              type="text"
+              value={data.Name || ''}
+              className="border px-2 py-1 w-full"
+              onChange={(e) => setData({ ...data, Name: e.target.value })}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Email</label>
+            <input
+              type="text"
+              value={data.Email || ''}
+              className="border px-2 py-1 w-full"
+              onChange={(e) => setData({ ...data, Email: e.target.value })}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Address</label>
+            <input
+              type="text"
+              value={data.Address || ''}
+              className="border px-2 py-1 w-full"
+              onChange={(e) => setData({ ...data, Address: e.target.value })}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Phone</label>
+            <input
+              type="text"
+              value={data.Phone || ''}
+              className="border px-2 py-1 w-full"
+              onChange={(e) => setData({ ...data, Phone: e.target.value })}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Role id</label>
+            <input
+              type="text"
+              value={data.RoleID || ''}
+              className="border px-2 py-1 w-full"
+              onChange={(e) => setData({ ...data, RoleID: parseInt(e.target.value, 10) })}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Theme App</label>
+            <input
+              type="text"
+              value={data.AppThemeID || ''}
+              className="border px-2 py-1 w-full"
+              onChange={(e) => setData({ ...data, AppThemeID: parseInt(e.target.value, 10) })}
+            />
+          </div>
+          <div>
+            <label className="font-medium">Note</label>
+            <textarea
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+              rows="4"
+              value={data.Note || ''}
+              onChange={(e) => setData({ ...data, Note: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="font-medium">
+              <input
+                type="checkbox"
+                className="mr-1"
+                checked={data.IsSuperAdmin === 1 || 0} // Check if IsActive is 1
+                onChange={() => setData({
+                  ...data,
+                  IsSuperAdmin: data.IsSuperAdmin === 1 ? 0 : 1,
+                })}
+              />
+              Is Super Admin
+            </label>
+          </div>
+
+          <div>
+            <label className="font-medium">
+              <input
+                type="checkbox"
+                className="mr-1"
+                checked={data.IsActive === 1 || 0} // Check if IsActive is 1
+                onChange={() => setData({ ...data, IsActive: data.IsActive === 1 ? 0 : 1 })}
+              />
+              Is Active
+            </label>
+          </div>
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded"
           >
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2"
-        >
-          Save Settings
-        </button>
-      </form>
-    </div>
-        {/* <div className="h-full mx-auto mt-14">
+            Update
+          </button>
+        </form>
+      </div>
+      {/* <div className="h-full mx-auto mt-14">
           <div className="fixed w-full ml-1">
             <h1 className="text-white text-2xl font-bold mb-4">Settings</h1>
           </div>
@@ -324,9 +370,8 @@ function SettingUser ({ imageUrl, username }) {
             </div>
           </div>
         </div> */}
-      </section>
-    </>
+    </section>
   );
-};
+}
 
 export default SettingUser;

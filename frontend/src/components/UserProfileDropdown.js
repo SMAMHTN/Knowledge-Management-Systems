@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image'; // Import the Next.js Image component
-import { getUserData } from '../dep/core/coreHandler';
+import { getUserData, Logout } from '../dep/core/coreHandler';
 
 function UserProfile({ maxWidth, maxHeight }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -64,7 +64,9 @@ function UserProfile({ maxWidth, maxHeight }) {
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
-
+  const handleLogout = async () => {
+    const success = await Logout();
+  };
   return (
     <div className="relative inline-block text-left">
       <div>
@@ -120,12 +122,9 @@ function UserProfile({ maxWidth, maxHeight }) {
               </Link>
             </li>
             <li>
-              <Link
-                href="/sign-out"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-              >
-                Sign out
-              </Link>
+              <button onClick={handleLogout} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                Log out
+              </button>
             </li>
           </ul>
         </div>
