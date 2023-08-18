@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 
 export const useOutsideClick = (ref, closeModal) => {
@@ -31,7 +31,7 @@ export function useModal(initialState = false) {
   return { isModalOpen, openModal, closeModal };
 }
 
-export const success = (successText) => toast.success(successText, {
+const success = (successText) => toast.success(successText, {
   position: 'top-right',
   autoClose: 3000,
   hideProgressBar: true,
@@ -42,7 +42,7 @@ export const success = (successText) => toast.success(successText, {
   theme: 'colored',
 });
 
-export const error = (errorText) => toast.error(errorText, {
+const error = (errorText) => toast.error(errorText, {
   position: 'top-right',
   autoClose: 3000,
   hideProgressBar: true,
@@ -53,7 +53,7 @@ export const error = (errorText) => toast.error(errorText, {
   theme: 'colored',
 });
 
-const formatConsoleMessage = (statusCode, data) => `Status Code: ${statusCode}, Data: ${data}`;
+export const formatConsoleMessage = (statusCode, data) => `Status Code: ${statusCode}, Data: ${data}`;
 
 // alert for add new data
 export const alertAdd = (response) => {
@@ -134,3 +134,41 @@ export const alertUpdate = (response) => {
     console.log(consoleMessage);
   }
 };
+
+// delete confirmation popup
+export function DeleteModal({
+  isOpen, onClose, onDelete, message,
+}) {
+  const modalRef = useRef(null);
+
+  // Attach the useOutsideClick hook to the modal's background
+  useOutsideClick(modalRef, onClose);
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-20 flex items-center justify-center bg-black bg-opacity-50">
+      <div ref={modalRef} className="bg-white rounded p-6 shadow-md w-96">
+        <h2 className="text-xl font-semibold mb-4">Confirm Deletion</h2>
+        <p className="mb-4">{message}</p>
+        <div className="flex justify-end">
+          <button
+            className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+          <button
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+            onClick={onDelete}
+          >
+            Delete
+          </button>
+
+        </div>
+      </div>
+    </div>
+  );
+}

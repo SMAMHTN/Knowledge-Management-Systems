@@ -4,11 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CoreAPIGET, CoreAPI } from '../../../dep/core/coreHandler';
 import AddUser from './AddUser';
+import { DeleteModal, alertDelete } from '@/components/Feature';
 
 function UserTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingUserID, setDeletingUserID] = useState(null);
+  const [deleteMessage, setDeleteMessage] = useState('');
 
   const fetchData = async () => {
     try {
@@ -21,25 +25,26 @@ function UserTable() {
     }
   };
 
-  useEffect(() => {
-    console.log(data); // Log the 'data' value after it updates
-  }, [data]);
-
-  const handleDelete = async (UserID) => {
+  const handleConfirmDelete = async () => {
     try {
-      // Send the delete request to the server
-      await CoreAPI('DELETE', 'user', { UserID });
+      const responseDel = await CoreAPI('DELETE', 'user', { UserID: deletingUserID });
 
-      // Remove the deleted category from the data state
       const updatedData = data.filter(
-        (user) => user.UserID !== UserID,
+        (user) => user.UserID !== deletingUserID,
       );
       setData(updatedData);
+      alertDelete(responseDel);
+      setIsDeleteModalOpen(false);
+      setDeletingCategoryID(null);
     } catch (error) {
       console.error('Error deleting category:', error);
     }
   };
 
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingUserID(null);
+  };
   useEffect(() => {
     fetchData();
   }, [router.pathname]);
@@ -100,7 +105,13 @@ function UserTable() {
                         View
                       </button>
                       <button
-                        onClick={() => handleDelete(user.UserID)}
+                        onClick={() => {
+                          setDeletingUserID(user.UserID);
+                          setDeleteMessage(
+                            `Are you sure you would like to delete user "${user.Username}"? This action cannot be undone.`,
+                          );
+                          setIsDeleteModalOpen(true);
+                        }}
                         className="bg-red-500 text-white rounded px-2 py-1 ml-2"
                       >
                         Delete
@@ -115,6 +126,12 @@ function UserTable() {
             </tbody>
           </table>
         </div>
+        <DeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleConfirmDelete}
+          message={deleteMessage}
+        />
       </div>
       {/* buat user biasa */}
 

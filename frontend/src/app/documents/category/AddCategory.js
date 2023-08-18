@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { KmsAPI } from '../../../dep/kms/kmsHandler';
 import {
-  useOutsideClick, useModal, alertAdd, formatConsoleMessage,
+  useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';
 
 function AddCategory({ fetchData }) {
@@ -36,12 +36,7 @@ function AddCategory({ fetchData }) {
     try {
       // Make the API call to save the data
       const response = await KmsAPI('POST', 'category', formData);
-      // Use the alertAdd function
       alertAdd(response);
-
-      // Use the formatConsoleMessage function
-      const consoleMessage = formatConsoleMessage(response.body.StatusCode, response.body.Data);
-      console.log(consoleMessage);
       fetchData(); // Assuming fetchData is a function that fetches data again
       closeModal();
     } catch (error) {

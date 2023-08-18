@@ -4,15 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import AddCategory from './AddCategory';
-
-function handleChange() {
-  setModal(!modal);
-}
+import { DeleteModal, alertDelete } from '@/components/Feature';
 
 function CatTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingCategoryID, setDeletingCategoryID] = useState(null);
+  const [deleteMessage, setDeleteMessage] = useState('');
 
   const fetchData = async () => {
     try {
@@ -25,19 +25,25 @@ function CatTable() {
     }
   };
 
-  const handleDelete = async (CategoryID) => {
+  const handleConfirmDelete = async () => {
     try {
-      // Send the delete request to the server
-      await KmsAPI('DELETE', 'category', { CategoryID });
+      const responseDel = await KmsAPI('DELETE', 'category', { CategoryID: deletingCategoryID });
 
-      // Remove the deleted category from the data state
       const updatedData = data.filter(
-        (category) => category.CategoryID !== CategoryID,
+        (category) => category.CategoryID !== deletingCategoryID,
       );
       setData(updatedData);
+      alertDelete(responseDel);
+      setIsDeleteModalOpen(false);
+      setDeletingCategoryID(null);
     } catch (error) {
       console.error('Error deleting category:', error);
     }
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingCategoryID(null);
   };
 
   useEffect(() => {
@@ -92,7 +98,13 @@ function CatTable() {
                       View
                     </button>
                     <button
-                      onClick={() => handleDelete(category.CategoryID)}
+                      onClick={() => {
+                        setDeletingCategoryID(category.CategoryID);
+                        setDeleteMessage(
+                          `Are you sure you would like to delete "${category.CategoryName}" category? This action cannot be undone.`,
+                        );
+                        setIsDeleteModalOpen(true);
+                      }}
                       className="bg-red-500 text-white rounded px-2 py-1 ml-2"
                     >
                       Delete
@@ -103,6 +115,12 @@ function CatTable() {
             </tbody>
           </table>
         </div>
+        <DeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleConfirmDelete}
+          message={deleteMessage}
+        />
       </div>
       {/* buat user biasa */}
 

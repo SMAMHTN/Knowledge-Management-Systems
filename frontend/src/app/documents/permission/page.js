@@ -1,17 +1,22 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { KmsAPIGET, KmsAPI } from "@/dep/kms/kmsHandler";
-import AddPermission from "./AddPermission";
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { KmsAPIGET, KmsAPI } from '@/dep/kms/kmsHandler';
+import AddPermission from './AddPermission';
+import { DeleteModal, alertDelete } from '@/components/Feature';
 
 function PerTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingPermissionID, setDeletingPermissionID] = useState(null);
+  const [deleteMessage, setDeleteMessage] = useState('');
 
   const fetchData = async () => {
     try {
-      const response = await KmsAPIGET("listpermission");
+      const response = await KmsAPIGET('listpermission');
       const jsonData = response.body.Data;
       setData(jsonData);
       setError(null);
@@ -20,27 +25,33 @@ function PerTable() {
     }
   };
 
-  const handleDelete = async (PermissionID) => {
+  const handleConfirmDelete = async () => {
     try {
-      // Send the delete request to the server
-      await KmsAPI("DELETE", "permission", { PermissionID });
+      const responseDel = await KmsAPI('DELETE', 'permission', { PermissionID: deletingPermissionID });
 
       const updatedData = data.filter(
-        (permission) => permission.PermissionID !== PermissionID
+        (permission) => permission.PermissionID !== deletingPermissionID,
       );
       setData(updatedData);
+      alertDelete(responseDel);
+      setIsDeleteModalOpen(false);
+      setDeletingCategoryID(null);
     } catch (error) {
-      console.error("Error deleting permission:", error);
+      console.error('Error deleting permission:', error);
     }
   };
 
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingPermissionID(null);
+  };
   useEffect(() => {
     fetchData();
   }, [router.pathname]);
 
   const truncateText = (text, length) => {
     if (text.length > length) {
-      return text.slice(0, length - 3) + "...";
+      return `${text.slice(0, length - 3)}...`;
     }
     return text;
   };
@@ -51,65 +62,76 @@ function PerTable() {
   };
 
   return (
-    <>
-      <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-        {/* buat s.admin */}
-        <div className="max-w-md ml-14 p-4 mt-9">
-          <div className="max-w-3xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">permission Table</h2>
-            <div className="my-2">
-              <AddPermission fetchData={fetchData} />
-            </div>
-            <table className="w-full border">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2">PermissionID</th>
-                  <th className="px-4 py-2">CategoryID</th>
-                  <th className="px-4 py-2">RoleID</th>
-                  <th className="px-4 py-2">Create</th>
-                  <th className="px-4 py-2">Read</th>
-                  <th className="px-4 py-2">Update</th>
-                  <th className="px-4 py-2">Delete</th>
-                  <th className="px-4 py-2">FileType</th>
-                  <th className="px-4 py-2">DocType</th>
-                  <th className="px-4 py-2">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((permission) => (
-                  <tr key={permission.PermissionID}>
-                    <td className="px-4 py-2">{permission.PermissionID}</td>
-                    <td className="px-4 py-2">{permission.CategoryID}</td>
-                    <td className="px-4 py-2">{permission.RoleID}</td>
-                    <td className="px-4 py-2">{permission.Create}</td>
-                    <td className="px-4 py-2">{permission.Read}</td>
-                    <td className="px-4 py-2">{permission.Update}</td>
-                    <td className="px-4 py-2">{permission.Delete}</td>
-                    <td className="px-4 py-2">{permission.FileType}</td>
-                    <td className="px-4 py-2">{permission.DocType}</td>
-                    <td className="px-4 py-2 flex justify-end items-center">
-                      <button
-                        onClick={() => handleNavigate(permission.PermissionID)}
-                        className="bg-yellow-500 text-white rounded px-2 py-1"
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => handleDelete(permission.PermissionID)}
-                        className="bg-red-500 text-white rounded px-2 py-1 ml-2"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
+      {/* buat s.admin */}
+      <div className="max-w-md ml-14 p-4 mt-9">
+        <div className="max-w-3xl mx-auto p-4">
+          <h2 className="text-2xl font-bold mb-4">permission Table</h2>
+          <div className="my-2">
+            <AddPermission fetchData={fetchData} />
           </div>
+          <table className="w-full border">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2">PermissionID</th>
+                <th className="px-4 py-2">CategoryID</th>
+                <th className="px-4 py-2">RoleID</th>
+                <th className="px-4 py-2">Create</th>
+                <th className="px-4 py-2">Read</th>
+                <th className="px-4 py-2">Update</th>
+                <th className="px-4 py-2">Delete</th>
+                <th className="px-4 py-2">FileType</th>
+                <th className="px-4 py-2">DocType</th>
+                <th className="px-4 py-2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((permission) => (
+                <tr key={permission.PermissionID}>
+                  <td className="px-4 py-2">{permission.PermissionID}</td>
+                  <td className="px-4 py-2">{permission.CategoryID}</td>
+                  <td className="px-4 py-2">{permission.RoleID}</td>
+                  <td className="px-4 py-2">{permission.Create}</td>
+                  <td className="px-4 py-2">{permission.Read}</td>
+                  <td className="px-4 py-2">{permission.Update}</td>
+                  <td className="px-4 py-2">{permission.Delete}</td>
+                  <td className="px-4 py-2">{permission.FileType}</td>
+                  <td className="px-4 py-2">{permission.DocType}</td>
+                  <td className="px-4 py-2 flex justify-end items-center">
+                    <button
+                      onClick={() => handleNavigate(permission.PermissionID)}
+                      className="bg-yellow-500 text-white rounded px-2 py-1"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDeletingPermissionID(permission.PermissionID);
+                        setDeleteMessage(
+                          `Are you sure you would like to delete permission id "${permission.PermissionID}" ? This action cannot be undone.`,
+                        );
+                        setIsDeleteModalOpen(true);
+                      }}
+                      className="bg-red-500 text-white rounded px-2 py-1 ml-2"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {/* buat user biasa */}
+        <DeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleConfirmDelete}
+          message={deleteMessage}
+        />
+      </div>
+      {/* buat user biasa */}
 
-        {/* <div className="h-full mt-14">
+      {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
             <h1 className="text-white text-2xl font-bold mb-4">Dashboard</h1>
           </div>
@@ -352,8 +374,7 @@ function PerTable() {
             </div>
           </div>
         </div> */}
-      </section>
-    </>
+    </section>
   );
 }
 

@@ -4,11 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { KmsAPIGET, KmsAPI } from '@/dep/kms/kmsHandler';
 import AddArticle from './AddArticle';
+import { DeleteModal, alertDelete } from '@/components/Feature';
 
 function DocTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingArticleID, setDeletingArticleID] = useState(null);
+  const [deleteMessage, setDeleteMessage] = useState('');
 
   const fetchData = async () => {
     try {
@@ -21,19 +25,25 @@ function DocTable() {
     }
   };
 
-  const handleDelete = async (ArticleID) => {
+  const handleConfirmDelete = async () => {
     try {
-      // Send the delete request to the server
-      await KmsAPI('DELETE', 'article', { ArticleID });
+      const responseDel = await KmsAPI('DELETE', 'article', { ArticleID: deletingArticleID });
 
-      // Remove the deleted category from the data state
       const updatedData = data.filter(
-        (article) => article.ArticleID !== ArticleID,
+        (article) => article.ArticleID !== deletingArticleID,
       );
       setData(updatedData);
+      alertDelete(responseDel);
+      setIsDeleteModalOpen(false);
+      setDeletingArticleID(null);
     } catch (error) {
       console.error('Error deleting category:', error);
     }
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingCategoryID(null);
   };
 
   useEffect(() => {
@@ -99,7 +109,13 @@ function DocTable() {
                       View
                     </button>
                     <button
-                      onClick={() => handleDelete(article.ArticleID)}
+                      onClick={() => {
+                        setDeletingArticleID(article.ArticleID);
+                        setDeleteMessage(
+                          `Are you sure you would like to delete "${article.Title}" Article? This action cannot be undone.`,
+                        );
+                        setIsDeleteModalOpen(true);
+                      }}
                       className="bg-red-500 text-white rounded px-2 py-1 ml-2"
                     >
                       Delete
@@ -110,6 +126,12 @@ function DocTable() {
             </tbody>
           </table>
         </div>
+        <DeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleConfirmDelete}
+          message={deleteMessage}
+        />
       </div>
       {/* buat user biasa */}
 

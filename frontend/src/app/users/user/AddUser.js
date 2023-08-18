@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { CoreAPI } from '../../../dep/core/coreHandler';
-import { useOutsideClick, useModal } from '@/components/Feature';
+import {
+  useOutsideClick, useModal, alertAdd,
+} from '@/components/Feature';
 
 function AddUser({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
@@ -46,14 +48,12 @@ function AddUser({ fetchData }) {
 
   const handleSave = async (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
-    console.log(formData);
     try {
       // Make the API call to save the data
-      await CoreAPI('POST', 'user', formData);
-
-      // Refresh the page after successfully saving the data
-      fetchData();
-      console.log('Data saved successfully.');
+      const response = await CoreAPI('POST', 'user', formData);
+      alertAdd(response);
+      fetchData(); // Assuming fetchData is a function that fetches data again
+      closeModal();
     } catch (error) {
       console.log('Error occurred:', error);
       // Handle error, show a message, etc.
