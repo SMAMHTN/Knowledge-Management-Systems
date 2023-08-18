@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { CoreAPI } from '../../../dep/core/coreHandler';
-import { useOutsideClick, useModal } from '@/components/Feature';
+import {
+  useOutsideClick, useModal, alertAdd,
+} from '@/components/Feature';
 
 function AddRole({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
@@ -14,10 +16,13 @@ function AddRole({ fetchData }) {
   useOutsideClick(ref, closeModal);
 
   const handleInputChange = (e) => {
-    const {
-      name, value, type, checked,
-    } = e.target;
-    let parsedValue;
+    const { name, value } = e.target;
+    let parsedValue = value; // Initialize parsedValue with the original value
+
+    // Convert to integer if the input field name suggests it
+    if (name === 'RoleParentID') {
+      parsedValue = parseInt(value, 10);
+    }
 
     setFormData((prevData) => ({
       ...prevData,
@@ -27,14 +32,13 @@ function AddRole({ fetchData }) {
 
   const handleSave = async (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
-    console.log(formData);
     try {
       // Make the API call to save the data
-      await CoreAPI('POST', 'role', formData);
-
-      // Refresh the page after successfully saving the data
-      fetchData();
-      console.log('Data saved successfully.');
+      console.log(formData);
+      const response = await CoreAPI('POST', 'role', formData);
+      alertAdd(response);
+      fetchData(); // Assuming fetchData is a function that fetches data again
+      closeModal();
     } catch (error) {
       console.log('Error occurred:', error);
       // Handle error, show a message, etc.

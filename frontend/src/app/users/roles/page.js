@@ -1,17 +1,22 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { CoreAPIGET, CoreAPI } from "../../../dep/core/coreHandler";
-import AddRole from "./AddRole";
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { CoreAPIGET, CoreAPI } from '../../../dep/core/coreHandler';
+import AddRole from './AddRole';
+import { DeleteModal, alertDelete } from '@/components/Feature';
 
 function RoleTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingRoleID, setDeletingRoleID] = useState(null);
+  const [deleteMessage, setDeleteMessage] = useState('');
 
   const fetchData = async () => {
     try {
-      const response = await CoreAPIGET("listrole");
+      const response = await CoreAPIGET('listrole');
       const jsonData = response.body.Data;
       setData(jsonData);
       setError(null);
@@ -19,20 +24,28 @@ function RoleTable() {
       setError(error.message);
     }
   };
-  const handleDelete = async (RoleID) => {
-    try {
-      // Send the delete request to the server
-      await CoreAPI("DELETE", "role", { RoleID });
 
-      // Remove the deleted category from the data state
+  const handleConfirmDelete = async () => {
+    try {
+      const responseDel = await CoreAPI('DELETE', 'role', { RoleID: deletingRoleID });
+
       const updatedData = data.filter(
-        (role) => role.RoleID !== RoleID
+        (role) => role.RoleID !== deletingRoleID,
       );
       setData(updatedData);
+      alertDelete(responseDel);
+      setIsDeleteModalOpen(false);
+      setDeletingRoleID(null);
     } catch (error) {
-      console.error("Error deleting category:", error);
+      console.error('Error deleting Role:', error);
     }
   };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingRoleID(null);
+  };
+
   useEffect(() => {
     fetchData();
   }, [router.pathname]);
@@ -43,55 +56,66 @@ function RoleTable() {
   };
 
   return (
-    <>
-      <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-        {/* buat s.admin */}
-        <div className="max-w-md ml-14  p-4 mt-9">
-          <div className="max-w-3xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">Roles Table</h2>
-            <div className="my-2">
-              <AddRole fetchData={fetchData}/>
-            </div>
-            <table className="w-full border">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2">id</th>
-                  <th className="px-4 py-2">Role Name</th>
-                  <th className="px-4 py-2">role parent id</th>
-                  <th className="px-4 py-2">Description</th>
-                  <th className="px-4 py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((role) => (
-                  <tr key={role.RoleID} className="border-b">
-                    <td className="px-4 py-2">{role.RoleID}</td>
-                    <td className="px-4 py-2">{role.RoleName}</td>
-                    <td className="px-4 py-2">{role.RoleParentID}</td>
-                    <td className="px-4 py-2">{role.RoleDescription}</td>
-                    <td className="px-4 py-2 flex justify-end items-center">
-                      <button 
-                      onClick={() => handleNavigate(role.RoleID)}
-                      className="bg-yellow-500 text-white rounded px-2 py-1">
-                        
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(role.RoleID)}
-                        className="bg-red-500 text-white rounded px-2 py-1 ml-2"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
+      {/* buat s.admin */}
+      <div className="max-w-md ml-14  p-4 mt-9">
+        <div className="max-w-3xl mx-auto p-4">
+          <h2 className="text-2xl font-bold mb-4">Roles Table</h2>
+          <div className="my-2">
+            <AddRole fetchData={fetchData} />
           </div>
+          <table className="w-full border">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2">id</th>
+                <th className="px-4 py-2">Role Name</th>
+                <th className="px-4 py-2">role parent id</th>
+                <th className="px-4 py-2">Description</th>
+                <th className="px-4 py-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((role) => (
+                <tr key={role.RoleID} className="border-b">
+                  <td className="px-4 py-2">{role.RoleID}</td>
+                  <td className="px-4 py-2">{role.RoleName}</td>
+                  <td className="px-4 py-2">{role.RoleParentID}</td>
+                  <td className="px-4 py-2">{role.RoleDescription}</td>
+                  <td className="px-4 py-2 flex justify-end items-center">
+                    <button
+                      onClick={() => handleNavigate(role.RoleID)}
+                      className="bg-yellow-500 text-white rounded px-2 py-1"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDeletingRoleID(role.RoleID);
+                        setDeleteMessage(
+                          `Are you sure you would like to delete "${role.RoleName}" role? This action cannot be undone.`,
+                        );
+                        setIsDeleteModalOpen(true);
+                      }}
+                      className="bg-red-500 text-white rounded px-2 py-1 ml-2"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {/* buat user biasa */}
+        <DeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleConfirmDelete}
+          message={deleteMessage}
+        />
+      </div>
+      {/* buat user biasa */}
 
-        {/* <div className="h-full mt-14">
+      {/* <div className="h-full mt-14">
           <div className="fixed w-full ml-1">
             <h1 className="text-white text-2xl font-bold mb-4">Dashboard</h1>
           </div>
@@ -334,8 +358,7 @@ function RoleTable() {
             </div>
           </div>
         </div> */}
-      </section>
-    </>
+    </section>
   );
 }
 

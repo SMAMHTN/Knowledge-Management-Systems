@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { CoreAPI, CoreAPIGET } from '../../../../dep/core/coreHandler';
+import { alertUpdate } from '@/components/Feature';
 
 function UserDetails({ params }) {
   const [data, setData] = useState([]);
@@ -24,13 +25,12 @@ function UserDetails({ params }) {
 
   const handleUpdate = async () => {
     try {
-      console.log(data);
-      console.log(params.id);
       data.RoleParentID = parseInt(data.RoleParentID);
       const response = await CoreAPI('PUT', 'role', data);
+      alertUpdate(response);
     } catch (error) {
       console.log(error);
-      console.log('Ada error anjg');
+      console.log('An error occurred');
       // Handle error
     }
   };
