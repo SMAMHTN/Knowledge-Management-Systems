@@ -4,13 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image'; // Import the Next.js Image component
 import { Login, CoreAPIGET } from '../../dep/core/coreHandler';
+import ShowLogo from '@/components/ShowLogo';
 // import { KmsAPIGET, KmsAPI } from "../../dep/kms/kmsHandler";
 
 export default function Page() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [nextlink, setNextlink] = useState('/tes');
+  const [nextlink, setNextlink] = useState('/');
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -39,13 +40,7 @@ export default function Page() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-300">
         <div className="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-md w-full max-w-md">
           <div id="logo" className="flex flex-col mb-6 mx-auto">
-            <Image
-              className=" object-scale-down h-24 w-24"
-              height={500}
-              width={500}
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/LEGO_logo.svg/1024px-LEGO_logo.svg.png"
-              alt="Test2"
-            />
+            <ShowLogo maxWidth="80px" maxHeight="80px" />
           </div>
           <div className="font-medium self-center text-xl sm:text-2xl uppercase text-gray-800">
             Login

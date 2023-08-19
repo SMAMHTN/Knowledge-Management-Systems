@@ -1,5 +1,5 @@
 import UserProfileDropdown from './UserProfileDropdown';
-import ShowLogo from './ShowLogo'; // Import the ShowLogo component
+import ShowLogo from './ShowLogo';
 
 function Navbar() {
   return (
