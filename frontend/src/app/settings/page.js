@@ -35,9 +35,6 @@ function SystemSetting() {
       const response = await CoreAPIGET('listtheme');
       const themeData = response.body.Data;
       setThemeOptions(themeData);
-
-      // Add this console.log to check themeOptions
-      console.log('Theme Options:', themeData);
     } catch (error) {
       setError(error.message);
     }
