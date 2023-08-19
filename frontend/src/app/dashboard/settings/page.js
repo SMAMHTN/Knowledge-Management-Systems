@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { CoreAPI, getUserData } from '../../../dep/core/coreHandler';
 import { alertUpdate } from '@/components/Feature';
-import ShowLogo from '@/components/ShowLogo';
 import LogoUpload from '@/app/settings/LogoUpload';
 import ProfileImage from '@/components/ShowUserPhoto';
 
@@ -112,6 +111,25 @@ function UserSettings() {
                 </td>
               </tr>
             ))}
+
+            <tr>
+              <td className="p-2">
+                <ProfileImage maxWidth="50px" maxHeight="50px" />
+              </td>
+            </tr>
+            <tr>
+              <td className="p-2"><LogoUpload onUpload={handleLogoUpload} /></td>
+            </tr>
+            <tr>
+              <td className="p-2">
+                <button
+                  onClick={handleSaveClick}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
+                >
+                  save
+                </button>
+              </td>
+            </tr>
           </tbody>
         </table>
 
@@ -158,19 +176,24 @@ function UserSettings() {
                 </td>
               </tr>
             ))}
+            <tr>
+              <td className="p-2">
+                <ProfileImage maxWidth="50px" maxHeight="50px" />
+              </td>
+              <td className="p-2"><LogoUpload onUpload={handleLogoUpload} /></td>
+              <td className="p-2">
+                <button
+                  onClick={handleSaveClick}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
+                >
+                  save
+                </button>
+              </td>
+            </tr>
+
           </tbody>
         </table>
-        <div className="mb-4 text-black">
-          <ProfileImage maxWidth="100px" maxHeight="100px" />
-        </div>
 
-        <LogoUpload onUpload={handleLogoUpload} />
-        <button
-          onClick={handleSaveClick}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
-        >
-          save
-        </button>
       </div>
     </section>
   );
