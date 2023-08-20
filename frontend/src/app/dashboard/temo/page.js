@@ -17,6 +17,7 @@ function UserSettings() {
       try {
         const response = await getUserData();
         setData(response);
+        console.log(response);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -88,6 +89,7 @@ function UserSettings() {
   const handleLogoUpload = (base64String) => {
     // Update the data state with the uploaded logo
     setData({ ...data, UserPhoto: base64String });
+    console.log(data);
   };
   return (
     <section className="max-w-screen-xl h-screen relative mt-9">
@@ -133,49 +135,7 @@ function UserSettings() {
                 </td>
               </tr>
             ))}
-            <tr className="border-y border-black">
-              <td className="p-2">
-                {editing === 'apptheme' ? (
-                  // Dropdown for editing AppthemeID
-                  <select
-                    value={data.AppthemeID}
-                    onChange={(e) => handleAppthemeIDChange(Number(e.target.value))}
-                    className="border px-2 py-1 w-full"
-                  >
-                    {themeOptions.map((theme) => (
-                      <option key={theme.AppthemeID} value={theme.AppthemeID}>
-                        {theme.AppthemeName}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  // Display the AppthemeName based on the AppthemeID
-                  getAppthemeName(data.AppthemeID)
-                )}
-              </td>
-              <td className="p-2">
-                {editing === 'apptheme' ? (
-                  <div className="flex items-center space-x-2">
-                    <button onClick={handleCancelClick} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleSaveClick}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
-                    >
-                      Save
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setEditing('apptheme')}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
-                  >
-                    Edit
-                  </button>
-                )}
-              </td>
-            </tr>
+
             <tr>
               <td className="p-2">
                 <ProfileImage maxWidth="50px" maxHeight="50px" />
@@ -243,7 +203,18 @@ function UserSettings() {
             <tr className="border-y border-black">
               <td className="p-2">
                 <div>
-                  Theme:
+                  App Theme:
+                </div>
+              </td>
+              <td className="p-2">
+                {' '}
+                {getAppthemeName(data.AppthemeID)}
+              </td>
+            </tr>
+            <tr className="border-y border-black">
+              <td className="p-2">
+                <div>
+                  App Theme:
                 </div>
               </td>
               <td className="p-2">
@@ -286,20 +257,6 @@ function UserSettings() {
                     Edit
                   </button>
                 )}
-              </td>
-            </tr>
-            <tr>
-              <td className="p-2">
-                <ProfileImage maxWidth="50px" maxHeight="50px" />
-              </td>
-              <td className="p-2"><LogoUpload onUpload={handleLogoUpload} /></td>
-              <td className="p-2">
-                <button
-                  onClick={handleSaveClick}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
-                >
-                  save
-                </button>
               </td>
             </tr>
           </tbody>
