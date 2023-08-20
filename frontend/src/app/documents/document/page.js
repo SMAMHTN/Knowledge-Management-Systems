@@ -1,13 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { KmsAPIGET } from '@/dep/kms/kmsHandler';
 
 function DocTable() {
-  const router = useRouter();
   const [datadoc, setDatadoc] = useState([]);
   const [datafile, setDatafile] = useState([]);
+  const [docCategoryNames, setDocCategoryNames] = useState({});
+  const [fileCategoryNames, setFileCategoryNames] = useState({});
+  const [docCategoryNamesFetched, setDocCategoryNamesFetched] = useState(false);
+  const [fileCategoryNamesFetched, setFileCategoryNamesFetched] = useState(false);
+
   const [error, setError] = useState('');
 
   const fetchDocData = async () => {
@@ -20,6 +23,7 @@ function DocTable() {
       setError(error.message);
     }
   };
+
   const fetchFileData = async () => {
     try {
       const response = await KmsAPIGET('listfile');
@@ -31,17 +35,92 @@ function DocTable() {
     }
   };
 
-  useEffect(() => {
-    fetchDocData(); fetchFileData();
-  }, [router.pathname]);
-
-  const truncateText = (text, length) => {
-    if (text.length > length) {
-      return `${text.slice(0, length - 3)}...`;
+  const fetchCatName = async (categoryID) => {
+    try {
+      const responseCat = await KmsAPIGET(`category?CategoryID=${categoryID}`);
+      return responseCat.body.Data.CategoryName;
+    } catch (error) {
+      console.error('Error fetching category name:', error);
+      return null;
     }
-    return text;
   };
 
+  useEffect(() => {
+    const fetchCategoryNames = async () => {
+      const docCatNames = {};
+      const fileCatNames = {};
+      for (const doc of datadoc) {
+        if (!docCatNames[doc.CategoryID]) {
+          docCatNames[doc.CategoryID] = await fetchCatName(doc.CategoryID);
+        }
+      }
+      for (const file of datafile) {
+        if (!fileCatNames[file.CategoryID]) {
+          fileCatNames[file.CategoryID] = await fetchCatName(file.CategoryID);
+        }
+      }
+      setDocCategoryNames(docCatNames);
+      setFileCategoryNames(fileCatNames);
+    };
+
+    if (datadoc.length > 0 && datafile.length > 0) {
+      fetchCategoryNames();
+    }
+  }, [datadoc, datafile]);
+
+  const updateDocCatNames = async () => {
+    const catNamesMap = {};
+    for (const doc of datadoc) {
+      if (!catNamesMap[doc.CategoryID]) {
+        catNamesMap[doc.CategoryID] = await fetchCatName(doc.CategoryID);
+      }
+    }
+    const updatedDocData = datadoc.map((doc) => ({
+      ...doc,
+      CategoryName: catNamesMap[doc.CategoryID] || doc.CategoryID,
+    }));
+    setDatadoc(updatedDocData);
+    setDocCategoryNamesFetched(true);
+  };
+
+  const updateFileCatNames = async () => {
+    const catNamesMap = {};
+    for (const file of datafile) {
+      if (!catNamesMap[file.CategoryID]) {
+        catNamesMap[file.CategoryID] = await fetchCatName(file.CategoryID);
+      }
+    }
+    const updatedFileData = datafile.map((file) => ({
+      ...file,
+      CategoryName: catNamesMap[file.CategoryID] || file.CategoryID,
+    }));
+    setDatafile(updatedFileData);
+    setFileCategoryNamesFetched(true);
+  };
+
+  useEffect(() => {
+    if (!docCategoryNamesFetched) {
+      fetchDocData();
+    }
+  }, [docCategoryNamesFetched]);
+
+  useEffect(() => {
+    if (datadoc.length > 0 && !docCategoryNamesFetched) {
+      updateDocCatNames();
+    }
+  }, [datadoc, docCategoryNamesFetched]);
+
+  useEffect(() => {
+    if (!fileCategoryNamesFetched) {
+      fetchFileData();
+    }
+  }, [fileCategoryNamesFetched]);
+
+  useEffect(() => {
+    if (datafile.length > 0 && !fileCategoryNamesFetched) {
+      updateFileCatNames();
+    }
+  }, [datafile, fileCategoryNamesFetched]);
   return (
     <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
       {/* buat s.admin */}
@@ -53,17 +132,17 @@ function DocTable() {
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-4 py-2">DocID</th>
-                <th className="px-4 py-2">DocLoc</th>
-                <th className="px-4 py-2">CategoryID</th>
-                <th className="px-4 py-2">DocType</th>
+                <th className="px-4 py-2">Name</th>
+                <th className="px-4 py-2">Category</th>
+                <th className="px-4 py-2">Type</th>
               </tr>
             </thead>
             <tbody>
               {datadoc.map((document) => (
                 <tr key={document.DocID}>
                   <td className="px-4 py-2">{document.DocID}</td>
-                  <td className="px-4 py-2">{document.DocLoc}</td>
-                  <td className="px-4 py-2">{document.CategoryID}</td>
+                  <td className="px-4 py-2">{document.DocLoc.split('/').pop()}</td>
+                  <td className="px-4 py-2">{docCategoryNames[document.CategoryID] || document.CategoryID}</td>
                   <td className="px-4 py-2">
                     {document.DocType}
                   </td>
@@ -79,17 +158,17 @@ function DocTable() {
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-4 py-2">FileID</th>
-                <th className="px-4 py-2">FileLoc</th>
-                <th className="px-4 py-2">CategoryID</th>
-                <th className="px-4 py-2">FileType</th>
+                <th className="px-4 py-2">Name</th>
+                <th className="px-4 py-2">Category  </th>
+                <th className="px-4 py-2">Type</th>
               </tr>
             </thead>
             <tbody>
               {datafile.map((file) => (
                 <tr key={file.FileID}>
                   <td className="px-4 py-2">{file.FileID}</td>
-                  <td className="px-4 py-2">{file.FileLoc}</td>
-                  <td className="px-4 py-2">{file.CategoryID}</td>
+                  <td className="px-4 py-2">{file.FileLoc.split('/').pop() }</td>
+                  <td className="px-4 py-2">{fileCategoryNames[file.CategoryID] || file.CategoryID}</td>
                   <td className="px-4 py-2">
                     {file.FileType}
                   </td>
