@@ -4,29 +4,48 @@ import React, { useState, useEffect } from 'react';
 import { CoreAPIGET } from '../../../dep/core/coreHandler';
 
 function HistoryTable() {
-  // Sample data for the table
   const [data, setData] = useState([]);
+  const [usNames, setUsNames] = useState({});
   const [error, setError] = useState('');
+
+  const updateUsNames = async (historyData) => {
+    const fetchUsName = async (userID) => {
+      try {
+        const responseUs = await CoreAPIGET(`user?UserID=${userID}`);
+        return responseUs.body.Data.Name;
+      } catch (error) {
+        console.error('Error fetching user name:', error);
+        return null;
+      }
+    };
+
+    const usNamesMap = {};
+    for (const history of historyData) {
+      if (!usNamesMap[history.UserID]) {
+        usNamesMap[history.UserID] = await fetchUsName(history.UserID);
+      }
+    }
+    setUsNames(usNamesMap);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await CoreAPIGET('listhistory');
-
-        // Reverse the order of the data
         const reversedData = response.body.Data.reverse();
-
-        // Update state with the fetched data in reverse order
         setData(reversedData);
         setError(null);
+
+        if (reversedData.length > 0) {
+          updateUsNames(reversedData);
+        }
       } catch (error) {
-        // Handle errors here
-        console.error('Error fetching user data:', error);
+        console.error('Error fetching history data:', error);
       }
     };
 
     fetchData();
-  }, []); // Empty dependency array, so this effect runs once after initial render
+  }, []);
 
   return (
     <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
@@ -37,9 +56,9 @@ function HistoryTable() {
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-4 py-2">ActivityType</th>
+                <th className="px-4 py-2">Type</th>
                 <th className="px-4 py-2">Changes</th>
-                <th className="px-4 py-2">UserID</th>
+                <th className="px-4 py-2">User</th>
                 <th className="px-4 py-2">Time</th>
               </tr>
             </thead>
@@ -48,7 +67,10 @@ function HistoryTable() {
                 <tr key={history.id} className="border-b">
                   <td className="px-4 py-2">{history.ActivityType}</td>
                   <td className="px-4 py-2">{history.Changes}</td>
-                  <td className="px-4 py-2">{history.UserID}</td>
+                  <td className="px-4 py-2">
+                    {' '}
+                    {usNames[history.UserID] || '-'}
+                  </td>
                   <td className="px-4 py-2">{history.Time}</td>
                 </tr>
               ))}

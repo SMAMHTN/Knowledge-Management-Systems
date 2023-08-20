@@ -131,7 +131,7 @@ function DocTable() {
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-4 py-2">DocID</th>
+                <th className="px-4 py-2">ID</th>
                 <th className="px-4 py-2">Name</th>
                 <th className="px-4 py-2">Category</th>
                 <th className="px-4 py-2">Type</th>
@@ -157,7 +157,7 @@ function DocTable() {
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-4 py-2">FileID</th>
+                <th className="px-4 py-2">ID</th>
                 <th className="px-4 py-2">Name</th>
                 <th className="px-4 py-2">Category  </th>
                 <th className="px-4 py-2">Type</th>
