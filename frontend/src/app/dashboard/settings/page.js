@@ -47,7 +47,12 @@ function UserSettings() {
 
   // Function to get AppthemeName based on AppthemeID
   const getAppthemeName = (appthemeID) => appthemeMapping[appthemeID] || '';
-
+  const handleAppthemeIDChange = (newValue) => {
+    setData((prevData) => ({
+      ...prevData,
+      AppthemeID: newValue,
+    }));
+  };
   useEffect(() => {
     // Create initial settings array when data changes
     const initialSettingsArray = editableFields.map((field) => ({
