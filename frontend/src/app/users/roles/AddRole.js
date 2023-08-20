@@ -4,7 +4,7 @@ import {
   useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';
 
-function AddRole({ fetchData }) {
+function AddRole({ fetchListRoles }) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const ref = useRef(null);
   const [formData, setFormData] = useState({
@@ -37,7 +37,7 @@ function AddRole({ fetchData }) {
       console.log(formData);
       const response = await CoreAPI('POST', 'role', formData);
       alertAdd(response);
-      fetchData(); // Assuming fetchData is a function that fetches data again
+      fetchListRoles(); // Assuming fetchData is a function that fetches data again
       closeModal();
     } catch (error) {
       console.log('Error occurred:', error);

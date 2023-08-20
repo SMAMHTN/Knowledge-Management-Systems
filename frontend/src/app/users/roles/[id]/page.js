@@ -11,8 +11,6 @@ function UserDetails({ params }) {
     const fetchUserData = async () => {
       try {
         const response = await CoreAPIGET(`role?RoleID=${params.id}`);
-        console.log(response);
-
         setData(response.body.Data);
       } catch (error) {
         // Handle errors here

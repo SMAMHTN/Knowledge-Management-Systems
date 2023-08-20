@@ -9,6 +9,7 @@ import { DeleteModal, alertDelete } from '@/components/Feature';
 function UserTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
+  const [roleNames, setRoleNames] = useState({});
   const [error, setError] = useState('');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingUserID, setDeletingUserID] = useState(null);
@@ -23,6 +24,26 @@ function UserTable() {
     } catch (error) {
       setError(error.message);
     }
+  };
+
+  const fetchRoleName = async (roleID) => {
+    try {
+      const responseRole = await CoreAPIGET(`role?RoleID=${roleID}`);
+      return responseRole.body.Data.RoleName;
+    } catch (error) {
+      console.error('Error fetching role name:', error);
+      return null;
+    }
+  };
+
+  const updateRoleNames = async () => {
+    const roleNamesMap = {};
+    for (const user of data) {
+      if (!roleNamesMap[user.RoleID]) {
+        roleNamesMap[user.RoleID] = await fetchRoleName(user.RoleID);
+      }
+    }
+    setRoleNames(roleNamesMap);
   };
 
   const handleConfirmDelete = async () => {
@@ -48,6 +69,12 @@ function UserTable() {
   useEffect(() => {
     fetchData();
   }, [router.pathname]);
+
+  useEffect(() => {
+    if (data.length > 0) {
+      updateRoleNames();
+    }
+  }, [data]);
 
   const truncateText = (text, length) => {
     if (text.length > length) {
@@ -93,7 +120,10 @@ function UserTable() {
                     <td className="text-center">
                       {user.IsActive === 1 ? 'Active' : 'Not Active'}
                     </td>
-                    <td className="text-center">{user.RoleID}</td>
+                    <td className="px-4 py-2 text-center">
+                      {' '}
+                      {roleNames[user.RoleID] || '-'}
+                    </td>
                     <td className="px-4 py-2">
                       {truncateText(user.Email, 20)}
                     </td>

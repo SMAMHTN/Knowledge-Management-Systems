@@ -9,6 +9,7 @@ import { DeleteModal, alertDelete } from '@/components/Feature';
 function CatTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
+  const [catNames, setCatNames] = useState({});
   const [error, setError] = useState('');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingCategoryID, setDeletingCategoryID] = useState(null);
@@ -23,6 +24,26 @@ function CatTable() {
     } catch (error) {
       setError(error.message);
     }
+  };
+
+  const fetchCatName = async (categoryID) => {
+    try {
+      const responseCat = await KmsAPIGET(`category?CategoryID=${categoryID}`);
+      return responseCat.body.Data.CategoryName;
+    } catch (error) {
+      console.error('Error fetching category name:', error);
+      return null;
+    }
+  };
+
+  const updateCatNames = async () => {
+    const catNamesMap = {};
+    for (const category of data) {
+      if (!catNamesMap[category.CategoryParentID]) {
+        catNamesMap[category.CategoryParentID] = await fetchCatName(category.CategoryParentID);
+      }
+    }
+    setCatNames(catNamesMap);
   };
 
   const handleConfirmDelete = async () => {
@@ -50,6 +71,12 @@ function CatTable() {
     fetchData();
   }, [router.pathname]);
 
+  useEffect(() => {
+    if (data.length > 0) {
+      updateCatNames();
+    }
+  }, [data]);
+
   const truncateText = (text, length) => {
     if (text.length > length) {
       return `${text.slice(0, length - 3)}...`;
@@ -74,10 +101,9 @@ function CatTable() {
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-4 py-2">CategoryID</th>
-                <th className="px-4 py-2">CategoryName</th>
-                <th className="px-4 py-2">CategoryParentID</th>
-                <th className="px-4 py-2">CategoryDescription</th>
+                <th className="px-4 py-2">ID</th>
+                <th className="px-4 py-2">Name</th>
+                <th className="px-4 py-2">Parent Name</th>
                 <th className="px-4 py-2">Action</th>
               </tr>
             </thead>
@@ -86,9 +112,9 @@ function CatTable() {
                 <tr key={category.CategoryID}>
                   <td className="px-4 py-2">{category.CategoryID}</td>
                   <td className="px-4 py-2">{category.CategoryName}</td>
-                  <td className="px-4 py-2">{category.CategoryParentID}</td>
-                  <td className="px-4 py-2">
-                    {category.CategoryDescription}
+                  <td className="px-4 py-2 text-center">
+                    {' '}
+                    {catNames[category.CategoryParentID] === category.CategoryName ? '-' : catNames[category.CategoryParentID] || category.CategoryParentID}
                   </td>
                   <td className="px-4 py-2 flex justify-end items-center">
                     <button

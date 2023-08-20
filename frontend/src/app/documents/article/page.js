@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation';
 import { KmsAPIGET, KmsAPI } from '@/dep/kms/kmsHandler';
 import AddArticle from './AddArticle';
 import { DeleteModal, alertDelete } from '@/components/Feature';
+import { CoreAPIGET } from '@/dep/core/coreHandler';
 
 function DocTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
+  const [usNames, setUsNames] = useState({});
+  const [catNames, setCatNames] = useState({});
   const [error, setError] = useState('');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingArticleID, setDeletingArticleID] = useState(null);
@@ -23,6 +26,46 @@ function DocTable() {
     } catch (error) {
       setError(error.message);
     }
+  };
+
+  const fetchUsName = async (OwnerID) => {
+    try {
+      const responseUs = await CoreAPIGET(`user?UserID=${OwnerID}`);
+      return responseUs.body.Data.Name;
+    } catch (error) {
+      console.error('Error fetching user name:', error);
+      return null;
+    }
+  };
+
+  const updateUsNames = async () => {
+    const usNamesMap = {};
+    for (const article of data) {
+      if (!usNamesMap[article.OwnerID]) {
+        usNamesMap[article.OwnerID] = await fetchUsName(article.OwnerID);
+      }
+    }
+    setUsNames(usNamesMap);
+  };
+
+  const fetchRoleName = async (categoryID) => {
+    try {
+      const responseCat = await KmsAPIGET(`category?CategoryID=${categoryID}`);
+      return responseCat.body.Data.CategoryName;
+    } catch (error) {
+      console.error('Error fetching category name:', error);
+      return null;
+    }
+  };
+
+  const updateCatNames = async () => {
+    const catNamesMap = {};
+    for (const article of data) {
+      if (!catNamesMap[article.CategoryID]) {
+        catNamesMap[article.CategoryID] = await fetchRoleName(article.CategoryID);
+      }
+    }
+    setCatNames(catNamesMap);
   };
 
   const handleConfirmDelete = async () => {
@@ -50,6 +93,18 @@ function DocTable() {
     fetchData();
   }, [router.pathname]);
 
+  useEffect(() => {
+    if (data.length > 0) {
+      updateUsNames();
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (data.length > 0) {
+      updateCatNames();
+    }
+  }, [data]);
+
   const truncateText = (text, length) => {
     if (text.length > length) {
       return `${text.slice(0, length - 3)}...`;
@@ -73,12 +128,12 @@ function DocTable() {
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-4 py-2">OwnerID</th>
-                <th className="px-4 py-2">LastEditedByID</th>
-                <th className="px-4 py-2">LastEditedTime</th>
+                <th className="px-4 py-2">ID</th>
+                <th className="px-4 py-2">Owner</th>
+                <th className="px-4 py-2">Last Edited</th>
                 <th className="px-4 py-2">Tag</th>
                 <th className="px-4 py-2">Title</th>
-                <th className="px-4 py-2">CategoryID</th>
+                <th className="px-4 py-2">Category</th>
                 <th className="px-4 py-2">Article</th>
                 <th className="px-4 py-2">Active</th>
                 <th className="px-4 py-2">Action</th>
@@ -87,12 +142,18 @@ function DocTable() {
             <tbody>
               {data.map((article) => (
                 <tr key={article.ArticleID}>
-                  <td className="px-4 py-2">{article.OwnerID}</td>
-                  <td className="px-4 py-2">{article.LastEditedByID}</td>
+                  <td className="px-4 py-2">{article.ArticleID}</td>
+                  <td className="px-4 py-2 text-center">
+                    {' '}
+                    {usNames[article.OwnerID] || '-'}
+                  </td>
                   <td className="px-4 py-2">{article.LastEditedTime}</td>
                   <td className="px-4 py-2">{article.Tag}</td>
                   <td className="px-4 py-2">{article.Title}</td>
-                  <td className="px-4 py-2">{article.CategoryID}</td>
+                  <td className="px-4 py-2 text-center">
+                    {' '}
+                    {catNames[article.CategoryID] || '-'}
+                  </td>
                   <td className="px-4 py-2">{article.Article}</td>
                   <td className="px-4 py-2">{article.IsActive}</td>
                   {/* <td className="px-4 py-2 whitespace-nowrap overflow-hidden overflow-ellipsis">

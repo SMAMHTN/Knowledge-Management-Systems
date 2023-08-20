@@ -3,12 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { KmsAPIGET, KmsAPI } from '@/dep/kms/kmsHandler';
+import { CoreAPIGET } from '@/dep/core/coreHandler';
 import AddPermission from './AddPermission';
 import { DeleteModal, alertDelete } from '@/components/Feature';
 
 function PerTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
+  const [roleNames, setRoleNames] = useState({});
+  const [catNames, setCatNames] = useState({});
   const [error, setError] = useState('');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingPermissionID, setDeletingPermissionID] = useState(null);
@@ -23,6 +26,46 @@ function PerTable() {
     } catch (error) {
       setError(error.message);
     }
+  };
+
+  const fetchRoleName = async (roleID) => {
+    try {
+      const responseRole = await CoreAPIGET(`role?RoleID=${roleID}`);
+      return responseRole.body.Data.RoleName;
+    } catch (error) {
+      console.error('Error fetching role name:', error);
+      return null;
+    }
+  };
+
+  const updateRoleNames = async () => {
+    const roleNamesMap = {};
+    for (const permission of data) {
+      if (!roleNamesMap[permission.RoleID]) {
+        roleNamesMap[permission.RoleID] = await fetchRoleName(permission.RoleID);
+      }
+    }
+    setRoleNames(roleNamesMap);
+  };
+
+  const fetchCatName = async (categoryID) => {
+    try {
+      const responseCat = await KmsAPIGET(`category?CategoryID=${categoryID}`);
+      return responseCat.body.Data.CategoryName;
+    } catch (error) {
+      console.error('Error fetching category name:', error);
+      return null;
+    }
+  };
+
+  const updateCatNames = async () => {
+    const catNamesMap = {};
+    for (const permission of data) {
+      if (!catNamesMap[permission.CategoryID]) {
+        catNamesMap[permission.CategoryID] = await fetchCatName(permission.CategoryID);
+      }
+    }
+    setCatNames(catNamesMap);
   };
 
   const handleConfirmDelete = async () => {
@@ -49,6 +92,17 @@ function PerTable() {
     fetchData();
   }, [router.pathname]);
 
+  useEffect(() => {
+    if (data.length > 0) {
+      updateRoleNames();
+    }
+  }, [data]);
+  useEffect(() => {
+    if (data.length > 0) {
+      updateCatNames();
+    }
+  }, [data]);
+
   const truncateText = (text, length) => {
     if (text.length > length) {
       return `${text.slice(0, length - 3)}...`;
@@ -73,13 +127,13 @@ function PerTable() {
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-4 py-2">PermissionID</th>
-                <th className="px-4 py-2">CategoryID</th>
-                <th className="px-4 py-2">RoleID</th>
-                <th className="px-4 py-2">Create</th>
-                <th className="px-4 py-2">Read</th>
-                <th className="px-4 py-2">Update</th>
-                <th className="px-4 py-2">Delete</th>
+                <th className="px-4 py-2">ID</th>
+                <th className="px-4 py-2">Category</th>
+                <th className="px-4 py-2">Role</th>
+                <th className="px-4 py-2">C</th>
+                <th className="px-4 py-2">R</th>
+                <th className="px-4 py-2">U</th>
+                <th className="px-4 py-2">D</th>
                 <th className="px-4 py-2">FileType</th>
                 <th className="px-4 py-2">DocType</th>
                 <th className="px-4 py-2">Action</th>
@@ -89,8 +143,8 @@ function PerTable() {
               {data.map((permission) => (
                 <tr key={permission.PermissionID}>
                   <td className="px-4 py-2">{permission.PermissionID}</td>
-                  <td className="px-4 py-2">{permission.CategoryID}</td>
-                  <td className="px-4 py-2">{permission.RoleID}</td>
+                  <td className="px-4 py-2">{catNames[permission.CategoryID] || '-'}</td>
+                  <td className="px-4 py-2">{roleNames[permission.RoleID] || '-'}</td>
                   <td className="px-4 py-2">{permission.Create}</td>
                   <td className="px-4 py-2">{permission.Read}</td>
                   <td className="px-4 py-2">{permission.Update}</td>
