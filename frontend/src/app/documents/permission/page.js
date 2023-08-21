@@ -18,12 +18,10 @@ function PerTable(handleItemsPerPageChange) {
   const [deletingPermissionID, setDeletingPermissionID] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const {
     totalPages,
-    startIndex,
-    endIndex,
     currentPageData,
   } = CalcPagiData(data, currentPage, itemsPerPage);
 
@@ -136,7 +134,10 @@ function PerTable(handleItemsPerPageChange) {
           </div>
           <ItmsPerPageComp
             itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
+            setItemsPerPage={(newItemsPerPage) => {
+              setItemsPerPage(newItemsPerPage);
+              setCurrentPage(1);
+            }}
           />
           <table className="w-full border">
             <thead>
@@ -154,7 +155,7 @@ function PerTable(handleItemsPerPageChange) {
               </tr>
             </thead>
             <tbody>
-              {data.map((permission) => (
+              {currentPageData.map((permission) => (
                 <tr key={permission.PermissionID}>
                   <td className="px-4 py-2">{permission.PermissionID}</td>
                   <td className="px-4 py-2">{catNames[permission.CategoryID] || '-'}</td>

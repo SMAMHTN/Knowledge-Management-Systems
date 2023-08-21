@@ -16,12 +16,10 @@ function CatTable(handleItemsPerPageChange) {
   const [deletingCategoryID, setDeletingCategoryID] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const {
     totalPages,
-    startIndex,
-    endIndex,
     currentPageData,
   } = CalcPagiData(data, currentPage, itemsPerPage);
 
@@ -110,7 +108,10 @@ function CatTable(handleItemsPerPageChange) {
           </div>
           <ItmsPerPageComp
             itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
+            setItemsPerPage={(newItemsPerPage) => {
+              setItemsPerPage(newItemsPerPage);
+              setCurrentPage(1);
+            }}
           />
           <table className="w-full border">
             <thead>

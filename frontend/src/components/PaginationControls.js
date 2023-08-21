@@ -15,14 +15,17 @@ export function CalcPagiData(data, currentPage, itemsPerPage) {
 }
 
 export function ItmsPerPageComp({ itemsPerPage, setItemsPerPage }) {
-  const options = [5, 10, 20, 50];
+  const options = [20, 100, 500];
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+  };
   return (
     <div className="my-2">
       <span className="mr-2">Items per page:</span>
       {options.map((option) => (
         <button
           key={option}
-          onClick={() => setItemsPerPage(option)}
+          onClick={() => handleItemsPerPageChange(option)}
           className={`ml-2 px-4 py-2 rounded ${
             itemsPerPage === option
               ? 'bg-blue-500 text-white'

@@ -14,8 +14,8 @@ function DocTable(handleItemsPerPageChange) {
   const [error, setError] = useState('');
   const [docCategoryNamesFetched, setDocCategoryNamesFetched] = useState(false);
   const [fileCategoryNamesFetched, setFileCategoryNamesFetched] = useState(false);
-  const docPagination = usePagination(datadoc, 5); // 5 items per page for docs
-  const filePagination = usePagination(datafile, 5);
+  const docPagination = usePagination(datadoc, 20); // 5 items per page for docs
+  const filePagination = usePagination(datafile, 20);
 
   const fetchDocData = async () => {
     try {
@@ -133,7 +133,10 @@ function DocTable(handleItemsPerPageChange) {
           <h2 className="text-2xl font-bold mb-4">Document Table</h2>
           <ItmsPerPageComp
             itemsPerPage={docPagination.itemsPerPage}
-            setItemsPerPage={docPagination.updateItemsPerPage}
+            setItemsPerPage={(newItemsPerPage) => {
+              docPagination.updateItemsPerPage(newItemsPerPage);
+              docPagination.currentPage = 1;
+            }}
           />
           <div className="my-2" />
           <table className="w-full border">
@@ -161,8 +164,13 @@ function DocTable(handleItemsPerPageChange) {
           <PagiCtrl
             currentPage={docPagination.currentPage}
             totalPages={docPagination.totalPages}
-            onPageChange={docPagination.setCurrentPage}
-            onItemsPerPageChange={docPagination.setItemsPerPage}
+            onPageChange={(newPage) => {
+              docPagination.currentPage = newPage;
+            }}
+            onItemsPerPageChange={(newItemsPerPage) => {
+              docPagination.updateItemsPerPage(newItemsPerPage);
+              docPagination.currentPage = 1; // Reset to page 1
+            }}
           />
         </div>
         <div className="max-w-3xl mx-auto p-4">
@@ -170,7 +178,10 @@ function DocTable(handleItemsPerPageChange) {
           <div className="my-2" />
           <ItmsPerPageComp
             itemsPerPage={filePagination.itemsPerPage}
-            setItemsPerPage={filePagination.updateItemsPerPage}
+            setItemsPerPage={(newItemsPerPage) => {
+              filePagination.updateItemsPerPage(newItemsPerPage);
+              filePagination.currentPage = 1; // Reset to page 1
+            }}
           />
           <table className="w-full border">
             <thead>
@@ -197,8 +208,13 @@ function DocTable(handleItemsPerPageChange) {
           <PagiCtrl
             currentPage={filePagination.currentPage}
             totalPages={filePagination.totalPages}
-            onPageChange={filePagination.setCurrentPage}
-            onItemsPerPageChange={filePagination.setItemsPerPage}
+            onPageChange={(newPage) => {
+              filePagination.currentPage = newPage;
+            }}
+            onItemsPerPageChange={(newItemsPerPage) => {
+              filePagination.updateItemsPerPage(newItemsPerPage);
+              filePagination.currentPage = 1; // Reset to page 1
+            }}
           />
         </div>
       </div>

@@ -4,17 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { CoreAPIGET } from '../../../dep/core/coreHandler';
 import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
 
-function HistoryTable(handleItemsPerPageChange) {
+function HistoryTable() {
   const [data, setData] = useState([]);
   const [usNames, setUsNames] = useState({});
-  const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const {
     totalPages,
-    startIndex,
-    endIndex,
     currentPageData,
   } = CalcPagiData(data, currentPage, itemsPerPage);
 
@@ -44,7 +41,6 @@ function HistoryTable(handleItemsPerPageChange) {
         const response = await CoreAPIGET('listhistory');
         const reversedData = response.body.Data.reverse();
         setData(reversedData);
-        setError(null);
 
         if (reversedData.length > 0) {
           updateUsNames(reversedData);
@@ -59,13 +55,15 @@ function HistoryTable(handleItemsPerPageChange) {
 
   return (
     <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-      {/* buat s.admin */}
       <div className="max-w-md mx-auto p-4 mt-9">
         <div className="max-w-3xl mx-auto p-4">
           <h2 className="text-2xl font-bold mb-4">Activity Log</h2>
           <ItmsPerPageComp
             itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
+            setItemsPerPage={(newItemsPerPage) => {
+              setItemsPerPage(newItemsPerPage);
+              setCurrentPage(1);
+            }}
           />
 
           <table className="w-full border">
@@ -79,7 +77,7 @@ function HistoryTable(handleItemsPerPageChange) {
             </thead>
             <tbody>
               {currentPageData.map((history) => (
-                <tr key={history.id} className="border-b">
+                <tr key={history.HistoryID} className="border-b">
                   <td className="px-4 py-2">{history.ActivityType}</td>
                   <td className="px-4 py-2">{history.Changes}</td>
                   <td className="px-4 py-2">
@@ -95,9 +93,11 @@ function HistoryTable(handleItemsPerPageChange) {
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
-            onItemsPerPageChange={handleItemsPerPageChange}
+            onItemsPerPageChange={(newItemsPerPage) => {
+              setItemsPerPage(newItemsPerPage);
+              setCurrentPage(1);
+            }}
           />
-
         </div>
       </div>
       {/* buat user biasa */}
