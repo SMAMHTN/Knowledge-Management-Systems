@@ -2,16 +2,20 @@
 
 import React, { useState, useEffect } from 'react';
 import { KmsAPIGET } from '@/dep/kms/kmsHandler';
+import {
+  CalcPagiData, PagiCtrl, ItmsPerPageComp, usePagination,
+} from '@/components/PaginationControls';
 
-function DocTable() {
+function DocTable(handleItemsPerPageChange) {
   const [datadoc, setDatadoc] = useState([]);
   const [datafile, setDatafile] = useState([]);
   const [docCategoryNames, setDocCategoryNames] = useState({});
   const [fileCategoryNames, setFileCategoryNames] = useState({});
+  const [error, setError] = useState('');
   const [docCategoryNamesFetched, setDocCategoryNamesFetched] = useState(false);
   const [fileCategoryNamesFetched, setFileCategoryNamesFetched] = useState(false);
-
-  const [error, setError] = useState('');
+  const docPagination = usePagination(datadoc, 5); // 5 items per page for docs
+  const filePagination = usePagination(datafile, 5);
 
   const fetchDocData = async () => {
     try {
@@ -127,6 +131,10 @@ function DocTable() {
       <div className="max-w-md ml-14 p-4 mt-9">
         <div className="max-w-3xl mx-auto p-4">
           <h2 className="text-2xl font-bold mb-4">Document Table</h2>
+          <ItmsPerPageComp
+            itemsPerPage={docPagination.itemsPerPage}
+            setItemsPerPage={docPagination.updateItemsPerPage}
+          />
           <div className="my-2" />
           <table className="w-full border">
             <thead>
@@ -150,10 +158,20 @@ function DocTable() {
               ))}
             </tbody>
           </table>
+          <PagiCtrl
+            currentPage={docPagination.currentPage}
+            totalPages={docPagination.totalPages}
+            onPageChange={docPagination.setCurrentPage}
+            onItemsPerPageChange={docPagination.setItemsPerPage}
+          />
         </div>
         <div className="max-w-3xl mx-auto p-4">
           <h2 className="text-2xl font-bold mb-4">File Table</h2>
           <div className="my-2" />
+          <ItmsPerPageComp
+            itemsPerPage={filePagination.itemsPerPage}
+            setItemsPerPage={filePagination.updateItemsPerPage}
+          />
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -176,6 +194,12 @@ function DocTable() {
               ))}
             </tbody>
           </table>
+          <PagiCtrl
+            currentPage={filePagination.currentPage}
+            totalPages={filePagination.totalPages}
+            onPageChange={filePagination.setCurrentPage}
+            onItemsPerPageChange={filePagination.setItemsPerPage}
+          />
         </div>
       </div>
       {/* buat user biasa */}

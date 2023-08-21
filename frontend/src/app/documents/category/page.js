@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import AddCategory from './AddCategory';
 import { DeleteModal, alertDelete } from '@/components/Feature';
+import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
 
-function CatTable() {
+function CatTable(handleItemsPerPageChange) {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [catNames, setCatNames] = useState({});
@@ -14,6 +15,15 @@ function CatTable() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingCategoryID, setDeletingCategoryID] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  const {
+    totalPages,
+    startIndex,
+    endIndex,
+    currentPageData,
+  } = CalcPagiData(data, currentPage, itemsPerPage);
 
   const fetchData = async () => {
     try {
@@ -98,6 +108,10 @@ function CatTable() {
           <div className="my-2">
             <AddCategory fetchData={fetchData} />
           </div>
+          <ItmsPerPageComp
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -108,7 +122,7 @@ function CatTable() {
               </tr>
             </thead>
             <tbody>
-              {data.map((category) => (
+              {currentPageData.map((category) => (
                 <tr key={category.CategoryID}>
                   <td className="px-4 py-2">{category.CategoryID}</td>
                   <td className="px-4 py-2">{category.CategoryName}</td>
@@ -141,6 +155,12 @@ function CatTable() {
             </tbody>
           </table>
         </div>
+        <PagiCtrl
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
         <DeleteModal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}

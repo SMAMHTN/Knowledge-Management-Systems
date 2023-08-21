@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { CoreAPIGET, CoreAPI } from '../../../dep/core/coreHandler';
 import AddUser from './AddUser';
 import { DeleteModal, alertDelete } from '@/components/Feature';
+import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
 
-function UserTable() {
+function UserTable(handleItemsPerPageChange) {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [roleNames, setRoleNames] = useState({});
@@ -14,6 +15,15 @@ function UserTable() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingUserID, setDeletingUserID] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  const {
+    totalPages,
+    startIndex,
+    endIndex,
+    currentPageData,
+  } = CalcPagiData(data, currentPage, itemsPerPage);
 
   const fetchData = async () => {
     try {
@@ -96,6 +106,10 @@ function UserTable() {
           <div className="my-2">
             <AddUser fetchData={fetchData} />
           </div>
+          <ItmsPerPageComp
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -109,8 +123,8 @@ function UserTable() {
               </tr>
             </thead>
             <tbody>
-              {data ? (
-                data.map((user) => (
+              {currentPageData ? (
+                currentPageData.map((user) => (
                   <tr key={user.UserID}>
                     <td className="px-4 py-2">{user.UserID}</td>
                     <td className="px-4 py-2">{user.Username}</td>
@@ -156,6 +170,12 @@ function UserTable() {
             </tbody>
           </table>
         </div>
+        <PagiCtrl
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
         <DeleteModal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}

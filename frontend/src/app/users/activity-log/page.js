@@ -2,11 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { CoreAPIGET } from '../../../dep/core/coreHandler';
+import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
 
-function HistoryTable() {
+function HistoryTable(handleItemsPerPageChange) {
   const [data, setData] = useState([]);
   const [usNames, setUsNames] = useState({});
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  const {
+    totalPages,
+    startIndex,
+    endIndex,
+    currentPageData,
+  } = CalcPagiData(data, currentPage, itemsPerPage);
 
   const updateUsNames = async (historyData) => {
     const fetchUsName = async (userID) => {
@@ -53,6 +63,11 @@ function HistoryTable() {
       <div className="max-w-md mx-auto p-4 mt-9">
         <div className="max-w-3xl mx-auto p-4">
           <h2 className="text-2xl font-bold mb-4">Activity Log</h2>
+          <ItmsPerPageComp
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
+
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -63,7 +78,7 @@ function HistoryTable() {
               </tr>
             </thead>
             <tbody>
-              {data.map((history) => (
+              {currentPageData.map((history) => (
                 <tr key={history.id} className="border-b">
                   <td className="px-4 py-2">{history.ActivityType}</td>
                   <td className="px-4 py-2">{history.Changes}</td>
@@ -76,6 +91,13 @@ function HistoryTable() {
               ))}
             </tbody>
           </table>
+          <PagiCtrl
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+
         </div>
       </div>
       {/* buat user biasa */}

@@ -6,8 +6,9 @@ import { KmsAPIGET, KmsAPI } from '@/dep/kms/kmsHandler';
 import AddArticle from './AddArticle';
 import { DeleteModal, alertDelete } from '@/components/Feature';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
+import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
 
-function DocTable() {
+function DocTable(handleItemsPerPageChange) {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [usNames, setUsNames] = useState({});
@@ -16,6 +17,15 @@ function DocTable() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingArticleID, setDeletingArticleID] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  const {
+    totalPages,
+    startIndex,
+    endIndex,
+    currentPageData,
+  } = CalcPagiData(data, currentPage, itemsPerPage);
 
   const fetchData = async () => {
     try {
@@ -124,7 +134,10 @@ function DocTable() {
         <div className="max-w-3xl mx-auto p-4">
           <h2 className="text-2xl font-bold mb-4">Doc Table</h2>
           <div className="my-2"><AddArticle fetchData={fetchData} /></div>
-
+          <ItmsPerPageComp
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -140,7 +153,7 @@ function DocTable() {
               </tr>
             </thead>
             <tbody>
-              {data.map((article) => (
+              {currentPageData.map((article) => (
                 <tr key={article.ArticleID}>
                   <td className="px-4 py-2">{article.ArticleID}</td>
                   <td className="px-4 py-2 text-center">
@@ -187,6 +200,12 @@ function DocTable() {
             </tbody>
           </table>
         </div>
+        <PagiCtrl
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
         <DeleteModal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}

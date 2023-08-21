@@ -6,8 +6,9 @@ import { KmsAPIGET, KmsAPI } from '@/dep/kms/kmsHandler';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 import AddPermission from './AddPermission';
 import { DeleteModal, alertDelete } from '@/components/Feature';
+import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
 
-function PerTable() {
+function PerTable(handleItemsPerPageChange) {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [roleNames, setRoleNames] = useState({});
@@ -16,6 +17,15 @@ function PerTable() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingPermissionID, setDeletingPermissionID] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  const {
+    totalPages,
+    startIndex,
+    endIndex,
+    currentPageData,
+  } = CalcPagiData(data, currentPage, itemsPerPage);
 
   const fetchData = async () => {
     try {
@@ -124,6 +134,10 @@ function PerTable() {
           <div className="my-2">
             <AddPermission fetchData={fetchData} />
           </div>
+          <ItmsPerPageComp
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+          />
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -176,6 +190,12 @@ function PerTable() {
             </tbody>
           </table>
         </div>
+        <PagiCtrl
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
         <DeleteModal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
