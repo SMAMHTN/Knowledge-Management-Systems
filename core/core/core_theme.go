@@ -1,6 +1,7 @@
 package core
 
 import (
+	"dependency"
 	"net/http"
 	"strconv"
 
@@ -10,7 +11,15 @@ import (
 func ListTheme(c echo.Context) error {
 	query := c.QueryParam("query")
 	res := Response{}
-	listtheme, _ := ReadTheme(query)
+	limit := new(dependency.LimitType)
+	err := c.Bind(limit)
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	listtheme, _ := ReadTheme(query + " " + limit.LimitMaker())
 	res.StatusCode = http.StatusOK
 	res.Data = listtheme
 	return c.JSON(http.StatusOK, res)

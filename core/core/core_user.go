@@ -37,8 +37,16 @@ func ListUser(c echo.Context) error {
 	query := c.QueryParam("query")
 	permission, _, _ := Check_Permission_API(c)
 	res := Response{}
+	limit := new(dependency.LimitType)
+	err := c.Bind(limit)
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
 	if permission {
-		listUser, _ := ReadUserWithoutPhoto(query)
+		listUser, _ := ReadUserWithoutPhoto(query + " " + limit.LimitMaker())
 		res.StatusCode = http.StatusOK
 		res.Data = listUser
 		return c.JSON(http.StatusOK, res)

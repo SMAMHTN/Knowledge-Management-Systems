@@ -4,9 +4,15 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 )
+
+type LimitType struct {
+	Page int `query:"page"`
+	Num  int `query:"num"`
+}
 
 func Db_Connect(conf Configuration, dbname string) (database *sql.DB, err error) {
 	if dbname == "" {
@@ -100,4 +106,20 @@ func Execute_sql_string_array_no_return(conf Configuration, sqlslice []string, d
 		}
 	}
 	return nil
+}
+
+func LimitMaker(page int, num int) (limit string) {
+	if num == 0 {
+		num = 10
+	}
+	limit = "LIMIT " + strconv.Itoa(page*num) + "," + strconv.Itoa(num)
+	return limit
+}
+
+func (data LimitType) LimitMaker() (limit string) {
+	if data.Num == 0 {
+		data.Num = 10
+	}
+	limit = "LIMIT " + strconv.Itoa(data.Page*data.Num) + "," + strconv.Itoa(data.Num)
+	return limit
 }
