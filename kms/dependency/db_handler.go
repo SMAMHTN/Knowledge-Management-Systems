@@ -120,6 +120,9 @@ func (data LimitType) LimitMaker() (limit string) {
 	if data.Num == 0 {
 		data.Num = 10
 	}
-	limit = "LIMIT " + strconv.Itoa(data.Page*data.Num) + "," + strconv.Itoa(data.Num)
+	if data.Page == 0 {
+		data.Page = 1
+	}
+	limit = "LIMIT " + strconv.Itoa((data.Page-1)*data.Num) + "," + strconv.Itoa(data.Num)
 	return limit
 }
