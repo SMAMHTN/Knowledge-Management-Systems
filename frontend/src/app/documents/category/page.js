@@ -4,15 +4,24 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import AddCategory from './AddCategory';
+import { DeleteModal, alertDelete } from '@/components/Feature';
+import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
 
-function handleChange() {
-  setModal(!modal);
-}
-
-function CatTable() {
+function CatTable(handleItemsPerPageChange) {
   const router = useRouter();
   const [data, setData] = useState([]);
+  const [catNames, setCatNames] = useState({});
   const [error, setError] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingCategoryID, setDeletingCategoryID] = useState(null);
+  const [deleteMessage, setDeleteMessage] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+
+  const {
+    totalPages,
+    currentPageData,
+  } = CalcPagiData(data, currentPage, itemsPerPage);
 
   const fetchData = async () => {
     try {
@@ -25,24 +34,56 @@ function CatTable() {
     }
   };
 
-  const handleDelete = async (CategoryID) => {
+  const fetchCatName = async (categoryID) => {
     try {
-      // Send the delete request to the server
-      await KmsAPI('DELETE', 'category', { CategoryID });
+      const responseCat = await KmsAPIGET(`category?CategoryID=${categoryID}`);
+      return responseCat.body.Data.CategoryName;
+    } catch (error) {
+      console.error('Error fetching category name:', error);
+      return null;
+    }
+  };
 
-      // Remove the deleted category from the data state
+  const updateCatNames = async () => {
+    const catNamesMap = {};
+    for (const category of data) {
+      if (!catNamesMap[category.CategoryParentID]) {
+        catNamesMap[category.CategoryParentID] = await fetchCatName(category.CategoryParentID);
+      }
+    }
+    setCatNames(catNamesMap);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const responseDel = await KmsAPI('DELETE', 'category', { CategoryID: deletingCategoryID });
+
       const updatedData = data.filter(
-        (category) => category.CategoryID !== CategoryID,
+        (category) => category.CategoryID !== deletingCategoryID,
       );
       setData(updatedData);
+      alertDelete(responseDel);
+      setIsDeleteModalOpen(false);
+      setDeletingCategoryID(null);
     } catch (error) {
       console.error('Error deleting category:', error);
     }
   };
 
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingCategoryID(null);
+  };
+
   useEffect(() => {
     fetchData();
   }, [router.pathname]);
+
+  useEffect(() => {
+    if (data.length > 0) {
+      updateCatNames();
+    }
+  }, [data]);
 
   const truncateText = (text, length) => {
     if (text.length > length) {
@@ -65,24 +106,30 @@ function CatTable() {
           <div className="my-2">
             <AddCategory fetchData={fetchData} />
           </div>
+          <ItmsPerPageComp
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={(newItemsPerPage) => {
+              setItemsPerPage(newItemsPerPage);
+              setCurrentPage(1);
+            }}
+          />
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-4 py-2">CategoryID</th>
-                <th className="px-4 py-2">CategoryName</th>
-                <th className="px-4 py-2">CategoryParentID</th>
-                <th className="px-4 py-2">CategoryDescription</th>
+                <th className="px-4 py-2">ID</th>
+                <th className="px-4 py-2">Name</th>
+                <th className="px-4 py-2">Parent Name</th>
                 <th className="px-4 py-2">Action</th>
               </tr>
             </thead>
             <tbody>
-              {data.map((category) => (
+              {currentPageData.map((category) => (
                 <tr key={category.CategoryID}>
                   <td className="px-4 py-2">{category.CategoryID}</td>
                   <td className="px-4 py-2">{category.CategoryName}</td>
-                  <td className="px-4 py-2">{category.CategoryParentID}</td>
-                  <td className="px-4 py-2">
-                    {category.CategoryDescription}
+                  <td className="px-4 py-2 text-center">
+                    {' '}
+                    {catNames[category.CategoryParentID] === category.CategoryName ? '-' : catNames[category.CategoryParentID] || category.CategoryParentID}
                   </td>
                   <td className="px-4 py-2 flex justify-end items-center">
                     <button
@@ -92,7 +139,13 @@ function CatTable() {
                       View
                     </button>
                     <button
-                      onClick={() => handleDelete(category.CategoryID)}
+                      onClick={() => {
+                        setDeletingCategoryID(category.CategoryID);
+                        setDeleteMessage(
+                          `Are you sure you would like to delete "${category.CategoryName}" category? This action cannot be undone.`,
+                        );
+                        setIsDeleteModalOpen(true);
+                      }}
                       className="bg-red-500 text-white rounded px-2 py-1 ml-2"
                     >
                       Delete
@@ -103,6 +156,18 @@ function CatTable() {
             </tbody>
           </table>
         </div>
+        <PagiCtrl
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+        <DeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleConfirmDelete}
+          message={deleteMessage}
+        />
       </div>
       {/* buat user biasa */}
 

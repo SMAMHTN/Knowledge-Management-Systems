@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { KmsAPI, KmsAPIGET } from '../../../../dep/kms/kmsHandler';
+import { alertUpdate } from '@/components/Feature';
 
 function ArticleDetail({ params }) {
   const [data, setData] = useState([]);
@@ -11,8 +11,6 @@ function ArticleDetail({ params }) {
     const fetchUserData = async () => {
       try {
         const response = await KmsAPIGET(`category?CategoryID=${params.id}`);
-        console.log(response);
-
         setData(response.body.Data);
       } catch (error) {
         // Handle errors here
@@ -25,12 +23,11 @@ function ArticleDetail({ params }) {
 
   const handleUpdate = async () => {
     try {
-      console.log(data);
       const response = await KmsAPI('PUT', 'category', data);
+      alertUpdate(response);
     } catch (error) {
       console.log(error);
-      console.log('Ada error anjg');
-      // Handle error
+      console.log('An error occurred');
     }
   };
 

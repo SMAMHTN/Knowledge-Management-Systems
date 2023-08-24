@@ -2,58 +2,102 @@
 
 import React, { useState, useEffect } from 'react';
 import { CoreAPIGET } from '../../../dep/core/coreHandler';
+import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
 
 function HistoryTable() {
-  // Sample data for the table
   const [data, setData] = useState([]);
-  const [error, setError] = useState('');
+  const [usNames, setUsNames] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+
+  const {
+    totalPages,
+    currentPageData,
+  } = CalcPagiData(data, currentPage, itemsPerPage);
+
+  const updateUsNames = async (historyData) => {
+    const fetchUsName = async (userID) => {
+      try {
+        const responseUs = await CoreAPIGET(`user?UserID=${userID}`);
+        return responseUs.body.Data.Name;
+      } catch (error) {
+        console.error('Error fetching user name:', error);
+        return null;
+      }
+    };
+
+    const usNamesMap = {};
+    for (const history of historyData) {
+      if (!usNamesMap[history.UserID]) {
+        usNamesMap[history.UserID] = await fetchUsName(history.UserID);
+      }
+    }
+    setUsNames(usNamesMap);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await CoreAPIGET('listhistory');
-
-        // Reverse the order of the data
         const reversedData = response.body.Data.reverse();
-
-        // Update state with the fetched data in reverse order
         setData(reversedData);
-        setError(null);
+
+        if (reversedData.length > 0) {
+          updateUsNames(reversedData);
+        }
       } catch (error) {
-        // Handle errors here
-        console.error('Error fetching user data:', error);
+        console.error('Error fetching history data:', error);
       }
     };
 
     fetchData();
-  }, []); // Empty dependency array, so this effect runs once after initial render
+  }, []);
 
   return (
     <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-      {/* buat s.admin */}
       <div className="max-w-md mx-auto p-4 mt-9">
         <div className="max-w-3xl mx-auto p-4">
           <h2 className="text-2xl font-bold mb-4">Activity Log</h2>
+          <ItmsPerPageComp
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={(newItemsPerPage) => {
+              setItemsPerPage(newItemsPerPage);
+              setCurrentPage(1);
+            }}
+          />
+
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-4 py-2">ActivityType</th>
+                <th className="px-4 py-2">Type</th>
                 <th className="px-4 py-2">Changes</th>
-                <th className="px-4 py-2">UserID</th>
+                <th className="px-4 py-2">User</th>
                 <th className="px-4 py-2">Time</th>
               </tr>
             </thead>
             <tbody>
-              {data.map((history) => (
-                <tr key={history.id} className="border-b">
+              {currentPageData.map((history) => (
+                <tr key={history.HistoryID} className="border-b">
                   <td className="px-4 py-2">{history.ActivityType}</td>
                   <td className="px-4 py-2">{history.Changes}</td>
-                  <td className="px-4 py-2">{history.UserID}</td>
+                  <td className="px-4 py-2">
+                    {' '}
+                    {usNames[history.UserID] || '-'}
+                  </td>
                   <td className="px-4 py-2">{history.Time}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <PagiCtrl
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={(newItemsPerPage) => {
+              setItemsPerPage(newItemsPerPage);
+              setCurrentPage(1);
+            }}
+          />
         </div>
       </div>
       {/* buat user biasa */}

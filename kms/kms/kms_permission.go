@@ -16,8 +16,16 @@ func ListPermission(c echo.Context) error {
 	query := c.QueryParam("query")
 	permission, _, _ := Check_Admin_Permission_API(c)
 	res := Response{}
+	limit := new(dependency.LimitType)
+	err := c.Bind(limit)
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
 	if permission {
-		listCategory, _ := ReadPermission(query)
+		listCategory, _ := ReadPermission(query + " " + limit.LimitMaker())
 		res.StatusCode = http.StatusOK
 		res.Data = listCategory
 		return c.JSON(http.StatusOK, res)

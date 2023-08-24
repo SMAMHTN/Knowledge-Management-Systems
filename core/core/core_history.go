@@ -1,6 +1,7 @@
 package core
 
 import (
+	"dependency"
 	"net/http"
 	t "time"
 
@@ -57,9 +58,17 @@ func AddHistory(c echo.Context) error {
 func ListHistory(c echo.Context) error {
 	query := c.QueryParam("query")
 	res := Response{}
+	limit := new(dependency.LimitType)
+	err := c.Bind(limit)
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
 	permission, _, _ := Check_Permission_API(c)
 	if permission {
-		Histories, _ := ReadHistory(query)
+		Histories, _ := ReadHistory(query + " " + limit.LimitMaker())
 		res.StatusCode = http.StatusOK
 		res.Data = Histories
 		return c.JSON(http.StatusOK, res)

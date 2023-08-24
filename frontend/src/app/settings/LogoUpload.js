@@ -37,39 +37,20 @@ function LogoUpload({ onUpload }) {
   };
 
   return (
-    <div>
+    <div className="flex items-center">
       <input
         type="file"
         accept=".jpg, .jpeg, .png"
         onChange={handleFileChange}
       />
-      {imagePreview && (
-        <div>
-          {/* Use the Next.js Image component */}
-          <Image
-            src={imagePreview}
-            alt="Preview"
-            width={200} // Set the width
-            height={200} // Set the height
-            objectFit="contain" // Set the object fit mode
-          />
-        </div>
-      )}
       <button
         onClick={handleUpload}
-        style={{
-          backgroundColor: '#007BFF',
-          color: 'white',
-          border: 'none',
-          padding: '8px 16px',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          marginTop: '10px',
-        }}
+        className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded ml-2"
       >
         Upload
       </button>
     </div>
+
   );
 }
 

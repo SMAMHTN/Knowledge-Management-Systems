@@ -4,11 +4,24 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CoreAPIGET, CoreAPI } from '../../../dep/core/coreHandler';
 import AddUser from './AddUser';
+import { DeleteModal, alertDelete } from '@/components/Feature';
+import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
 
-function UserTable() {
+function UserTable(handleItemsPerPageChange) {
   const router = useRouter();
   const [data, setData] = useState([]);
+  const [roleNames, setRoleNames] = useState({});
   const [error, setError] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingUserID, setDeletingUserID] = useState(null);
+  const [deleteMessage, setDeleteMessage] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+
+  const {
+    totalPages,
+    currentPageData,
+  } = CalcPagiData(data, currentPage, itemsPerPage);
 
   const fetchData = async () => {
     try {
@@ -21,28 +34,55 @@ function UserTable() {
     }
   };
 
-  useEffect(() => {
-    console.log(data); // Log the 'data' value after it updates
-  }, [data]);
-
-  const handleDelete = async (UserID) => {
+  const fetchRoleName = async (roleID) => {
     try {
-      // Send the delete request to the server
-      await CoreAPI('DELETE', 'user', { UserID });
+      const responseRole = await CoreAPIGET(`role?RoleID=${roleID}`);
+      return responseRole.body.Data.RoleName;
+    } catch (error) {
+      console.error('Error fetching role name:', error);
+      return null;
+    }
+  };
 
-      // Remove the deleted category from the data state
+  const updateRoleNames = async () => {
+    const roleNamesMap = {};
+    for (const user of data) {
+      if (!roleNamesMap[user.RoleID]) {
+        roleNamesMap[user.RoleID] = await fetchRoleName(user.RoleID);
+      }
+    }
+    setRoleNames(roleNamesMap);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const responseDel = await CoreAPI('DELETE', 'user', { UserID: deletingUserID });
+
       const updatedData = data.filter(
-        (user) => user.UserID !== UserID,
+        (user) => user.UserID !== deletingUserID,
       );
       setData(updatedData);
+      alertDelete(responseDel);
+      setIsDeleteModalOpen(false);
+      setDeletingCategoryID(null);
     } catch (error) {
       console.error('Error deleting category:', error);
     }
   };
 
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingUserID(null);
+  };
   useEffect(() => {
     fetchData();
   }, [router.pathname]);
+
+  useEffect(() => {
+    if (data.length > 0) {
+      updateRoleNames();
+    }
+  }, [data]);
 
   const truncateText = (text, length) => {
     if (text.length > length) {
@@ -64,6 +104,13 @@ function UserTable() {
           <div className="my-2">
             <AddUser fetchData={fetchData} />
           </div>
+          <ItmsPerPageComp
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={(newItemsPerPage) => {
+              setItemsPerPage(newItemsPerPage);
+              setCurrentPage(1);
+            }}
+          />
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -77,8 +124,8 @@ function UserTable() {
               </tr>
             </thead>
             <tbody>
-              {data ? (
-                data.map((user) => (
+              {currentPageData ? (
+                currentPageData.map((user) => (
                   <tr key={user.UserID}>
                     <td className="px-4 py-2">{user.UserID}</td>
                     <td className="px-4 py-2">{user.Username}</td>
@@ -88,7 +135,10 @@ function UserTable() {
                     <td className="text-center">
                       {user.IsActive === 1 ? 'Active' : 'Not Active'}
                     </td>
-                    <td className="text-center">{user.RoleID}</td>
+                    <td className="px-4 py-2 text-center">
+                      {' '}
+                      {roleNames[user.RoleID] || '-'}
+                    </td>
                     <td className="px-4 py-2">
                       {truncateText(user.Email, 20)}
                     </td>
@@ -100,7 +150,13 @@ function UserTable() {
                         View
                       </button>
                       <button
-                        onClick={() => handleDelete(user.UserID)}
+                        onClick={() => {
+                          setDeletingUserID(user.UserID);
+                          setDeleteMessage(
+                            `Are you sure you would like to delete user "${user.Username}"? This action cannot be undone.`,
+                          );
+                          setIsDeleteModalOpen(true);
+                        }}
                         className="bg-red-500 text-white rounded px-2 py-1 ml-2"
                       >
                         Delete
@@ -115,6 +171,18 @@ function UserTable() {
             </tbody>
           </table>
         </div>
+        <PagiCtrl
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+        <DeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleConfirmDelete}
+          message={deleteMessage}
+        />
       </div>
       {/* buat user biasa */}
 

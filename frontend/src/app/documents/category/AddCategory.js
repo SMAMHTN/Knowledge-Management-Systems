@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react';
 import { KmsAPI } from '../../../dep/kms/kmsHandler';
-import { useOutsideClick, useModal } from '@/components/Feature';
+import {
+  useOutsideClick, useModal, alertAdd,
+} from '@/components/Feature';
 
 function AddCategory({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
@@ -33,11 +35,10 @@ function AddCategory({ fetchData }) {
 
     try {
       // Make the API call to save the data
-      await KmsAPI('POST', 'category', formData);
-
-      // Refresh the page after successfully saving the data
-      fetchData();
-      console.log('Data saved successfully.');
+      const response = await KmsAPI('POST', 'category', formData);
+      alertAdd(response);
+      fetchData(); // Assuming fetchData is a function that fetches data again
+      closeModal();
     } catch (error) {
       console.log('Error occurred:', error);
       // Handle error, show a message, etc.
