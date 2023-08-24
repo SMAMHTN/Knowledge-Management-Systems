@@ -38,7 +38,7 @@ func RecordHistory(c echo.Context, ActivityType string, Changes string) error {
 		return err
 	}
 	r.IPAddress = c.RealIP()
-	_, err = CallCoreAPI("POST", "setting", r, username, password)
+	_, err = CallCoreAPI("POST", "history", r, username, password)
 	if err != nil {
 		return err
 	}

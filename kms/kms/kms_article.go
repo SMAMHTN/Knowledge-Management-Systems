@@ -137,9 +137,9 @@ func AddArticle(c echo.Context) error {
 		_, err = u.Create()
 		if err != nil {
 			Logger.Warn(err.Error())
-			res.StatusCode = http.StatusBadRequest
+			res.StatusCode = http.StatusConflict
 			res.Data = "CREATE ERROR : " + err.Error()
-			return c.JSON(http.StatusBadRequest, res)
+			return c.JSON(http.StatusConflict, res)
 		}
 		// resulta, err := u.ConvForSolr()
 		// if err != nil {
