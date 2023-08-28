@@ -1,4 +1,3 @@
-import { isLogin } from "@/dep/core/coreHandler";
 import { NextResponse } from "next/server";
 
 export function middleware(req) {
@@ -8,12 +7,12 @@ export function middleware(req) {
   const res = NextResponse.next();
 
   if (isPathProtected) {
-    let AlreadyLogin;
+    // let AlreadyLogin;
 
-    isLogin().then((x) => {
-      AlreadyLogin = x;
-    });
-    if (!AlreadyLogin) {
+    // isLogin().then((x) => {
+    //   AlreadyLogin = x;
+    // });
+    if (!req.cookies.has('username') && !req.cookies.has('password')) {
       const url = new URL(`/`, req.url);
       return NextResponse.redirect(url);
     }
