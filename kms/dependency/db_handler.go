@@ -3,6 +3,7 @@ package dependency
 import (
 	"database/sql"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 
@@ -136,8 +137,9 @@ func (data *LimitType) LimitMaker(totalrow int) (limit string, info Info) {
 	info.TotalShow = data.Num
 	info.TotalRow = totalrow
 	Lowerlimit0 := (data.Page - 1) * data.Num
-	info.UppperLimit = Lowerlimit0 + 1
+	info.LowerLimit = Lowerlimit0 + 1
 	info.UppperLimit = Lowerlimit0 + data.Num
+	info.TotalPage = int(math.Ceil(float64(totalrow) / float64(data.Num)))
 	limit = "LIMIT " + strconv.Itoa(Lowerlimit0) + "," + strconv.Itoa(data.Num)
 	return limit, info
 }

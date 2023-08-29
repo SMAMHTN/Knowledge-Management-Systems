@@ -21,10 +21,10 @@ func DummyCreate(i int) {
 
 func main() {
 	defer core.Database.Close()
-	go core.Test_api()
-	for i := 1; i <= 10000000; i++ {
-		DummyCreate(i)
-	}
+	core.Test_api()
+	// for i := 1; i <= 10000000; i++ {
+	// 	DummyCreate(i)
+	// }
 	// his := core.EmptyHistory()
 	// his.Create()
 	// core.Test_api()

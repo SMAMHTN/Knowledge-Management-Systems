@@ -115,6 +115,8 @@ func Check_DB_Exist() {
 		Logger.Panic(err.Error())
 		panic(err)
 	}
+	Database.SetMaxOpenConns(9999)
+	Database.SetMaxIdleConns(10)
 	admincategorytest := Category{CategoryID: 1}
 	err = admincategorytest.Read()
 	if err != nil {
