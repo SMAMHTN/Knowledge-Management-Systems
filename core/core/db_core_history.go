@@ -2,7 +2,6 @@ package core
 
 import (
 	"database/sql"
-	"dependency"
 	"errors"
 	t "time"
 )
@@ -24,15 +23,11 @@ func ReadHistory(args string) ([]History, error) {
 	var results []History
 	var sqlresult *sql.Rows
 	var err error
-	database, err := dependency.Db_Connect_custom(Conf, DatabaseName, "parseTime=true")
-	if err != nil {
-		return []History{}, err
-	}
-	defer database.Close()
+
 	if args != "" {
-		sqlresult, err = database.Query("SELECT * FROM core_history" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM core_history" + " " + args)
 	} else {
-		sqlresult, err = database.Query("SELECT * FROM core_history")
+		sqlresult, err = Database.Query("SELECT * FROM core_history")
 	}
 
 	if err != nil {
@@ -52,12 +47,8 @@ func ReadHistory(args string) ([]History, error) {
 
 func (data History) Create() (int, error) {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return 0, err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO core_history(ActivityType, `Time`, UserID, Changes, IPAddress) VALUES(?, ?, ?, ?, ?)")
+
+	ins, err := Database.Prepare("INSERT INTO core_history(ActivityType, `Time`, UserID, Changes, IPAddress) VALUES(?, ?, ?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}
@@ -71,13 +62,10 @@ func (data History) Create() (int, error) {
 }
 
 func (data *History) Read() error {
-	database, err := dependency.Db_Connect_custom(Conf, DatabaseName, "parseTime=true")
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
+
 	if data.HistoryID != 0 {
-		err = database.QueryRow("SELECT * FROM core_history WHERE HistoryID = ?", data.HistoryID).Scan(&data.HistoryID, &data.ActivityType, &data.Time, &data.UserID, &data.Changes, &data.IPAddress)
+		err = Database.QueryRow("SELECT * FROM core_history WHERE HistoryID = ?", data.HistoryID).Scan(&data.HistoryID, &data.ActivityType, &data.Time, &data.UserID, &data.Changes, &data.IPAddress)
 	} else {
 		return errors.New("please insert historyid")
 	}
@@ -89,12 +77,8 @@ func (data *History) Read() error {
 
 func (data History) Update() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE core.core_history SET ActivityType=?, `Time`=?, UserID=?, Changes=?, IPAddress=? WHERE HistoryID=?;")
+
+	upd, err := Database.Prepare("UPDATE core.core_history SET ActivityType=?, `Time`=?, UserID=?, Changes=?, IPAddress=? WHERE HistoryID=?;")
 	if err != nil {
 		return err
 	}
@@ -108,11 +92,7 @@ func (data History) Update() error {
 
 func (data History) Delete() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	del, err := database.Prepare("DELETE FROM core_history WHERE `HistoryID`=?")
+	del, err := Database.Prepare("DELETE FROM core_history WHERE `HistoryID`=?")
 	if err != nil {
 		return err
 	}
@@ -124,6 +104,6 @@ func (data History) Delete() error {
 	if err != nil {
 		return err
 	}
-	defer database.Close()
+
 	return nil
 }

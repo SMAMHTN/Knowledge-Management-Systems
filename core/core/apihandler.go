@@ -14,6 +14,12 @@ type Response struct {
 	Data       interface{} `json:",omitempty"`
 }
 
+type ResponseList struct {
+	StatusCode int
+	Data       interface{} `json:",omitempty"`
+	Info       interface{} `json:",omitempty"`
+}
+
 type IDSearch struct {
 	ID int `param:"id" query:"id" form:"id" json:"id" xml:"id"`
 }

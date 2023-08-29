@@ -14,12 +14,8 @@ func (data User) UpdateFromAPI() error {
 	if err != nil {
 		return err
 	}
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE core.core_user SET UserPhoto=?, Username=?, Password=?, Name=?, Email=?, Address=?, Phone=?, RoleID=?, AppthemeID=?, Note=?, IsSuperAdmin=?, IsActive=? WHERE UserID=?;")
+
+	upd, err := Database.Prepare("UPDATE core.core_user SET UserPhoto=?, Username=?, Password=?, Name=?, Email=?, Address=?, Phone=?, RoleID=?, AppthemeID=?, Note=?, IsSuperAdmin=?, IsActive=? WHERE UserID=?;")
 	if err != nil {
 		return err
 	}
@@ -36,7 +32,7 @@ func (data User) UpdateFromAPI() error {
 func ListUser(c echo.Context) error {
 	query := c.QueryParam("query")
 	permission, _, _ := Check_Permission_API(c)
-	res := Response{}
+	res := ResponseList{}
 	limit := new(dependency.LimitType)
 	err := c.Bind(limit)
 	if err != nil {
@@ -46,7 +42,16 @@ func ListUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		listUser, _ := ReadUserWithoutPhoto(query + " " + limit.LimitMaker())
+		var LimitQuery string
+		TotalRow, err := CountRows("core_user")
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		LimitQuery, res.Info = limit.LimitMaker(TotalRow)
+		listUser, _ := ReadUserWithoutPhoto(query + " " + LimitQuery)
 		res.StatusCode = http.StatusOK
 		res.Data = listUser
 		return c.JSON(http.StatusOK, res)

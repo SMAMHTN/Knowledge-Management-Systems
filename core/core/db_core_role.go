@@ -2,7 +2,6 @@ package core
 
 import (
 	"database/sql"
-	"dependency"
 	"errors"
 )
 
@@ -17,15 +16,11 @@ func ReadRole(args string) ([]Role, error) {
 	var results []Role
 	var sqlresult *sql.Rows
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return []Role{}, err
-	}
-	defer database.Close()
+
 	if args != "" {
-		sqlresult, err = database.Query("SELECT * FROM core_role" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM core_role" + " " + args)
 	} else {
-		sqlresult, err = database.Query("SELECT * FROM core_role")
+		sqlresult, err = Database.Query("SELECT * FROM core_role")
 	}
 
 	if err != nil {
@@ -45,12 +40,8 @@ func ReadRole(args string) ([]Role, error) {
 
 func (data *Role) Create() (int, error) {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return 0, err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO core_role(RoleName, RoleParentID, RoleDescription) VALUES(?, ?, ?)")
+
+	ins, err := Database.Prepare("INSERT INTO core_role(RoleName, RoleParentID, RoleDescription) VALUES(?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}
@@ -65,13 +56,9 @@ func (data *Role) Create() (int, error) {
 }
 
 func (data *Role) Read() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.RoleID != 0 {
-		err = database.QueryRow("SELECT * FROM core_role WHERE RoleID = ?", data.RoleID).Scan(&data.RoleID, &data.RoleName, &data.RoleParentID, &data.RoleDescription)
+		err = Database.QueryRow("SELECT * FROM core_role WHERE RoleID = ?", data.RoleID).Scan(&data.RoleID, &data.RoleName, &data.RoleParentID, &data.RoleDescription)
 	} else {
 		return errors.New("please insert roleid")
 	}
@@ -82,13 +69,9 @@ func (data *Role) Read() error {
 }
 
 func (data Role) CheckExist() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.RoleID != 0 {
-		err = database.QueryRow("SELECT RoleID FROM core_role WHERE RoleID = ?", data.RoleID).Scan(&data.RoleID)
+		err = Database.QueryRow("SELECT RoleID FROM core_role WHERE RoleID = ?", data.RoleID).Scan(&data.RoleID)
 	} else {
 		return errors.New("please insert roleid")
 	}
@@ -100,12 +83,8 @@ func (data Role) CheckExist() error {
 
 func (data Role) Update() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE core.core_role SET RoleName=?, RoleParentID=?, RoleDescription=? WHERE RoleID=?;")
+
+	upd, err := Database.Prepare("UPDATE core.core_role SET RoleName=?, RoleParentID=?, RoleDescription=? WHERE RoleID=?;")
 	if err != nil {
 		return err
 	}
@@ -119,11 +98,7 @@ func (data Role) Update() error {
 
 func (data Role) Delete() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	del, err := database.Prepare("DELETE FROM core_role WHERE `RoleID`=?")
+	del, err := Database.Prepare("DELETE FROM core_role WHERE `RoleID`=?")
 	if err != nil {
 		return err
 	}
@@ -135,20 +110,15 @@ func (data Role) Delete() error {
 	if err != nil {
 		return err
 	}
-	defer database.Close()
+
 	return nil
 }
 
 func (data Role) ListAllChild() ([]int, error) {
-	var err error
 	var childs = []int{}
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return childs, err
-	}
-	defer database.Close()
+
 	if data.RoleID != 0 {
-		rows, err := database.Query(`
+		rows, err := Database.Query(`
 			WITH RECURSIVE rolechilds AS (
 				SELECT RoleID,RoleParentID FROM core_role WHERE RoleID = ?
 				UNION

@@ -20,7 +20,7 @@ type Setting struct {
 func GetTime() time.Time {
 	var TimeZone string
 	database, _ := dependency.Db_Connect(Conf, DatabaseName)
-	defer database.Close()
+
 	database.QueryRow("SELECT TimeZone FROM core_setting WHERE CompanyID = 1").Scan(&TimeZone)
 	Timenow, _ := dependency.GetTime(TimeZone)
 	return Timenow
@@ -29,7 +29,7 @@ func GetTime() time.Time {
 func GetTimeZone() string {
 	var TimeZone string
 	database, _ := dependency.Db_Connect(Conf, DatabaseName)
-	defer database.Close()
+
 	database.QueryRow("SELECT TimeZone FROM core_setting WHERE CompanyID = 1").Scan(&TimeZone)
 	return TimeZone
 }
@@ -38,15 +38,11 @@ func ReadSetting(args string) ([]Setting, error) {
 	var results []Setting
 	var sqlresult *sql.Rows
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return []Setting{}, err
-	}
-	defer database.Close()
+
 	if args != "" {
-		sqlresult, err = database.Query("SELECT * FROM core_setting" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM core_setting" + " " + args)
 	} else {
-		sqlresult, err = database.Query("SELECT * FROM core_setting")
+		sqlresult, err = Database.Query("SELECT * FROM core_setting")
 	}
 
 	if err != nil {
@@ -66,12 +62,8 @@ func ReadSetting(args string) ([]Setting, error) {
 
 func (data Setting) Create() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO core_setting(CompanyName, CompanyLogo, CompanyAddress, Timezone, AppthemeID) VALUES(?, ?, ?, ?, ?)")
+
+	ins, err := Database.Prepare("INSERT INTO core_setting(CompanyName, CompanyLogo, CompanyAddress, Timezone, AppthemeID) VALUES(?, ?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
@@ -84,13 +76,9 @@ func (data Setting) Create() error {
 }
 
 func (data *Setting) Read() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.CompanyID != 0 {
-		err = database.QueryRow("SELECT * FROM core_setting WHERE CompanyID = ?", data.CompanyID).Scan(&data.CompanyID, &data.CompanyName, &data.CompanyLogo, &data.CompanyAddress, &data.TimeZone, &data.AppthemeID)
+		err = Database.QueryRow("SELECT * FROM core_setting WHERE CompanyID = ?", data.CompanyID).Scan(&data.CompanyID, &data.CompanyName, &data.CompanyLogo, &data.CompanyAddress, &data.TimeZone, &data.AppthemeID)
 	} else {
 		return errors.New("please insert companyid")
 	}
@@ -125,12 +113,8 @@ func (data Setting) Update() error {
 	if err != nil {
 		return err
 	}
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE core.core_setting SET CompanyName=?, CompanyLogo=?, CompanyAddress=?, Timezone=?, AppthemeID=? WHERE CompanyID=?;")
+
+	upd, err := Database.Prepare("UPDATE core.core_setting SET CompanyName=?, CompanyLogo=?, CompanyAddress=?, Timezone=?, AppthemeID=? WHERE CompanyID=?;")
 	if err != nil {
 		return err
 	}
@@ -144,11 +128,7 @@ func (data Setting) Update() error {
 
 func (data Setting) Delete() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	del, err := database.Prepare("DELETE FROM core_setting WHERE `CompanyID`=?")
+	del, err := Database.Prepare("DELETE FROM core_setting WHERE `CompanyID`=?")
 	if err != nil {
 		return err
 	}
@@ -160,6 +140,6 @@ func (data Setting) Delete() error {
 	if err != nil {
 		return err
 	}
-	defer database.Close()
+
 	return nil
 }

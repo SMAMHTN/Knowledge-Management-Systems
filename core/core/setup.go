@@ -1,6 +1,7 @@
 package core
 
 import (
+	"database/sql"
 	"dependency"
 	"fmt"
 	"path/filepath"
@@ -14,8 +15,16 @@ var Conf dependency.Configuration
 
 var Logger *zap.Logger
 
+var Database *sql.DB
+
 func Check_DB_Exist() error {
 	var err error
+	Database, err = dependency.Db_Connect_custom(Conf, DatabaseName, "parseTime=true")
+	if err != nil {
+		return err
+	}
+	Database.SetMaxOpenConns(9999)
+	Database.SetMaxIdleConns(10)
 	adminusertest := User{UserID: 1}
 	err = adminusertest.Read()
 	if err != nil {

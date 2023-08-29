@@ -2,7 +2,6 @@ package core
 
 import (
 	"database/sql"
-	"dependency"
 	"errors"
 )
 
@@ -16,15 +15,11 @@ func ReadTheme(args string) ([]Theme, error) {
 	var results []Theme
 	var sqlresult *sql.Rows
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return []Theme{}, err
-	}
-	defer database.Close()
+
 	if args != "" {
-		sqlresult, err = database.Query("SELECT * FROM core_theme" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM core_theme" + " " + args)
 	} else {
-		sqlresult, err = database.Query("SELECT * FROM core_theme")
+		sqlresult, err = Database.Query("SELECT * FROM core_theme")
 	}
 
 	if err != nil {
@@ -44,12 +39,8 @@ func ReadTheme(args string) ([]Theme, error) {
 
 func (data *Theme) Create() (int, error) {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return 0, err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO core_theme(AppthemeName, AppthemeValue) VALUES(?, ?)")
+
+	ins, err := Database.Prepare("INSERT INTO core_theme(AppthemeName, AppthemeValue) VALUES(?, ?)")
 	if err != nil {
 		return 0, err
 	}
@@ -64,13 +55,9 @@ func (data *Theme) Create() (int, error) {
 }
 
 func (data *Theme) Read() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.AppthemeID != 0 {
-		err = database.QueryRow("SELECT * FROM core_theme WHERE AppthemeID = ?", data.AppthemeID).Scan(&data.AppthemeID, &data.AppthemeName, &data.AppthemeValue)
+		err = Database.QueryRow("SELECT * FROM core_theme WHERE AppthemeID = ?", data.AppthemeID).Scan(&data.AppthemeID, &data.AppthemeName, &data.AppthemeValue)
 	} else {
 		return errors.New("please insert appthemeid")
 	}
@@ -82,12 +69,8 @@ func (data *Theme) Read() error {
 
 func (data Theme) Update() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE core.core_theme SET AppthemeName=?, AppthemeValue=? WHERE AppthemeID=?;")
+
+	upd, err := Database.Prepare("UPDATE core.core_theme SET AppthemeName=?, AppthemeValue=? WHERE AppthemeID=?;")
 	if err != nil {
 		return err
 	}
@@ -101,11 +84,7 @@ func (data Theme) Update() error {
 
 func (data Theme) Delete() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	del, err := database.Prepare("DELETE FROM core_theme WHERE `AppthemeID`=?")
+	del, err := Database.Prepare("DELETE FROM core_theme WHERE `AppthemeID`=?")
 	if err != nil {
 		return err
 	}
@@ -117,6 +96,6 @@ func (data Theme) Delete() error {
 	if err != nil {
 		return err
 	}
-	defer database.Close()
+
 	return nil
 }

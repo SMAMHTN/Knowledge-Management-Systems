@@ -27,15 +27,10 @@ func ReadUser(args string) ([]User, error) {
 	var results []User
 	var sqlresult *sql.Rows
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return []User{}, err
-	}
-	defer database.Close()
 	if args != "" {
-		sqlresult, err = database.Query("SELECT * FROM core_user" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM core_user" + " " + args)
 	} else {
-		sqlresult, err = database.Query("SELECT * FROM core_user")
+		sqlresult, err = Database.Query("SELECT * FROM core_user")
 	}
 
 	if err != nil {
@@ -60,15 +55,11 @@ func ReadUserWithoutPhoto(args string) ([]User, error) {
 	var results []User
 	var sqlresult *sql.Rows
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return []User{}, err
-	}
-	defer database.Close()
+
 	if args != "" {
-		sqlresult, err = database.Query("SELECT UserID, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive FROM core_user" + " " + args)
+		sqlresult, err = Database.Query("SELECT UserID, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive FROM core_user" + " " + args)
 	} else {
-		sqlresult, err = database.Query("SELECT UserID, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive FROM core_user")
+		sqlresult, err = Database.Query("SELECT UserID, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive FROM core_user")
 	}
 
 	if err != nil {
@@ -94,12 +85,8 @@ func (data *User) Create() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return 0, err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO core.core_user (UserPhoto, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
+
+	ins, err := Database.Prepare("INSERT INTO core.core_user (UserPhoto, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
 	if err != nil {
 		return 0, err
 	}
@@ -116,18 +103,14 @@ func (data *User) Create() (int, error) {
 }
 
 func (data *User) Read() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.UserID != 0 {
-		err = database.QueryRow("SELECT * FROM core_user WHERE UserID = ?", data.UserID).Scan(
+		err = Database.QueryRow("SELECT * FROM core_user WHERE UserID = ?", data.UserID).Scan(
 			&data.UserID, &data.UserPhoto, &data.Username,
 			&data.Password, &data.Name, &data.Email, &data.Address, &data.Phone, &data.RoleID,
 			&data.AppthemeID, &data.Note, &data.IsSuperAdmin, &data.IsActive)
 	} else if data.Username != "" {
-		err = database.QueryRow("SELECT * FROM core_user WHERE Username = ?", data.Username).Scan(
+		err = Database.QueryRow("SELECT * FROM core_user WHERE Username = ?", data.Username).Scan(
 			&data.UserID, &data.UserPhoto, &data.Username,
 			&data.Password, &data.Name, &data.Email, &data.Address, &data.Phone, &data.RoleID,
 			&data.AppthemeID, &data.Note, &data.IsSuperAdmin, &data.IsActive)
@@ -142,13 +125,9 @@ func (data *User) Read() error {
 }
 
 func (data *User) CheckExist() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.UserID != 0 {
-		err = database.QueryRow("SELECT UserID,Username,Name FROM core_user WHERE UserID = ?", data.UserID).Scan(&data.UserID, &data.Username, &data.Name)
+		err = Database.QueryRow("SELECT UserID,Username,Name FROM core_user WHERE UserID = ?", data.UserID).Scan(&data.UserID, &data.Username, &data.Name)
 	} else {
 		return errors.New("please insert UserID")
 	}
@@ -159,18 +138,14 @@ func (data *User) CheckExist() error {
 }
 
 func (data *User) ReadWithoutPhoto() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.UserID != 0 {
-		err = database.QueryRow("SELECT UserID, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive FROM core_user WHERE UserID = ?", data.UserID).Scan(
+		err = Database.QueryRow("SELECT UserID, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive FROM core_user WHERE UserID = ?", data.UserID).Scan(
 			&data.UserID, &data.Username,
 			&data.Password, &data.Name, &data.Email, &data.Address, &data.Phone, &data.RoleID,
 			&data.AppthemeID, &data.Note, &data.IsSuperAdmin, &data.IsActive)
 	} else if data.Username != "" {
-		err = database.QueryRow("SELECT UserID, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive FROM core_user WHERE Username = ?", data.Username).Scan(
+		err = Database.QueryRow("SELECT UserID, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive FROM core_user WHERE Username = ?", data.Username).Scan(
 			&data.UserID, &data.Username,
 			&data.Password, &data.Name, &data.Email, &data.Address, &data.Phone, &data.RoleID,
 			&data.AppthemeID, &data.Note, &data.IsSuperAdmin, &data.IsActive)
@@ -185,13 +160,9 @@ func (data *User) ReadWithoutPhoto() error {
 }
 
 func (data *User) ReadLogin() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.Username != "" && data.Password != "" {
-		err = database.QueryRow("SELECT UserID, Username, Password, Name, RoleID, AppthemeID, IsSuperAdmin, IsActive FROM core_user WHERE Username = ? AND Password = ?", data.Username, data.Password).Scan(
+		err = Database.QueryRow("SELECT UserID, Username, Password, Name, RoleID, AppthemeID, IsSuperAdmin, IsActive FROM core_user WHERE Username = ? AND Password = ?", data.Username, data.Password).Scan(
 			&data.UserID, &data.Username,
 			&data.Password, &data.Name, &data.RoleID,
 			&data.AppthemeID, &data.IsSuperAdmin, &data.IsActive)
@@ -210,12 +181,8 @@ func (data User) Update() error {
 	if err != nil {
 		return err
 	}
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE core.core_user SET UserPhoto=?, Username=?, Password=?, Name=?, Email=?, Address=?, Phone=?, RoleID=?, AppthemeID=?, Note=?, IsSuperAdmin=?, IsActive=? WHERE UserID=?;")
+
+	upd, err := Database.Prepare("UPDATE core.core_user SET UserPhoto=?, Username=?, Password=?, Name=?, Email=?, Address=?, Phone=?, RoleID=?, AppthemeID=?, Note=?, IsSuperAdmin=?, IsActive=? WHERE UserID=?;")
 	if err != nil {
 		return err
 	}
@@ -231,11 +198,7 @@ func (data User) Update() error {
 
 func (data User) Delete() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	del, err := database.Prepare("DELETE FROM core_user WHERE `UserID`=?")
+	del, err := Database.Prepare("DELETE FROM core_user WHERE `UserID`=?")
 	if err != nil {
 		return err
 	}
@@ -247,7 +210,7 @@ func (data User) Delete() error {
 	if err != nil {
 		return err
 	}
-	defer database.Close()
+
 	return nil
 }
 
@@ -257,12 +220,8 @@ func (data User) CreateFromAPI() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return 0, err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO core.core_user (UserPhoto, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
+
+	ins, err := Database.Prepare("INSERT INTO core.core_user (UserPhoto, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
 	if err != nil {
 		return 0, err
 	}

@@ -11,7 +11,7 @@ import (
 func ListRole(c echo.Context) error {
 	query := c.QueryParam("query")
 	permission, _, _ := Check_Permission_API(c)
-	res := Response{}
+	res := ResponseList{}
 	limit := new(dependency.LimitType)
 	err := c.Bind(limit)
 	if err != nil {
@@ -21,7 +21,16 @@ func ListRole(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		listRole, _ := ReadRole(query + " " + limit.LimitMaker())
+		var LimitQuery string
+		TotalRow, err := CountRows("core_role")
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		LimitQuery, res.Info = limit.LimitMaker(TotalRow)
+		listRole, _ := ReadRole(query + " " + LimitQuery)
 		res.StatusCode = http.StatusOK
 		res.Data = listRole
 		return c.JSON(http.StatusOK, res)
