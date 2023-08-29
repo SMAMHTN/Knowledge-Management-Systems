@@ -2,7 +2,6 @@ package kms
 
 import (
 	"database/sql"
-	"dependency"
 	"errors"
 )
 
@@ -17,15 +16,11 @@ func ReadCategory(args string) ([]Category, error) {
 	var results []Category
 	var sqlresult *sql.Rows
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return []Category{}, err
-	}
-	defer database.Close()
+
 	if args != "" {
-		sqlresult, err = database.Query("SELECT * FROM kms_category" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM kms_category" + " " + args)
 	} else {
-		sqlresult, err = database.Query("SELECT * FROM kms_category")
+		sqlresult, err = Database.Query("SELECT * FROM kms_category")
 	}
 
 	if err != nil {
@@ -45,12 +40,8 @@ func ReadCategory(args string) ([]Category, error) {
 
 func (data *Category) Create() (int, error) {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return 0, err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO kms_category(CategoryName, CategoryParentID, CategoryDescription) VALUES(?, ?, ?)")
+
+	ins, err := Database.Prepare("INSERT INTO kms_category(CategoryName, CategoryParentID, CategoryDescription) VALUES(?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}
@@ -65,13 +56,9 @@ func (data *Category) Create() (int, error) {
 }
 
 func (data *Category) Read() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.CategoryID != 0 {
-		err = database.QueryRow("SELECT * FROM kms_category WHERE CategoryID = ?", data.CategoryID).Scan(&data.CategoryID, &data.CategoryName, &data.CategoryParentID, &data.CategoryDescription)
+		err = Database.QueryRow("SELECT * FROM kms_category WHERE CategoryID = ?", data.CategoryID).Scan(&data.CategoryID, &data.CategoryName, &data.CategoryParentID, &data.CategoryDescription)
 	} else {
 		return errors.New("please insert categoryid")
 	}
@@ -83,12 +70,8 @@ func (data *Category) Read() error {
 
 func (data Category) Update() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE kms.kms_category SET CategoryName=?, CategoryParentID=?, CategoryDescription=? WHERE CategoryID=?;")
+
+	upd, err := Database.Prepare("UPDATE kms.kms_category SET CategoryName=?, CategoryParentID=?, CategoryDescription=? WHERE CategoryID=?;")
 	if err != nil {
 		return err
 	}
@@ -102,11 +85,7 @@ func (data Category) Update() error {
 
 func (data Category) Delete() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	del, err := database.Prepare("DELETE FROM kms_category WHERE `CategoryID`=?")
+	del, err := Database.Prepare("DELETE FROM kms_category WHERE `CategoryID`=?")
 	if err != nil {
 		return err
 	}
@@ -118,20 +97,15 @@ func (data Category) Delete() error {
 	if err != nil {
 		return err
 	}
-	defer database.Close()
+
 	return nil
 }
 
 func (data Category) ListAllCategoryParent() ([]int, error) {
-	var err error
 	var parents = []int{}
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return parents, err
-	}
-	defer database.Close()
+
 	if data.CategoryID != 0 {
-		rows, err := database.Query(`
+		rows, err := Database.Query(`
 			WITH RECURSIVE categoryparents AS (
 				SELECT CategoryID,CategoryParentID FROM kms_category WHERE CategoryID = ?
 				UNION
@@ -158,15 +132,10 @@ func (data Category) ListAllCategoryParent() ([]int, error) {
 }
 
 func (data Category) ListAllCategoryChild() ([]int, error) {
-	var err error
 	var Child = []int{}
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return nil, err
-	}
-	defer database.Close()
+
 	if data.CategoryID != 0 {
-		rows, err := database.Query(`
+		rows, err := Database.Query(`
 			WITH RECURSIVE categoryparents AS (
 				SELECT CategoryID,CategoryParentID FROM kms_category WHERE CategoryID = ?
 				UNION

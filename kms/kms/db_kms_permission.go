@@ -2,7 +2,6 @@ package kms
 
 import (
 	"database/sql"
-	"dependency"
 	"errors"
 )
 
@@ -22,15 +21,11 @@ func ReadPermission(args string) ([]Permission, error) {
 	var results []Permission
 	var sqlresult *sql.Rows
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return []Permission{}, err
-	}
-	defer database.Close()
+
 	if args != "" {
-		sqlresult, err = database.Query("SELECT * FROM kms_permission" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM kms_permission" + " " + args)
 	} else {
-		sqlresult, err = database.Query("SELECT * FROM kms_permission")
+		sqlresult, err = Database.Query("SELECT * FROM kms_permission")
 	}
 
 	if err != nil {
@@ -50,12 +45,8 @@ func ReadPermission(args string) ([]Permission, error) {
 
 func (data *Permission) Create() (int, error) {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return 0, err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO kms_permission(CategoryID, RoleID, `Create`, `Read`, `Update`, `Delete`, `FileType`, `DocType`) VALUES(?, ?, ?, ?, ?, ?, ?, ?)")
+
+	ins, err := Database.Prepare("INSERT INTO kms_permission(CategoryID, RoleID, `Create`, `Read`, `Update`, `Delete`, `FileType`, `DocType`) VALUES(?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}
@@ -70,15 +61,11 @@ func (data *Permission) Create() (int, error) {
 }
 
 func (data *Permission) Read() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.PermissionID != 0 {
-		err = database.QueryRow("SELECT * FROM kms_permission WHERE PermissionID = ?", data.PermissionID).Scan(&data.PermissionID, &data.CategoryID, &data.RoleID, &data.PCreate, &data.PRead, &data.PUpdate, &data.PDelete, &data.FileType, &data.DocType)
+		err = Database.QueryRow("SELECT * FROM kms_permission WHERE PermissionID = ?", data.PermissionID).Scan(&data.PermissionID, &data.CategoryID, &data.RoleID, &data.PCreate, &data.PRead, &data.PUpdate, &data.PDelete, &data.FileType, &data.DocType)
 	} else if data.CategoryID != 0 && data.RoleID != 0 {
-		err = database.QueryRow("SELECT * FROM kms_permission WHERE CategoryID = ? AND RoleID = ?", data.CategoryID, data.RoleID).Scan(&data.PermissionID, &data.CategoryID, &data.RoleID, &data.PCreate, &data.PRead, &data.PUpdate, &data.PDelete, &data.FileType, &data.DocType)
+		err = Database.QueryRow("SELECT * FROM kms_permission WHERE CategoryID = ? AND RoleID = ?", data.CategoryID, data.RoleID).Scan(&data.PermissionID, &data.CategoryID, &data.RoleID, &data.PCreate, &data.PRead, &data.PUpdate, &data.PDelete, &data.FileType, &data.DocType)
 	} else {
 		return errors.New("please insert permissionid")
 	}
@@ -90,12 +77,8 @@ func (data *Permission) Read() error {
 
 func (data Permission) Update() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE kms.kms_permission SET CategoryID=?, RoleID=?, `Create`=?, `Read`=?, `Update`=?, `Delete`=?, `FileType`=?, `DocType`=? WHERE PermissionID=?;")
+
+	upd, err := Database.Prepare("UPDATE kms.kms_permission SET CategoryID=?, RoleID=?, `Create`=?, `Read`=?, `Update`=?, `Delete`=?, `FileType`=?, `DocType`=? WHERE PermissionID=?;")
 	if err != nil {
 		return err
 	}
@@ -109,11 +92,7 @@ func (data Permission) Update() error {
 
 func (data Permission) Delete() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	del, err := database.Prepare("DELETE FROM kms_permission WHERE `PermissionID`=?")
+	del, err := Database.Prepare("DELETE FROM kms_permission WHERE `PermissionID`=?")
 	if err != nil {
 		return err
 	}
@@ -125,6 +104,6 @@ func (data Permission) Delete() error {
 	if err != nil {
 		return err
 	}
-	defer database.Close()
+
 	return nil
 }

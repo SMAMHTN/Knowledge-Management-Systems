@@ -20,6 +20,7 @@ func DummyCreate(i int) {
 }
 
 func main() {
+	defer core.Database.Close()
 	go core.Test_api()
 	for i := 1; i <= 10000000; i++ {
 		DummyCreate(i)

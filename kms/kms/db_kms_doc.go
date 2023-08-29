@@ -2,7 +2,6 @@ package kms
 
 import (
 	"database/sql"
-	"dependency"
 	"errors"
 )
 
@@ -17,15 +16,11 @@ func ReadDoc(args string) ([]Doc, error) {
 	var results []Doc
 	var sqlresult *sql.Rows
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return []Doc{}, err
-	}
-	defer database.Close()
+
 	if args != "" {
-		sqlresult, err = database.Query("SELECT * FROM kms_doc" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM kms_doc" + " " + args)
 	} else {
-		sqlresult, err = database.Query("SELECT * FROM kms_doc")
+		sqlresult, err = Database.Query("SELECT * FROM kms_doc")
 	}
 
 	if err != nil {
@@ -45,12 +40,8 @@ func ReadDoc(args string) ([]Doc, error) {
 
 func (data *Doc) Create() (int, error) {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return 0, err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO kms_doc(DocLoc, CategoryID, DocType) VALUES(?, ?, ?)")
+
+	ins, err := Database.Prepare("INSERT INTO kms_doc(DocLoc, CategoryID, DocType) VALUES(?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}
@@ -65,15 +56,11 @@ func (data *Doc) Create() (int, error) {
 }
 
 func (data *Doc) Read() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.DocID != 0 {
-		err = database.QueryRow("SELECT * FROM kms_doc WHERE DocID = ?", data.DocID).Scan(&data.DocID, &data.DocLoc, &data.CategoryID, &data.DocType)
+		err = Database.QueryRow("SELECT * FROM kms_doc WHERE DocID = ?", data.DocID).Scan(&data.DocID, &data.DocLoc, &data.CategoryID, &data.DocType)
 	} else if data.DocLoc != "" {
-		err = database.QueryRow("SELECT * FROM kms_doc WHERE DocLoc = ?", data.DocLoc).Scan(&data.DocID, &data.DocLoc, &data.CategoryID, &data.DocType)
+		err = Database.QueryRow("SELECT * FROM kms_doc WHERE DocLoc = ?", data.DocLoc).Scan(&data.DocID, &data.DocLoc, &data.CategoryID, &data.DocType)
 	} else {
 		return errors.New("please insert docid or docloc")
 	}
@@ -85,12 +72,8 @@ func (data *Doc) Read() error {
 
 func (data Doc) Update() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE kms.kms_doc SET DocLoc=?, CategoryID=?, DocType=? WHERE DocID=?;")
+
+	upd, err := Database.Prepare("UPDATE kms.kms_doc SET DocLoc=?, CategoryID=?, DocType=? WHERE DocID=?;")
 	if err != nil {
 		return err
 	}
@@ -104,11 +87,7 @@ func (data Doc) Update() error {
 
 func (data Doc) Delete() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	del, err := database.Prepare("DELETE FROM kms_doc WHERE `DocID`=?")
+	del, err := Database.Prepare("DELETE FROM kms_doc WHERE `DocID`=?")
 	if err != nil {
 		return err
 	}
@@ -120,6 +99,6 @@ func (data Doc) Delete() error {
 	if err != nil {
 		return err
 	}
-	defer database.Close()
+
 	return nil
 }

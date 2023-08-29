@@ -2,7 +2,6 @@ package kms
 
 import (
 	"database/sql"
-	"dependency"
 	"errors"
 )
 
@@ -17,15 +16,11 @@ func ReadFile(args string) ([]File, error) {
 	var results []File
 	var sqlresult *sql.Rows
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return []File{}, err
-	}
-	defer database.Close()
+
 	if args != "" {
-		sqlresult, err = database.Query("SELECT * FROM kms_file" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM kms_file" + " " + args)
 	} else {
-		sqlresult, err = database.Query("SELECT * FROM kms_file")
+		sqlresult, err = Database.Query("SELECT * FROM kms_file")
 	}
 
 	if err != nil {
@@ -45,12 +40,8 @@ func ReadFile(args string) ([]File, error) {
 
 func (data *File) Create() (int, error) {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return 0, err
-	}
-	defer database.Close()
-	ins, err := database.Prepare("INSERT INTO kms_file(FileLoc, CategoryID, FileType) VALUES(?, ?, ?)")
+
+	ins, err := Database.Prepare("INSERT INTO kms_file(FileLoc, CategoryID, FileType) VALUES(?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}
@@ -65,15 +56,11 @@ func (data *File) Create() (int, error) {
 }
 
 func (data *File) Read() error {
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	var err error
 	if data.FileID != 0 {
-		err = database.QueryRow("SELECT * FROM kms_file WHERE FileID = ?", data.FileID).Scan(&data.FileID, &data.FileLoc, &data.CategoryID, &data.FileType)
+		err = Database.QueryRow("SELECT * FROM kms_file WHERE FileID = ?", data.FileID).Scan(&data.FileID, &data.FileLoc, &data.CategoryID, &data.FileType)
 	} else if data.FileLoc != "" {
-		err = database.QueryRow("SELECT * FROM kms_file WHERE FileLoc = ?", data.FileLoc).Scan(&data.FileID, &data.FileLoc, &data.CategoryID, &data.FileType)
+		err = Database.QueryRow("SELECT * FROM kms_file WHERE FileLoc = ?", data.FileLoc).Scan(&data.FileID, &data.FileLoc, &data.CategoryID, &data.FileType)
 	} else {
 		return errors.New("please insert fileid or fileloc")
 	}
@@ -85,12 +72,8 @@ func (data *File) Read() error {
 
 func (data File) Update() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	upd, err := database.Prepare("UPDATE kms.kms_file SET FileLoc=?, CategoryID=?, FileType=? WHERE FileID=?;")
+
+	upd, err := Database.Prepare("UPDATE kms.kms_file SET FileLoc=?, CategoryID=?, FileType=? WHERE FileID=?;")
 	if err != nil {
 		return err
 	}
@@ -104,11 +87,7 @@ func (data File) Update() error {
 
 func (data File) Delete() error {
 	var err error
-	database, err := dependency.Db_Connect(Conf, DatabaseName)
-	if err != nil {
-		return err
-	}
-	del, err := database.Prepare("DELETE FROM kms_file WHERE `FileID`=?")
+	del, err := Database.Prepare("DELETE FROM kms_file WHERE `FileID`=?")
 	if err != nil {
 		return err
 	}
@@ -120,6 +99,6 @@ func (data File) Delete() error {
 	if err != nil {
 		return err
 	}
-	defer database.Close()
+
 	return nil
 }

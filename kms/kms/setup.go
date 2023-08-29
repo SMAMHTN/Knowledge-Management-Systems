@@ -1,6 +1,7 @@
 package kms
 
 import (
+	"database/sql"
 	"dependency"
 	"errors"
 	"fmt"
@@ -15,6 +16,8 @@ import (
 var Logger *zap.Logger
 
 var Conf dependency.Configuration
+
+var Database *sql.DB
 
 func init() {
 	ConfigurationFile = filepath.Join("config", "appconf", "kms_conf.json")
@@ -107,6 +110,11 @@ func Check_Filestore_Exist() {
 
 func Check_DB_Exist() {
 	var err error
+	Database, err = dependency.Db_Connect_custom(Conf, DatabaseName, "parseTime=true")
+	if err != nil {
+		Logger.Panic(err.Error())
+		panic(err)
+	}
 	admincategorytest := Category{CategoryID: 1}
 	err = admincategorytest.Read()
 	if err != nil {

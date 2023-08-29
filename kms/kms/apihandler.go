@@ -19,6 +19,12 @@ type Response struct {
 	Data       interface{} `json:",omitempty"`
 }
 
+type ResponseList struct {
+	StatusCode int
+	Data       interface{} `json:",omitempty"`
+	Info       interface{} `json:",omitempty"`
+}
+
 type DataArrayAPI struct {
 	Values []string `json:"Data"`
 }

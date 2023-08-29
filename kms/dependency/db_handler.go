@@ -9,6 +9,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+type Info struct {
+	UppperLimit int
+	LowerLimit  int
+	TotalPage   int
+	TotalRow    int
+	CurrentPage int
+	TotalShow   int
+}
+
 type LimitType struct {
 	Page int `query:"page"`
 	Num  int `query:"num"`
@@ -116,13 +125,19 @@ func LimitMaker(page int, num int) (limit string) {
 	return limit
 }
 
-func (data LimitType) LimitMaker() (limit string) {
+func (data *LimitType) LimitMaker(totalrow int) (limit string, info Info) {
 	if data.Num == 0 {
 		data.Num = 10
 	}
 	if data.Page == 0 {
 		data.Page = 1
 	}
-	limit = "LIMIT " + strconv.Itoa((data.Page-1)*data.Num) + "," + strconv.Itoa(data.Num)
-	return limit
+	info.CurrentPage = data.Page
+	info.TotalShow = data.Num
+	info.TotalRow = totalrow
+	Lowerlimit0 := (data.Page - 1) * data.Num
+	info.UppperLimit = Lowerlimit0 + 1
+	info.UppperLimit = Lowerlimit0 + data.Num
+	limit = "LIMIT " + strconv.Itoa(Lowerlimit0) + "," + strconv.Itoa(data.Num)
+	return limit, info
 }
