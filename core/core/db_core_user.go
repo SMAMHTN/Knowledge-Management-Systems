@@ -10,7 +10,7 @@ type User struct {
 	UserID          int    `json:"UserID" query:"UserID"`
 	UserPhoto       []byte `json:"-"`
 	UserPhotoBase64 string `json:"UserPhoto"`
-	Username        string `json:"Username"`
+	Username        string `json:"Username" query:"Username"`
 	Password        string `json:"Password"`
 	Name            string `json:"Name"`
 	Email           string `json:"Email"`
