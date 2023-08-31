@@ -1,59 +1,63 @@
-// components/DateTime.js
-"use client";
-import { useState, useEffect } from "react";
+'use client'
 
-const DateTime = ({ initialTime }) => {
-  const [currentTime, setCurrentTime] = useState(new Date(initialTime));
+import { useState, useEffect } from 'react';
+import { CoreAPIGET } from '../dep/core/coreHandler';
+import { DateTime } from 'luxon'; // Import DateTime from luxon
+
+function DateTimeTrue() {
+  const [tz, setTz] = useState('UTC');
+  const [currentTime, setCurrentTime] = useState(DateTime.local());
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(new Date());
+      setCurrentTime(DateTime.local());
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // Helper function to format the date and time
-  const formatTime = (date) => {
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-    return `${hours}:${minutes}:${seconds}`;
-  };
+  useEffect(() => {
+    CoreAPIGET('tz')
+      .then((response) => {
+        setTz(response.body.Data);
+      })
+      .catch((error) => {
+        console.log(error);
+        setTz('UTC');
+      });
 
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
+    const interval2 = setInterval(() => {
+      CoreAPIGET('tz')
+        .then((response) => {
+          setTz(response.body.Data);
+        })
+        .catch((error) => {
+          console.log(error);
+          setTz('UTC');
+        });
+    }, 10000000);
 
-  const isValidTime = !isNaN(currentTime.getTime());
-  const formattedTime = isValidTime ? formatTime(currentTime) : "Invalid Time";
-  const formattedDate = isValidTime ? formatDate(currentTime) : "Invalid Date";
+    return () => clearInterval(interval2);
+  }, []);
+
+  const isValidTime = currentTime.isValid;
+  const formattedTime = isValidTime
+    ? currentTime.setZone(tz).toFormat('HH:mm:ss')
+    : 'Invalid Time';
+  const formattedDate = isValidTime
+    ? currentTime.setZone(tz).toFormat('yyyy-MM-dd')
+    : 'Invalid Date';
 
   return (
-    <div
-      className={`dateTimeContainer transition-opacity ${
-        isValidTime ? "opacity-100" : "opacity-0"
-      }`}
-    >
-      <div
-        className={`time transition-opacity ${
-          isValidTime ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        Current Time: {isValidTime ? formatTime(currentTime) : "Invalid Time"}
+    <div className={`dateTimeContainer transition-opacity ${isValidTime ? 'opacity-100' : 'opacity-0'}`} suppressHydrationWarning>
+      <div className={`time transition-opacity ${isValidTime ? 'opacity-100' : 'opacity-0'}`} suppressHydrationWarning>
+        Current Time: {formattedTime}
       </div>
-      <div
-        className={`date transition-opacity ${
-          isValidTime ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        Current Date : {isValidTime ? formatDate(currentTime) : "Invalid Date"}
+      <div className={`date transition-opacity ${isValidTime ? 'opacity-100' : 'opacity-0'}`} suppressHydrationWarning>
+        Current Date: {formattedDate}
       </div>
     </div>
   );
-};
+}
 
-export default DateTime;
+export default DateTimeTrue;

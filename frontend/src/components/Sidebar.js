@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import styles from '../styles/Sidebar.module.css';
-import DateTime from '@/components/DateTime.js';
+import DateTimeTrue from '@/components/DateTime.js';
 
 function Sidebar({ initialTime }) {
   return (
@@ -132,7 +132,7 @@ function Sidebar({ initialTime }) {
         </ul>
       </div>
       <div className="mb-14 px-5 py-3 hidden md:block text-center text-xs">
-        <DateTime initialTime={initialTime} />
+        <DateTimeTrue initialTime={initialTime} />
       </div>
     </div>
   );
