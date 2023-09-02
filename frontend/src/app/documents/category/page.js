@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import AddCategory from './AddCategory';
 import { DeleteModal, alertDelete } from '@/components/Feature';
-import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
+import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
 
-function CatTable(handleItemsPerPageChange) {
+function CatTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [catNames, setCatNames] = useState({});
@@ -17,18 +17,16 @@ function CatTable(handleItemsPerPageChange) {
   const [deleteMessage, setDeleteMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-
-  const {
-    totalPages,
-    currentPageData,
-  } = CalcPagiData(data, currentPage, itemsPerPage);
+  const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
 
   const fetchData = async () => {
     try {
-      const response = await KmsAPIGET('listcategory');
+      const response = await KmsAPIGET(`listcategory?page=${currentPage}&num=${itemsPerPage}`);
       const jsonData = response.body.Data;
+      const pageInfo = response.body.Info;
       setData(jsonData);
       setError(null);
+      setPageInfo(pageInfo);
     } catch (error) {
       setError(error.message);
     }
@@ -77,13 +75,17 @@ function CatTable(handleItemsPerPageChange) {
 
   useEffect(() => {
     fetchData();
-  }, [router.pathname]);
+  }, [router.pathname, itemsPerPage, currentPage]);
 
   useEffect(() => {
     if (data.length > 0) {
       updateCatNames();
     }
   }, [data]);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   const truncateText = (text, length) => {
     if (text.length > length) {
@@ -105,14 +107,11 @@ function CatTable(handleItemsPerPageChange) {
           <h2 className="text-2xl font-bold mb-4">category Table</h2>
           <div className="my-2">
             <AddCategory fetchData={fetchData} />
+            <ItmsPerPageComp
+              itemsPerPage={itemsPerPage}
+              setItemsPerPage={setItemsPerPage}
+            />
           </div>
-          <ItmsPerPageComp
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={(newItemsPerPage) => {
-              setItemsPerPage(newItemsPerPage);
-              setCurrentPage(1);
-            }}
-          />
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -123,7 +122,7 @@ function CatTable(handleItemsPerPageChange) {
               </tr>
             </thead>
             <tbody>
-              {currentPageData.map((category) => (
+              {data.map((category) => (
                 <tr key={category.CategoryID}>
                   <td className="px-4 py-2">{category.CategoryID}</td>
                   <td className="px-4 py-2">{category.CategoryName}</td>
@@ -156,11 +155,13 @@ function CatTable(handleItemsPerPageChange) {
             </tbody>
           </table>
         </div>
-        <PagiCtrl
+        <PaginationComp
           currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
+          totalPages={pageInfo.TotalPage}
+          itemsPerPage={itemsPerPage}
+          handlePageChange={handlePageChange}
+          upperLimit={pageInfo.UpperLimit}
+          lowerLimit={pageInfo.LowerLimit}
         />
         <DeleteModal
           isOpen={isDeleteModalOpen}

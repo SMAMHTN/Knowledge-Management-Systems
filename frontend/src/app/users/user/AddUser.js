@@ -29,13 +29,12 @@ function AddUser({ fetchData }) {
     } = e.target;
     let parsedValue;
 
-    // Handle checkbox input
     if (type === 'checkbox') {
       parsedValue = checked ? 1 : 0;
     } else if (name === 'DocType' || name === 'FileType') {
       parsedValue = value === '' ? '[]' : `[${value}]`;
-    } else if (name === 'CategoryID' || name === 'RoleID') {
-      parsedValue = value === '' ? 0 : parseInt(value, 10);
+    } else if (name === 'CategoryID' || name === 'RoleID' || name === 'AppthemeID') {
+      parsedValue = value.trim() === '' || isNaN(value) ? '' : parseInt(value, 10);
     } else {
       parsedValue = value === '' ? 0 : value;
     }
@@ -52,7 +51,7 @@ function AddUser({ fetchData }) {
       // Make the API call to save the data
       const response = await CoreAPI('POST', 'user', formData);
       alertAdd(response);
-      fetchData(); // Assuming fetchData is a function that fetches data again
+      fetchData();
       closeModal();
     } catch (error) {
       console.log('Error occurred:', error);
@@ -176,7 +175,7 @@ function AddUser({ fetchData }) {
                   <input
                     type="text"
                     name="RoleID"
-                    value={formData.RoleID}
+                    value={formData.RoleID !== '' ? formData.RoleID : ''}
                     onChange={handleInputChange}
                     className="border px-2 py-1 w-full"
                   />

@@ -27,20 +27,24 @@ function Home() {
       <div className="max-w-md mx-auto p-4 mt-9">
         <h2 className="text-2xl font-bold mb-4">Navigation</h2>
         <div className="space-y-4">
-          <h1>
-            Selamat datang
-            {' '}
-            {userData.Name}
-          </h1>
-          <Link href="/settings" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-            Settings
-          </Link>
-          <Link href="/documents" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-            Management Dokumen
-          </Link>
-          <Link href="/management-s-admin" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-            Management S.Admin
-          </Link>
+          {userData && (
+          <>
+            <h1>
+              Selamat datang
+              {' '}
+              {userData.Name}
+            </h1>
+            <Link href="/settings" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
+              Settings
+            </Link>
+            <Link href="/documents" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
+              Management Dokumen
+            </Link>
+            <Link href="/management-s-admin" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
+              Management S.Admin
+            </Link>
+          </>
+          )}
         </div>
       </div>
       {/* buat user biasa */}

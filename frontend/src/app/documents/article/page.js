@@ -6,7 +6,7 @@ import { KmsAPIGET, KmsAPI } from '@/dep/kms/kmsHandler';
 import AddArticle from './AddArticle';
 import { DeleteModal, alertDelete } from '@/components/Feature';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
-import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
+import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
 
 function DocTable(handleItemsPerPageChange) {
   const router = useRouter();
@@ -19,17 +19,15 @@ function DocTable(handleItemsPerPageChange) {
   const [deleteMessage, setDeleteMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-
-  const {
-    totalPages,
-    currentPageData,
-  } = CalcPagiData(data, currentPage, itemsPerPage);
+  const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
 
   const fetchData = async () => {
     try {
-      const response = await KmsAPIGET('listarticle');
+      const response = await KmsAPIGET(`listarticle?page=${currentPage}&num=${itemsPerPage}`);
       const jsonData = response.body.Data;
+      const pageInfo = response.body.Info;
       setData(jsonData);
+      setPageInfo(pageInfo);
       setError(null);
     } catch (error) {
       setError(error.message);
@@ -99,7 +97,7 @@ function DocTable(handleItemsPerPageChange) {
 
   useEffect(() => {
     fetchData();
-  }, [router.pathname]);
+  }, [router.pathname, itemsPerPage, currentPage]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -124,7 +122,9 @@ function DocTable(handleItemsPerPageChange) {
     // Programmatically navigate to a different route
     router.push(`/documents/article/${ArticleID}`);
   };
-
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
   return (
     <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
       {/* buat s.admin */}
@@ -132,13 +132,7 @@ function DocTable(handleItemsPerPageChange) {
         <div className="max-w-3xl mx-auto p-4">
           <h2 className="text-2xl font-bold mb-4">Doc Table</h2>
           <div className="my-2"><AddArticle fetchData={fetchData} /></div>
-          <ItmsPerPageComp
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={(newItemsPerPage) => {
-              setItemsPerPage(newItemsPerPage);
-              setCurrentPage(1);
-            }}
-          />
+
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -154,7 +148,7 @@ function DocTable(handleItemsPerPageChange) {
               </tr>
             </thead>
             <tbody>
-              {currentPageData.map((article) => (
+              {data.map((article) => (
                 <tr key={article.ArticleID}>
                   <td className="px-4 py-2">{article.ArticleID}</td>
                   <td className="px-4 py-2 text-center">
@@ -201,11 +195,18 @@ function DocTable(handleItemsPerPageChange) {
             </tbody>
           </table>
         </div>
-        <PagiCtrl
+        <PaginationComp
           currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
+          totalPages={pageInfo.TotalPage}
+          itemsPerPage={itemsPerPage}
+          handlePageChange={handlePageChange}
+          upperLimit={pageInfo.UpperLimit}
+          lowerLimit={pageInfo.LowerLimit}
+        />
+
+        <ItmsPerPageComp
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
         />
         <DeleteModal
           isOpen={isDeleteModalOpen}
