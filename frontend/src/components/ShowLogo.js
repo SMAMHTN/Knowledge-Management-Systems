@@ -9,12 +9,14 @@ function ShowLogo({ maxWidth, maxHeight }) {
   const [data, setData] = useState({
     CompanyLogo: '',
   });
+  const [companyName, setCompanyName] = useState('');
 
   const fetchData = async () => {
     try {
       const response = await CoreAPIGET('setting');
       const jsonData = response.body.Data;
       setData(jsonData);
+      setCompanyName(jsonData.CompanyName);
       setError(null);
     } catch (error) {
       setError(error.message);
@@ -56,8 +58,9 @@ function ShowLogo({ maxWidth, maxHeight }) {
   };
 
   return (
-    <div>
+    <div className="flex items-center h-9 object-contain">
       <div>{renderCompanyLogo()}</div>
+      <span className="hidden md:block ml-2 text-gray-600">{companyName}</span>
     </div>
   );
 }
