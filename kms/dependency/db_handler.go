@@ -11,7 +11,7 @@ import (
 )
 
 type Info struct {
-	UppperLimit int
+	UpperLimit  int
 	LowerLimit  int
 	TotalPage   int
 	TotalRow    int
@@ -133,13 +133,17 @@ func (data *LimitType) LimitMaker(totalrow int) (limit string, info Info) {
 	if data.Page == 0 {
 		data.Page = 1
 	}
+	info.TotalPage = int(math.Ceil(float64(totalrow) / float64(data.Num)))
 	info.CurrentPage = data.Page
-	info.TotalShow = data.Num
 	info.TotalRow = totalrow
 	Lowerlimit0 := (data.Page - 1) * data.Num
 	info.LowerLimit = Lowerlimit0 + 1
-	info.UppperLimit = Lowerlimit0 + data.Num
-	info.TotalPage = int(math.Ceil(float64(totalrow) / float64(data.Num)))
+	if info.TotalPage == info.CurrentPage {
+		info.TotalShow = totalrow % data.Num
+	} else {
+		info.TotalShow = data.Num
+	}
+	info.UpperLimit = Lowerlimit0 + info.TotalShow
 	limit = "LIMIT " + strconv.Itoa(Lowerlimit0) + "," + strconv.Itoa(data.Num)
 	return limit, info
 }

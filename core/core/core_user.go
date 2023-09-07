@@ -206,7 +206,12 @@ func DeleteUser(c echo.Context) error {
 	res := Response{}
 	u := new(User)
 	err = c.Bind(u)
-	if err != nil || u.UserID == 1 {
+	if u.UserID == 1 {
+		res.StatusCode = http.StatusBadRequest
+		res.Data = "You Cannot Delete this Role because this role constrain used by system"
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	if err != nil {
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
