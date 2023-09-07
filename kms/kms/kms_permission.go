@@ -12,6 +12,18 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+type Permission_API struct {
+	PermissionID int `json:"PermissionID" query:"PermissionID"`
+	CategoryID   int
+	RoleID       int
+	PCreate      int `json:"Create"`
+	PRead        int `json:"Read"`
+	PUpdate      int `json:"Update"`
+	PDelete      int `json:"Delete"`
+	FileType     []string
+	DocType      []string
+}
+
 func ListPermission(c echo.Context) error {
 	query := c.QueryParam("query")
 	permission, _, _ := Check_Admin_Permission_API(c)
@@ -34,9 +46,14 @@ func ListPermission(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, res)
 		}
 		LimitQuery, res.Info = limit.LimitMaker(TotalRow)
-		listCategory, _ := ReadPermission(query + " " + LimitQuery)
+		ListPermission, _ := ReadPermission(query + " " + LimitQuery)
+		var ListPermissionAPI []Permission_API
+		for _, x := range ListPermission {
+			tmp, _ := x.ToAPI()
+			ListPermissionAPI = append(ListPermissionAPI, tmp)
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = listCategory
+		res.Data = ListPermissionAPI
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -49,7 +66,7 @@ func ShowPermission(c echo.Context) error {
 	permission, _, _ := Check_Admin_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Permission)
+	u := new(Permission_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -58,15 +75,29 @@ func ShowPermission(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		err = u.Read()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		err = uOri.Read()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusNotFound
 			res.Data = "KMS PERMISSION NOT FOUND"
 			return c.JSON(http.StatusNotFound, res)
 		}
+		*u, err = uOri.ToAPI()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = *u
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -79,26 +110,12 @@ func AddPermission(c echo.Context) error {
 	permission, _, _ := Check_Admin_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Permission)
+	u := new(Permission_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
-	}
-	_, err = dependency.ConvStringToStringArray(u.FileType)
-	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR FileType : " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
-	}
-	_, err = dependency.ConvStringToStringArray(u.DocType)
-	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR DocType : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
@@ -108,16 +125,36 @@ func AddPermission(c echo.Context) error {
 			res.Data = "RoleID Not Found"
 			return c.JSON(http.StatusConflict, res)
 		}
-		_, err = u.Create()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		_, err = uOri.Create()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
 		}
-		u.Read()
+		err = uOri.Read()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		*u, err = uOri.ToAPI()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = *u
 		err = RecordHistory(c, "Permission", "Added Permission : ("+strconv.Itoa(u.PermissionID)+")")
 		if err != nil {
 			Logger.Error("failed to record permission change history " + err.Error())
@@ -134,26 +171,12 @@ func EditPermission(c echo.Context) error {
 	permission, _, _ := Check_Admin_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Permission)
+	u := new(Permission_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
-	}
-	_, err = dependency.ConvStringToStringArray(u.FileType)
-	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR FileType : " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
-	}
-	_, err = dependency.ConvStringToStringArray(u.DocType)
-	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR DocType : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
@@ -163,16 +186,36 @@ func EditPermission(c echo.Context) error {
 			res.Data = "RoleID Not Found"
 			return c.JSON(http.StatusConflict, res)
 		}
-		err = u.Update()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		err = uOri.Update()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
 		}
-		u.Read()
+		err = uOri.Read()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		*u, err = uOri.ToAPI()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = *u
 		err = RecordHistory(c, "Permission", "Edited Permission : ("+strconv.Itoa(u.PermissionID)+")")
 		if err != nil {
 			Logger.Error("failed to record permission change history " + err.Error())
@@ -189,7 +232,7 @@ func DeletePermission(c echo.Context) error {
 	permission, _, _ := Check_Admin_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Permission)
+	u := new(Permission_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -198,7 +241,14 @@ func DeletePermission(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		err = u.Delete()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		err = uOri.Delete()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
@@ -337,7 +387,7 @@ func GetAllFileTypePermission(c echo.Context, CategoryID int, RoleID int) (FileT
 	FinalQuery := fmt.Sprintf("WHERE RoleID IN (%s) AND CategoryID IN (%s)", roleIDListString, categoryIDListString)
 	PermissionList, err := ReadPermission(FinalQuery)
 	for _, val := range PermissionList {
-		TmpFileTypeList, err := dependency.ConvStringToStringArrayUnique(val.FileType)
+		TmpFileTypeList, err := dependency.ConvStringToStringArrayUniqueBracket(val.FileType)
 		if err != nil {
 			return nil, err
 		}
@@ -387,7 +437,7 @@ func GetAllDocTypePermission(c echo.Context, CategoryID int, RoleID int) (DocTyp
 	FinalQuery := fmt.Sprintf("WHERE RoleID IN (%s) AND CategoryID IN (%s)", roleIDListString, categoryIDListString)
 	PermissionList, err := ReadPermission(FinalQuery)
 	for _, val := range PermissionList {
-		TmpDocTypeList, err := dependency.ConvStringToStringArrayUnique(val.DocType)
+		TmpDocTypeList, err := dependency.ConvStringToStringArrayUniqueBracket(val.DocType)
 		if err != nil {
 			return nil, err
 		}
@@ -439,4 +489,41 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 		}
 	}
 	return CategoryIDList, nil
+}
+
+func (data Permission) ToAPI() (res Permission_API, err error) {
+	res = Permission_API{
+		PermissionID: data.PermissionID,
+		CategoryID:   data.CategoryID,
+		RoleID:       data.RoleID,
+		PCreate:      data.PCreate,
+		PRead:        data.PRead,
+		PUpdate:      data.PUpdate,
+		PDelete:      data.PDelete,
+		FileType:     []string{},
+		DocType:      []string{},
+	}
+	res.FileType = dependency.ConvStringToStringArray(data.DocType)
+	res.DocType = dependency.ConvStringToStringArray(data.DocType)
+	return res, nil
+}
+
+func (data Permission_API) ToTable() (res Permission, err error) {
+	res = Permission{
+		PermissionID: data.PermissionID,
+		CategoryID:   data.CategoryID,
+		RoleID:       data.RoleID,
+		PCreate:      data.PCreate,
+		PRead:        data.PRead,
+		PUpdate:      data.PUpdate,
+		PDelete:      data.PDelete,
+		FileType:     "",
+		DocType:      "",
+	}
+	res.FileType, err = dependency.ConvStringArrayToString(data.DocType)
+	if err != nil {
+		return res, err
+	}
+	res.DocType, err = dependency.ConvStringArrayToString(data.DocType)
+	return res, err
 }

@@ -13,7 +13,7 @@ func (data Article_Table) ConvForSolr() (result ArticleSolr, err error) {
 	result.OwnerID = data.OwnerID
 	result.LastEditedByID = data.LastEditedByID
 	result.LastEditedTime = data.LastEditedTime
-	result.Tag, err = dependency.ConvStringToStringArray(data.Tag)
+	result.Tag = dependency.ConvStringToStringArray(data.Tag)
 	if err != nil {
 		return result, err
 	}

@@ -23,6 +23,20 @@ type Article_Table struct {
 	IsActive       int
 }
 
+type Article_API struct {
+	ArticleID      int `json:"ArticleID" query:"ArticleID"`
+	OwnerID        int
+	LastEditedByID int
+	LastEditedTime time.Time
+	Tag            []string
+	Title          string
+	CategoryID     int
+	Article        string
+	FileID         []int
+	DocID          []int
+	IsActive       int
+}
+
 func ListArticle(c echo.Context) error {
 	query := c.QueryParam("query")
 	permission, _, _ := Check_Admin_Permission_API(c)
@@ -45,9 +59,19 @@ func ListArticle(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, res)
 		}
 		LimitQuery, res.Info = limit.LimitMaker(TotalRow)
-		DocList, _ := ReadArticle(query + " " + LimitQuery)
+		ArticleList, _ := ReadArticle(query + " " + LimitQuery)
+		var ArticleListAPI []Article_API
+		for _, x := range ArticleList {
+			tmp, err := x.ToAPI()
+			if err != nil {
+				res.StatusCode = http.StatusInternalServerError
+				res.Data = err
+				return c.JSON(http.StatusInternalServerError, res)
+			}
+			ArticleListAPI = append(ArticleListAPI, tmp)
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = DocList
+		res.Data = ArticleListAPI
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -59,7 +83,7 @@ func ListArticle(c echo.Context) error {
 func ShowArticle(c echo.Context) error {
 	var err error
 	var res Response
-	u := new(Article_Table)
+	u := new(Article_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -67,7 +91,14 @@ func ShowArticle(c echo.Context) error {
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	err = u.Read()
+	uOri, err := u.ToTable()
+	if err != nil {
+		Logger.Error(err.Error())
+		res.StatusCode = http.StatusInternalServerError
+		res.Data = err
+		return c.JSON(http.StatusInternalServerError, res)
+	}
+	err = uOri.Read()
 	if err != nil {
 		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
@@ -92,8 +123,15 @@ func ShowArticle(c echo.Context) error {
 	}
 	permission, _, _ := Check_Admin_Permission_API(c)
 	if TrueRead || TrueUpdate || permission {
+		*u, err = uOri.ToAPI()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = *u
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -105,33 +143,12 @@ func ShowArticle(c echo.Context) error {
 func AddArticle(c echo.Context) error {
 	var err error
 	var res Response
-	u := new(Article_Table)
+	u := new(Article_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
 		res.Data = "DATA INPUT ERROR : " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
-	}
-	_, err = dependency.ConvStringToStringArray(u.Tag)
-	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR Tag : " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
-	}
-	_, err = dependency.ConvStringToIntArray(u.FileID)
-	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR FileID : " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
-	}
-	_, err = dependency.ConvStringToIntArray(u.DocID)
-	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR DocID : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	_, user, _ := Check_Admin_Permission_API(c)
@@ -151,7 +168,14 @@ func AddArticle(c echo.Context) error {
 	}
 	permission, _, _ := Check_Admin_Permission_API(c)
 	if TrueCreate || permission {
-		_, err = u.Create()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		_, err = uOri.Create()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
@@ -176,8 +200,15 @@ func AddArticle(c echo.Context) error {
 		// 	res.Data = "UPDATE ERROR : " + err.Error()
 		// 	return c.JSON(http.StatusBadRequest, res)
 		// }
+		*u, err = uOri.ToAPI()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = *u
 		err = RecordHistory(c, "Article", "Added Article : "+u.Title+"("+strconv.Itoa(u.ArticleID)+")")
 		if err != nil {
 			Logger.Error("failed to record article change history " + err.Error())
@@ -193,7 +224,7 @@ func AddArticle(c echo.Context) error {
 func EditArticle(c echo.Context) error {
 	var err error
 	var res Response
-	u := new(Article_Table)
+	u := new(Article_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -201,28 +232,13 @@ func EditArticle(c echo.Context) error {
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	_, err = dependency.ConvStringToStringArray(u.Tag)
+	oriu, err := u.ToTable()
 	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR Tag : " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
+		Logger.Error(err.Error())
+		res.StatusCode = http.StatusInternalServerError
+		res.Data = err
+		return c.JSON(http.StatusInternalServerError, res)
 	}
-	_, err = dependency.ConvStringToIntArray(u.FileID)
-	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR FileID : " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
-	}
-	_, err = dependency.ConvStringToIntArray(u.DocID)
-	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR DocID : " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
-	}
-	oriu := *u
 	err = oriu.Read()
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -265,15 +281,29 @@ func EditArticle(c echo.Context) error {
 		// 	res.Data = "UPDATE ERROR : " + err.Error()
 		// 	return c.JSON(http.StatusBadRequest, res)
 		// }
-		err = u.Update()
+		oriu, err = u.ToTable()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		err = oriu.Update()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
 			res.Data = "UPDATE ERROR : " + err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
+		*u, err = oriu.ToAPI()
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = *u
 		err = RecordHistory(c, "Article", "Edited Article : "+u.Title+"("+strconv.Itoa(u.ArticleID)+")")
 		if err != nil {
 			Logger.Error("failed to record article change history " + err.Error())
@@ -289,7 +319,7 @@ func EditArticle(c echo.Context) error {
 func DeleteArticle(c echo.Context) error {
 	var err error
 	var res Response
-	u := new(Article_Table)
+	u := new(Article_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -297,7 +327,13 @@ func DeleteArticle(c echo.Context) error {
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	oriu := u
+	oriu, err := u.ToTable()
+	if err != nil {
+		Logger.Error(err.Error())
+		res.StatusCode = http.StatusInternalServerError
+		res.Data = err
+		return c.JSON(http.StatusInternalServerError, res)
+	}
 	err = oriu.Read()
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -323,7 +359,7 @@ func DeleteArticle(c echo.Context) error {
 	}
 	permission, _, _ := Check_Admin_Permission_API(c)
 	if TrueDelete || permission {
-		err = u.Delete()
+		err = oriu.Delete()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -381,4 +417,46 @@ func QueryArticle(c echo.Context) error {
 	res.StatusCode = http.StatusOK
 	res.Data = string(response)
 	return c.JSON(http.StatusOK, res)
+}
+
+func (data Article_Table) ToAPI() (res Article_API, err error) {
+	res.Article = data.Article
+	res.ArticleID = data.ArticleID
+	res.CategoryID = data.CategoryID
+	res.DocID, err = dependency.ConvStringToIntArray(data.DocID)
+	if err != nil {
+		return res, err
+	}
+	res.FileID, err = dependency.ConvStringToIntArray(data.FileID)
+	if err != nil {
+		return res, err
+	}
+	res.IsActive = data.IsActive
+	res.LastEditedByID = data.LastEditedByID
+	res.LastEditedTime = data.LastEditedTime
+	res.OwnerID = data.OwnerID
+	res.Tag = dependency.ConvStringToStringArray(data.Tag)
+	res.Title = data.Title
+	return res, err
+}
+
+func (data Article_API) ToTable() (res Article_Table, err error) {
+	res.Article = data.Article
+	res.ArticleID = data.ArticleID
+	res.CategoryID = data.CategoryID
+	res.DocID, err = dependency.ConvIntArrayToStringUnique(data.DocID)
+	if err != nil {
+		return res, err
+	}
+	res.FileID, err = dependency.ConvIntArrayToStringUnique(data.FileID)
+	if err != nil {
+		return res, err
+	}
+	res.IsActive = data.IsActive
+	res.LastEditedByID = data.LastEditedByID
+	res.LastEditedTime = data.LastEditedTime
+	res.OwnerID = data.OwnerID
+	res.Tag, err = dependency.ConvStringArrayToString(data.Tag)
+	res.Title = data.Title
+	return res, err
 }

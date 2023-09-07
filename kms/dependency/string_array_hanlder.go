@@ -3,16 +3,22 @@ package dependency
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 )
 
-func CheckStringArray(data string) bool {
+// import (
+// 	"errors"
+// 	"fmt"
+// 	"strconv"
+// 	"strings"
+// )
+
+func CheckStringArrayBracket(data string) bool {
 	return data[0] == '[' && data[len(data)-1] == ']'
 }
 
-func ConvStringToStringArray(data string) (result []string, err error) {
-	if !CheckStringArray(data) {
+func ConvStringToStringArrayBracket(data string) (result []string, err error) {
+	if !CheckStringArrayBracket(data) {
 		return nil, errors.New("this isnt an array")
 	}
 	splitStr := strings.Split(data[1:len(data)-1], ",")
@@ -28,28 +34,28 @@ func ConvStringToStringArray(data string) (result []string, err error) {
 	return result, err
 }
 
-func ConvStringToIntArray(data string) (result []int, err error) {
-	StringArray, err := ConvStringToStringArray(data)
-	if err != nil {
+// func ConvStringToIntArray(data string) (result []int, err error) {
+// 	StringArray, err := ConvStringToStringArray(data)
+// 	if err != nil {
 
-		return nil, err
-	}
-	for count, x := range StringArray {
-		if x != "" {
-			y64, err := strconv.ParseInt(x, 10, 0)
-			y := int(y64)
-			if err != nil {
-				return nil, fmt.Errorf("index : %d with value %s not detected as integer with error : %s", count, strings.ToLower(x), err.Error())
-			}
-			result = append(result, y)
-		}
-	}
-	return result, nil
-}
+// 		return nil, err
+// 	}
+// 	for count, x := range StringArray {
+// 		if x != "" {
+// 			y64, err := strconv.ParseInt(x, 10, 0)
+// 			y := int(y64)
+// 			if err != nil {
+// 				return nil, fmt.Errorf("index : %d with value %s not detected as integer with error : %s", count, strings.ToLower(x), err.Error())
+// 			}
+// 			result = append(result, y)
+// 		}
+// 	}
+// 	return result, nil
+// }
 
-func ConvStringToStringArrayUnique(data string) (result []string, err error) {
+func ConvStringToStringArrayUniqueBracket(data string) (result []string, err error) {
 	TmpStringArrayUnique := make(map[string]bool)
-	StringArray, err := ConvStringToStringArray(data)
+	StringArray, err := ConvStringToStringArrayBracket(data)
 	if err != nil {
 
 		return nil, err
