@@ -22,10 +22,12 @@ export function useModal(initialState = false) {
 
   const openModal = () => {
     setIsModalOpen(true);
+    document.body.style.overflow = 'hidden';
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
+    document.body.style.overflow = 'auto';
   };
 
   return { isModalOpen, openModal, closeModal };
@@ -171,4 +173,21 @@ export function DeleteModal({
       </div>
     </div>
   );
+}
+
+export function EmptyWarning({ message, type }) {
+  const toastType = type === 'error' ? toast.error : toast.success;
+
+  toastType(message, {
+    position: 'top-right',
+    autoClose: 3000,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: 'colored',
+  });
+
+  return null;
 }

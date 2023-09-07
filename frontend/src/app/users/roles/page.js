@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { CoreAPIGET, CoreAPI } from '../../../dep/core/coreHandler';
 import AddRole from './AddRole';
 import { DeleteModal, alertDelete } from '@/components/Feature';
-import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
+import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
 
-function RoleTable(handleItemsPerPageChange) {
+function RoleTable() {
   const router = useRouter();
   const [listRoles, setListRoles] = useState([]);
   const [roleNames, setRoleNames] = useState({});
@@ -17,17 +17,15 @@ function RoleTable(handleItemsPerPageChange) {
   const [deleteMessage, setDeleteMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-
-  const {
-    totalPages,
-    currentPageData,
-  } = CalcPagiData(data, currentPage, itemsPerPage);
+  const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
 
   const fetchListRoles = async () => {
     try {
-      const response = await CoreAPIGET('listrole');
+      const response = await CoreAPIGET(`listrole?page=${currentPage}&num=${itemsPerPage}`);
       const jsonData = response.body.Data;
+      const pageInfo = response.body.Info;
       setListRoles(jsonData);
+      setPageInfo(pageInfo);
       setError(null);
     } catch (error) {
       setError(error.message);
@@ -77,7 +75,7 @@ function RoleTable(handleItemsPerPageChange) {
 
   useEffect(() => {
     fetchListRoles();
-  }, [router.pathname]);
+  }, [router.pathname, itemsPerPage, currentPage]);
 
   useEffect(() => {
     if (listRoles.length > 0) {
@@ -88,7 +86,9 @@ function RoleTable(handleItemsPerPageChange) {
   const handleNavigate = (RoleID) => {
     router.push(`/users/roles/${RoleID}`);
   };
-
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
   return (
     <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
       <div className="max-w-md ml-14 p-4 mt-9">
@@ -97,13 +97,6 @@ function RoleTable(handleItemsPerPageChange) {
           <div className="my-2">
             <AddRole fetchData={fetchListRoles} />
           </div>
-          <ItmsPerPageComp
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={(newItemsPerPage) => {
-              setItemsPerPage(newItemsPerPage);
-              setCurrentPage(1);
-            }}
-          />
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -114,7 +107,7 @@ function RoleTable(handleItemsPerPageChange) {
               </tr>
             </thead>
             <tbody>
-              {currentPageData.map((role) => (
+              {listRoles.map((role) => (
                 <tr key={role.RoleID} className="border-b">
                   <td className="px-4 py-2">{role.RoleID}</td>
                   <td className="px-4 py-2">{role.RoleName}</td>
@@ -147,11 +140,19 @@ function RoleTable(handleItemsPerPageChange) {
             </tbody>
           </table>
         </div>
-        <PagiCtrl
+        <PaginationComp
           currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
+          totalPages={pageInfo.TotalPage}
+          totalRow={pageInfo.TotalRow}
+          itemsPerPage={itemsPerPage}
+          handlePageChange={handlePageChange}
+          upperLimit={pageInfo.UpperLimit}
+          lowerLimit={pageInfo.LowerLimit}
+        />
+        <ItmsPerPageComp
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+          setCurrentPage={setCurrentPage}
         />
         <DeleteModal
           isOpen={isDeleteModalOpen}

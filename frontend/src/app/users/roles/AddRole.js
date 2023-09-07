@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { CoreAPI } from '../../../dep/core/coreHandler';
 import {
-  useOutsideClick, useModal, alertAdd,
+  useOutsideClick, useModal, alertAdd, EmptyWarning,
 } from '@/components/Feature';
+import { RequiredFieldIndicator, FieldNumOnly } from '@/components/FormComponent';
 
-function AddRole({ fetchListRoles }) {
+function AddRole({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const ref = useRef(null);
   const [formData, setFormData] = useState({
@@ -17,34 +18,51 @@ function AddRole({ fetchListRoles }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    let parsedValue = value; // Initialize parsedValue with the original value
-
-    // Convert to integer if the input field name suggests it
+    let parsedValue = value;
+    let { roleParentIDIsValid } = formData;
     if (name === 'RoleParentID') {
-      parsedValue = parseInt(value, 10);
+      if (value.trim() === '') {
+        parsedValue = '';
+      } else if (isNaN(value)) {
+        roleParentIDIsValid = false;
+      } else {
+        parsedValue = parseInt(value, 10);
+        roleParentIDIsValid = true;
+      }
     }
 
     setFormData((prevData) => ({
       ...prevData,
       [name]: parsedValue,
+      roleParentIDIsValid,
     }));
+  };
+  const handleCancel = () => {
+    setFormData({
+      RoleName: '',
+      RoleParentID: 1,
+      RoleDescription: '',
+    });
+    closeModal();
   };
 
   const handleSave = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
-    try {
-      // Make the API call to save the data
-      console.log(formData);
-      const response = await CoreAPI('POST', 'role', formData);
-      alertAdd(response);
-      fetchListRoles(); // Assuming fetchData is a function that fetches data again
-      closeModal();
-    } catch (error) {
-      console.log('Error occurred:', error);
-      // Handle error, show a message, etc.
+    e.preventDefault();
+    if (!formData.RoleName || !formData.roleParentIDIsValid) {
+      EmptyWarning({
+        type: 'error',
+        message: 'Required fields cannot be empty',
+      });
+      return;
     }
 
-    // Close the modal
+    try {
+      const response = await CoreAPI('POST', 'role', formData);
+      alertAdd(response);
+      fetchData();
+    } catch (error) {
+      console.log('Error occurred:', error);
+    }
     closeModal();
   };
 
@@ -71,7 +89,7 @@ function AddRole({ fetchListRoles }) {
         }`}
 
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-40" ref={ref}>
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={closeModal}
@@ -93,7 +111,11 @@ function AddRole({ fetchListRoles }) {
           <h2 className="text-2xl font-semibold mb-4">Add Roles</h2>
           <form onSubmit={handleSave}>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">RoleName</label>
+              <label className="block font-semibold mb-1">
+                Role Name
+                {' '}
+                <RequiredFieldIndicator />
+              </label>
               <input
                 type="text"
                 name="RoleName"
@@ -102,32 +124,54 @@ function AddRole({ fetchListRoles }) {
                 className="border px-2 py-1 w-full"
               />
             </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">RoleParentID</label>
+            <div className="mb-6">
+              <label className="block font-semibold mb-1">
+                Role Parent ID
+                {' '}
+                <RequiredFieldIndicator />
+              </label>
               <input
                 type="text"
                 name="RoleParentID"
                 value={formData.RoleParentID}
                 onChange={handleInputChange}
-                className="border px-2 py-1 w-full"
+                className={`border px-2 py-1 w-full rounded${
+                  formData.roleParentIDIsValid === false ? ' border-red-500' : ''
+                }`}
               />
+              {formData.roleParentIDIsValid === false && (
+                <FieldNumOnly />
+              )}
             </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">RoleDescription</label>
-              <input
-                type="text"
+            <div className="mb-6">
+              <label className="block font-semibold mb-1">
+                Description
+              </label>
+              <textarea
                 name="RoleDescription"
                 value={formData.RoleDescription}
                 onChange={handleInputChange}
-                className="border px-2 py-1 w-full"
+                className="border px-2 py-1 w-full rounded resize-none"
               />
             </div>
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Save
-            </button>
+            <div className="place-content-end mt-10 flex">
+              <button
+                type="button"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className={`bg-blue-500 text-white px-4 py-2 rounded ${
+                  formData.roleParentIDIsValid === false ? 'bg-gray-300 cursor-not-allowed' : 'hover:bg-blue-600'
+                }`}
+                disabled={formData.roleParentIDIsValid === false}
+              >
+                Save
+              </button>
+            </div>
           </form>
         </div>
       </div>

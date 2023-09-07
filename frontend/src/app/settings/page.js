@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-
 import { useRouter } from 'next/navigation';
+
 import { CoreAPI, CoreAPIGET } from '../../dep/core/coreHandler';
 import AddTheme from './AddTheme';
 import ShowLogo from '../../components/ShowLogo';
 import LogoUpload from './LogoUpload';
+import TimezoneDropdown from '@/components/TimezoneDropdown';
 
 function SystemSetting() {
   const router = useRouter();
@@ -19,11 +20,15 @@ function SystemSetting() {
     secondary: '',
   });
 
+  // Initialize the timezone with the data from the server
+  const [initialTimezone, setInitialTimezone] = useState('');
+
   const fetchData = async () => {
     try {
       const response = await CoreAPIGET('setting');
       const jsonData = response.body.Data;
       setData(jsonData);
+      setInitialTimezone(jsonData.TimeZone); // Set the initial timezone from the server
       setError(null);
     } catch (error) {
       setError(error.message);
@@ -71,13 +76,12 @@ function SystemSetting() {
       }
     }
   }, [data.AppthemeID, themeOptions]);
-
-  // useEffect for logging selected theme colors
-  useEffect(() => {
-    // Log the selected theme colors whenever it changes
-    console.log('Selected Theme Colors:', selectedThemeColors);
-  }, [selectedThemeColors]);
-
+  const handleTimezoneChange = (timezone) => {
+    setData((prevData) => ({
+      ...prevData,
+      TimeZone: timezone,
+    }));
+  };
   const handleUpdate = async (e) => {
     e.preventDefault(); // Prevent default form submission
     try {
@@ -91,7 +95,7 @@ function SystemSetting() {
         CompanyName: data.CompanyName,
         CompanyLogo: data.CompanyLogo,
         CompanyAddress: data.CompanyAddress,
-        TimeZone: data.TimeZone,
+        TimeZone: data.TimeZone, // Use the locally managed TimeZone
         AppthemeID: selectedThemeId, // Use the integer value
       };
 
@@ -113,7 +117,6 @@ function SystemSetting() {
   // Custom styled dropdown
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
-  // Close the dropdown when a click occurs outside of the dropdown area
   useEffect(() => {
     const handleClickOutsideDropdown = (event) => {
       if (isDropdownOpen && !event.target.closest('.theme-dropdown')) {
@@ -127,24 +130,22 @@ function SystemSetting() {
     };
   }, [isDropdownOpen]);
 
-  // Toggle the dropdown when the button is clicked
   const toggleDropdown = () => {
     setDropdownOpen((prevState) => !prevState);
   };
-  // Handle theme selection from the dropdown
+
   const handleThemeSelection = (theme) => {
     setSelectedTheme(theme.AppthemeID);
 
-    // Parse the primary and secondary colors from the selected theme
     const colors = JSON.parse(theme.AppthemeValue);
     setSelectedThemeColors({
       primary: colors.primary_color || '',
       secondary: colors.secondary_color || '',
     });
   };
-  // Define a callback function to handle the uploaded data
+
   const handleLogoUpload = (base64String) => {
-    // Update the data state with the uploaded logo
+    console.log('Handling logo upload in SystemSetting:', base64String);
     setData({ ...data, CompanyLogo: base64String });
   };
 
@@ -152,7 +153,7 @@ function SystemSetting() {
     <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
       <div className="max-w-md ml-14 p-4 mt-9">
         <div className="max-w-3xl mx-auto p-4">
-          <form onSubmit={handleUpdate}>
+          <form>
             <div className="mb-4">
               <label className="block font-semibold mb-1">CompanyName</label>
               <input
@@ -162,22 +163,14 @@ function SystemSetting() {
                 onChange={(e) => setData({ ...data, CompanyName: e.target.value })}
               />
             </div>
-            <div className="mb-4">
-              <ShowLogo maxWidth="100px" maxHeight="100px" />
-            </div>
-            <LogoUpload onUpload={handleLogoUpload} />
             {/* <div className="mb-4">
-                <label className="block font-semibold mb-1">CompanyLogo</label>
-                <input
-                  type="text"
-                  value={data.CompanyLogo || ""}
-                  className="border px-2 py-1 w-full"
-                  onChange={(e) =>
-                    setData({ ...data, CompanyLogo: e.target.value })
-                  }
-                />
-              </div> */}
+              <ShowLogo maxWidth="100px" maxHeight="100px" />
+            </div> */}
 
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">CompanyLogo</label>
+              <LogoUpload onUpload={handleLogoUpload} />
+            </div>
             <div className="mb-4">
               <label className="block font-semibold mb-1">
                 CompanyAddress
@@ -190,12 +183,10 @@ function SystemSetting() {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">TimeZone</label>
-              <input
-                type="text"
-                value={data.TimeZone || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, TimeZone: e.target.value })}
+              <label className="block font-semibold">Timezone</label>
+              <TimezoneDropdown
+                selectedTimezone={data.TimeZone || initialTimezone}
+                onTimezoneChange={handleTimezoneChange}
               />
             </div>
             <div className="mb-4">
@@ -204,13 +195,14 @@ function SystemSetting() {
                 <button
                   type="button"
                   onClick={toggleDropdown}
-                  className="border px-2 py-1 w-full text-left"
+                  className="border bg-white px-3 py-2 w-full text-left rounded"
                 >
+
                   {themeOptions.length > 0
-                      && themeOptions.find((theme) => theme.AppthemeID === selectedTheme)?.AppthemeName}
+                      && themeOptions.find((theme) => theme.AppthemeID === selectedTheme)?.AppthemeName || 'Select a theme'}
                 </button>
                 {isDropdownOpen && (
-                <ul className="theme-dropdown absolute mt-1 bg-white border rounded">
+                <ul className="absolute top-full left-0 w-full z-20 bg-white border rounded shadow mt-2 max-h-40 overflow-y-auto">
                   {themeOptions.map((theme) => (
                     <li
                       key={theme.AppthemeID}
@@ -231,6 +223,19 @@ function SystemSetting() {
                   ))}
                 </ul>
                 )}
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg
+                    className="fill-current h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
 
@@ -251,7 +256,7 @@ function SystemSetting() {
             </div>
             )}
             {selectedThemeColors.secondary && (
-            <div>
+            <div className="mb-4">
               <span>Secondary Color: </span>
               <span
                 style={{
@@ -267,12 +272,15 @@ function SystemSetting() {
             )}
 
             <button
-              type="submit"
+              type="button"
               className="bg-blue-500 text-white px-4 py-2 rounded"
+              onClick={handleUpdate}
             >
               Update
             </button>
           </form>
+
+          <div className="mb-4" />
           <AddTheme fetchThemes={fetchThemes} />
         </div>
       </div>

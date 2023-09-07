@@ -6,7 +6,7 @@ import { KmsAPIGET, KmsAPI } from '@/dep/kms/kmsHandler';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 import AddPermission from './AddPermission';
 import { DeleteModal, alertDelete } from '@/components/Feature';
-import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
+import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
 
 function PerTable(handleItemsPerPageChange) {
   const router = useRouter();
@@ -19,17 +19,15 @@ function PerTable(handleItemsPerPageChange) {
   const [deleteMessage, setDeleteMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-
-  const {
-    totalPages,
-    currentPageData,
-  } = CalcPagiData(data, currentPage, itemsPerPage);
+  const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
 
   const fetchData = async () => {
     try {
-      const response = await KmsAPIGET('listpermission');
+      const response = await KmsAPIGET(`listpermission?page=${currentPage}&num=${itemsPerPage}`);
       const jsonData = response.body.Data;
+      const pageInfo = response.body.Info;
       setData(jsonData);
+      setPageInfo(pageInfo);
       setError(null);
     } catch (error) {
       setError(error.message);
@@ -86,7 +84,7 @@ function PerTable(handleItemsPerPageChange) {
       setData(updatedData);
       alertDelete(responseDel);
       setIsDeleteModalOpen(false);
-      setDeletingCategoryID(null);
+      setDeletingPermissionID(null);
     } catch (error) {
       console.error('Error deleting permission:', error);
     }
@@ -96,9 +94,10 @@ function PerTable(handleItemsPerPageChange) {
     setIsDeleteModalOpen(false);
     setDeletingPermissionID(null);
   };
+
   useEffect(() => {
     fetchData();
-  }, [router.pathname]);
+  }, [router.pathname, itemsPerPage, currentPage]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -123,6 +122,10 @@ function PerTable(handleItemsPerPageChange) {
     router.push(`/documents/permission/${PermissionID}`);
   };
 
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
       {/* buat s.admin */}
@@ -132,13 +135,7 @@ function PerTable(handleItemsPerPageChange) {
           <div className="my-2">
             <AddPermission fetchData={fetchData} />
           </div>
-          <ItmsPerPageComp
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={(newItemsPerPage) => {
-              setItemsPerPage(newItemsPerPage);
-              setCurrentPage(1);
-            }}
-          />
+
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -155,7 +152,7 @@ function PerTable(handleItemsPerPageChange) {
               </tr>
             </thead>
             <tbody>
-              {currentPageData.map((permission) => (
+              {data.map((permission) => (
                 <tr key={permission.PermissionID}>
                   <td className="px-4 py-2">{permission.PermissionID}</td>
                   <td className="px-4 py-2">{catNames[permission.CategoryID] || '-'}</td>
@@ -191,11 +188,20 @@ function PerTable(handleItemsPerPageChange) {
             </tbody>
           </table>
         </div>
-        <PagiCtrl
+        <PaginationComp
           currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
+          totalPages={pageInfo.TotalPage}
+          totalRow={pageInfo.TotalRow}
+          itemsPerPage={itemsPerPage}
+          handlePageChange={handlePageChange}
+          upperLimit={pageInfo.UpperLimit}
+          lowerLimit={pageInfo.LowerLimit}
+        />
+
+        <ItmsPerPageComp
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+          setCurrentPage={setCurrentPage}
         />
         <DeleteModal
           isOpen={isDeleteModalOpen}

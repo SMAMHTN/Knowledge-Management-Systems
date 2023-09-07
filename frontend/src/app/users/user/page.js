@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { CoreAPIGET, CoreAPI } from '../../../dep/core/coreHandler';
 import AddUser from './AddUser';
 import { DeleteModal, alertDelete } from '@/components/Feature';
-import { CalcPagiData, PagiCtrl, ItmsPerPageComp } from '@/components/PaginationControls';
+import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
 
-function UserTable(handleItemsPerPageChange) {
+function UserTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [roleNames, setRoleNames] = useState({});
@@ -17,17 +17,15 @@ function UserTable(handleItemsPerPageChange) {
   const [deleteMessage, setDeleteMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-
-  const {
-    totalPages,
-    currentPageData,
-  } = CalcPagiData(data, currentPage, itemsPerPage);
+  const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
 
   const fetchData = async () => {
     try {
-      const response = await CoreAPIGET('listuser');
+      const response = await CoreAPIGET(`listuser?page=${currentPage}&num=${itemsPerPage}`);
       const jsonData = response.body.Data;
+      const pageInfo = response.body.Info;
       setData(jsonData);
+      setPageInfo(pageInfo);
       setError(null);
     } catch (error) {
       setError(error.message);
@@ -64,7 +62,7 @@ function UserTable(handleItemsPerPageChange) {
       setData(updatedData);
       alertDelete(responseDel);
       setIsDeleteModalOpen(false);
-      setDeletingCategoryID(null);
+      setDeletingUserID(null);
     } catch (error) {
       console.error('Error deleting category:', error);
     }
@@ -74,9 +72,10 @@ function UserTable(handleItemsPerPageChange) {
     setIsDeleteModalOpen(false);
     setDeletingUserID(null);
   };
+
   useEffect(() => {
     fetchData();
-  }, [router.pathname]);
+  }, [router.pathname, itemsPerPage, currentPage]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -90,11 +89,15 @@ function UserTable(handleItemsPerPageChange) {
     }
     return text;
   };
+
   const handleNavigate = (userID) => {
     // Programmatically navigate to a different route
     router.push(`/users/user/${userID}`);
   };
 
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
   return (
     <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
       {/* buat s.admin */}
@@ -104,13 +107,7 @@ function UserTable(handleItemsPerPageChange) {
           <div className="my-2">
             <AddUser fetchData={fetchData} />
           </div>
-          <ItmsPerPageComp
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={(newItemsPerPage) => {
-              setItemsPerPage(newItemsPerPage);
-              setCurrentPage(1);
-            }}
-          />
+
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -124,8 +121,8 @@ function UserTable(handleItemsPerPageChange) {
               </tr>
             </thead>
             <tbody>
-              {currentPageData ? (
-                currentPageData.map((user) => (
+              {data ? (
+                data.map((user) => (
                   <tr key={user.UserID}>
                     <td className="px-4 py-2">{user.UserID}</td>
                     <td className="px-4 py-2">{user.Username}</td>
@@ -171,11 +168,19 @@ function UserTable(handleItemsPerPageChange) {
             </tbody>
           </table>
         </div>
-        <PagiCtrl
+        <PaginationComp
           currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
+          totalPages={pageInfo.TotalPage}
+          totalRow={pageInfo.TotalRow}
+          itemsPerPage={itemsPerPage}
+          handlePageChange={handlePageChange}
+          upperLimit={pageInfo.UpperLimit}
+          lowerLimit={pageInfo.LowerLimit}
+        />
+        <ItmsPerPageComp
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+          setCurrentPage={setCurrentPage}
         />
         <DeleteModal
           isOpen={isDeleteModalOpen}

@@ -14,7 +14,7 @@ function AddArticle({ fetchData }) {
     Tag: '[Game,Kuliah,Suffering]',
     Title: 'Kesalahan a',
     CategoryID: 1,
-    Article: 'Gua Menyesal apa',
+    Article: 'Normandy battle',
     FileID: '[]',
     DocID: '[]',
     IsActive: 1,
@@ -43,6 +43,21 @@ function AddArticle({ fetchData }) {
       ...prevData,
       [name]: parsedValue,
     }));
+  };
+  const handleCancel = () => {
+    setFormData({
+      OwnerID: 7,
+      LastEditedByID: 7,
+      LastEditedTime: '2023-03-24T13:47:51Z',
+      Tag: '[Game,Kuliah,Suffering]',
+      Title: 'Kesalahan a',
+      CategoryID: 1,
+      Article: 'Normandy battle',
+      FileID: '[]',
+      DocID: '[]',
+      IsActive: 1,
+    });
+    closeModal();
   };
 
   const handleSave = async (e) => {
@@ -210,13 +225,22 @@ function AddArticle({ fetchData }) {
                 IsActive
               </label>
             </div>
+            <div className="place-content-end mt-10 flex">
+              <button
+                type="button"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Save
+              </button>
+            </div>
 
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Save
-            </button>
           </form>
         </div>
       </div>
