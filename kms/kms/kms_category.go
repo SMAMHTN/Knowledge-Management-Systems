@@ -203,6 +203,7 @@ func DeleteCategory(c echo.Context) error {
 	}
 	if u.CategoryID == 1 || u.CategoryID == 2 {
 		res.StatusCode = http.StatusBadRequest
+		res.Data = "You Cannot Delete this Role because this role constrain used by system"
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {

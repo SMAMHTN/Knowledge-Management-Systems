@@ -167,7 +167,7 @@ func DeleteRole(c echo.Context) error {
 	}
 	if u.RoleID == 1 || u.RoleID == 2 {
 		res.StatusCode = http.StatusBadRequest
-		res.Data = "You Cannot Delete "
+		res.Data = "You Cannot Delete this Role because this role constrain used by system"
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {

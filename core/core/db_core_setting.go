@@ -19,18 +19,16 @@ type Setting struct {
 
 func GetTime() time.Time {
 	var TimeZone string
-	database, _ := dependency.Db_Connect(Conf, DatabaseName)
 
-	database.QueryRow("SELECT TimeZone FROM core_setting WHERE CompanyID = 1").Scan(&TimeZone)
+	Database.QueryRow("SELECT TimeZone FROM core_setting WHERE CompanyID = 1").Scan(&TimeZone)
 	Timenow, _ := dependency.GetTime(TimeZone)
 	return Timenow
 }
 
 func GetTimeZone() string {
 	var TimeZone string
-	database, _ := dependency.Db_Connect(Conf, DatabaseName)
 
-	database.QueryRow("SELECT TimeZone FROM core_setting WHERE CompanyID = 1").Scan(&TimeZone)
+	Database.QueryRow("SELECT TimeZone FROM core_setting WHERE CompanyID = 1").Scan(&TimeZone)
 	return TimeZone
 }
 
