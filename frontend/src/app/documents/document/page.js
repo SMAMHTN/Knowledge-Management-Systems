@@ -2,11 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { KmsAPIGET } from '@/dep/kms/kmsHandler';
-import {
-  CalcPagiData, PagiCtrl, ItmsPerPageComp, usePagination,
-} from '@/components/PaginationControls';
+import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
 
-function DocTable(handleItemsPerPageChange) {
+function DocTable() {
   const [datadoc, setDatadoc] = useState([]);
   const [datafile, setDatafile] = useState([]);
   const [docCategoryNames, setDocCategoryNames] = useState({});

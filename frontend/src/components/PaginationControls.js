@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
-export function ItmsPerPageComp({ itemsPerPage, setItemsPerPage }) {
+export function ItmsPerPageComp({ itemsPerPage, setCurrentPage, setItemsPerPage }) {
   const options = [5, 20, 100, 500];
 
   const handleItemsPerPageChange = (newItemsPerPage) => {
-    console.log('Items per page changing:', newItemsPerPage);
+    setCurrentPage(1);
     setItemsPerPage(newItemsPerPage);
   };
 
@@ -31,7 +31,7 @@ export function ItmsPerPageComp({ itemsPerPage, setItemsPerPage }) {
 }
 
 export function PaginationComp({
-  currentPage, totalPages, handlePageChange, upperLimit, lowerLimit,
+  currentPage, totalRow, totalPages, handlePageChange, upperLimit, lowerLimit,
 }) {
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages;
@@ -58,7 +58,7 @@ export function PaginationComp({
         {' '}
         of
         {' '}
-        {totalPages}
+        {totalRow}
       </span>
       <button
         onClick={() => {

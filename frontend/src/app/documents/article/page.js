@@ -198,15 +198,16 @@ function DocTable(handleItemsPerPageChange) {
         <PaginationComp
           currentPage={currentPage}
           totalPages={pageInfo.TotalPage}
+          totalRow={pageInfo.TotalRow}
           itemsPerPage={itemsPerPage}
           handlePageChange={handlePageChange}
           upperLimit={pageInfo.UpperLimit}
           lowerLimit={pageInfo.LowerLimit}
         />
-
         <ItmsPerPageComp
           itemsPerPage={itemsPerPage}
           setItemsPerPage={setItemsPerPage}
+          setCurrentPage={setCurrentPage}
         />
         <DeleteModal
           isOpen={isDeleteModalOpen}

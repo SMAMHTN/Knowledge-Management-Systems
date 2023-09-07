@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { KmsAPI } from '../../../dep/kms/kmsHandler';
 import {
-  useOutsideClick, useModal, alertAdd,
+  useOutsideClick, useModal, alertAdd, EmptyWarning,
 } from '@/components/Feature';
+import { RequiredFieldIndicator, FieldNumOnly } from '@/components/FormComponent';
 
 function AddPermission({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
@@ -14,11 +15,35 @@ function AddPermission({ fetchData }) {
     Read: 0,
     Update: 0,
     Delete: 0,
-    FileType: '[]',
-    DocType: '[]',
+    FileType: '',
+    DocType: '',
   });
-
   useOutsideClick(ref, closeModal);
+  const [roleIDIsValid, setRoleIDIsValid] = useState(true);
+  const [categoryIDIsValid, setcategoryIDIsValid] = useState(true);
+
+  const validateAndSetValidity = (fieldName, value) => {
+    let isValid;
+
+    if (value.trim() === '') {
+      isValid = true;
+    } else if (!isNaN(value)) {
+      isValid = true;
+    } else {
+      isValid = false;
+    }
+
+    switch (fieldName) {
+      case 'RoleID':
+        setRoleIDIsValid(isValid);
+        break;
+      case 'CategoryID':
+        setcategoryIDIsValid(isValid);
+        break;
+      default:
+        break;
+    }
+  };
 
   const handleInputChange = (e) => {
     const {
@@ -26,39 +51,75 @@ function AddPermission({ fetchData }) {
     } = e.target;
     let parsedValue;
 
-    // Handle checkbox input
     if (type === 'checkbox') {
       parsedValue = checked ? 1 : 0;
-    } else if (name === 'DocType' || name === 'FileType') {
-      parsedValue = value === '' ? '[]' : `[${value}]`;
-    } else if (name === 'CategoryID' || name === 'RoleID') {
-      parsedValue = value === '' ? 0 : parseInt(value, 10);
+    } else if (
+      name === 'CategoryID'
+      || name === 'RoleID'
+    ) {
+      validateAndSetValidity(name, value);
+      if (value.trim() === '') {
+        parsedValue = '';
+      } else {
+        parsedValue = !isNaN(value) ? parseInt(value, 10) : value;
+      }
     } else {
       parsedValue = value === '' ? 0 : value;
     }
-
+    console.log(`name: ${name}, value: ${value}, parsedValue: ${parsedValue}`);
     setFormData((prevData) => ({
       ...prevData,
       [name]: parsedValue,
     }));
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
-    console.log(formData);
-    try {
-      // Make the API call to save the data
-      const response = await KmsAPI('POST', 'permission', formData);
+  const handleCancel = () => {
+    setFormData({
+      CategoryID: '',
+      RoleID: '',
+      Create: 0,
+      Read: 0,
+      Update: 0,
+      Delete: 0,
+      FileType: '',
+      DocType: '',
+    });
+    closeModal();
+  };
+  function splitStringToArray(inputString) {
+    if (typeof inputString === 'string') {
+      return inputString.split(',');
+    }
+    // Handle the case where inputString is not a string
+    return []; // or any other default value as needed
+  }
 
+  const handleSave = async (e) => {
+    e.preventDefault();
+
+    if (!formData.CategoryID || !formData.RoleID) {
+      EmptyWarning({
+        type: 'error',
+        message: 'Required fields cannot be empty',
+      });
+      return;
+    }
+
+    formData.DocType = splitStringToArray(formData.DocType);
+    formData.FileType = splitStringToArray(formData.FileType);
+    console.log(formData.FileType);
+    console.log(formData.DocType);
+    try {
+      const response = await KmsAPI('POST', 'permission', formData);
+      console.log(formData);
       alertAdd(response);
 
-      fetchData(); // Assuming fetchData is a function that fetches data again
+      fetchData();
     } catch (error) {
       console.log('Error occurred:', error);
       // Handle error, show a message, etc.
     }
 
-    // Close the modal
     closeModal();
   };
 
@@ -85,7 +146,7 @@ function AddPermission({ fetchData }) {
         }`}
 
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-40" ref={ref}>
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={closeModal}
@@ -107,7 +168,11 @@ function AddPermission({ fetchData }) {
           <h2 className="text-2xl font-semibold mb-4">Add Permission</h2>
           <form onSubmit={handleSave}>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">CategoryID</label>
+              <label className="block font-semibold mb-1">
+                CategoryID
+                {' '}
+                <RequiredFieldIndicator />
+              </label>
               <input
                 type="text"
                 name="CategoryID"
@@ -115,9 +180,16 @@ function AddPermission({ fetchData }) {
                 onChange={handleInputChange}
                 className="border px-2 py-1 w-full"
               />
+              {!categoryIDIsValid && (
+              <FieldNumOnly />
+              )}
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">RoleID</label>
+              <label className="block font-semibold mb-1">
+                RoleID
+                {' '}
+                <RequiredFieldIndicator />
+              </label>
               <input
                 type="text"
                 name="RoleID"
@@ -125,6 +197,9 @@ function AddPermission({ fetchData }) {
                 onChange={handleInputChange}
                 className="border px-2 py-1 w-full"
               />
+              {!roleIDIsValid && (
+                <FieldNumOnly />
+              )}
             </div>
 
             <div>
@@ -195,12 +270,21 @@ function AddPermission({ fetchData }) {
                 className="border px-2 py-1 w-full"
               />
             </div>
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Save
-            </button>
+            <div className="place-content-end mt-10 flex">
+              <button
+                type="button"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Save
+              </button>
+            </div>
           </form>
         </div>
       </div>
@@ -209,125 +293,3 @@ function AddPermission({ fetchData }) {
 }
 
 export default AddPermission;
-
-// "use client";
-// import React, { useState } from "react";
-// import { useState, useEffect } from "react";
-// import { useRouter } from "next/navigation";
-// import { KmsAPI } from "@/dep/kms/kmsHandler";
-
-// function AddProduct() {
-//   const [formData, setFormData] = useState({
-//     CategoryName: "",
-//     CategoryParentID: "",
-//     CategoryDescription: "",
-//   });
-//   const [modal, setModal] = useState(false);
-//   const [isMutating, setIsMutating] = useState(false);
-
-//   const router = useRouter();
-
-//   function handleSubmit(e) {
-//     e.preventDefault();
-
-//     setIsMutating(true);
-
-// // Use useEffect to fetch data
-// useEffect(() => {
-//   const fetchData = async () => {
-//     try {
-//       await KmsAPI("POST", "category", data);
-//       setIsMutating(false);
-//       router.refresh();
-//       setModal(false);
-//     } catch (error) {
-//       console.log("Error occurred:", error);
-//       setIsMutating(false);
-//       // Handle error, show a message, etc.
-//     }
-//   };
-
-//   fetchData();
-// }, [data, router]); // Add data and router as dependencies for useEffect
-//   }
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prevData) => ({
-//       ...prevData,
-//       [name]: value,
-//     }));
-//   };
-
-//   function handleChange() {
-//     setModal(!modal);
-//   }
-
-//   return (
-//     <div>
-//       <button  onClick={handleChange} className="bg-blue-500 text-white rounded px-2 py-1">
-//         Add New +
-//       </button>
-//       <input
-//         type="checkbox"
-//         checked={modal}
-//         onChange={handleChange}
-//         className="modal-toggle"
-//       />
-
-//       <div className="modal">
-//         <div className="modal-box">
-//           <h3 className="font-bold text-lg">Add New Product</h3>
-//           <form onSubmit={handleSubmit}>
-//             <div className="form-control">
-//               <label className="label font-bold">CategoryName</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryName}
-//           onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Product Name"
-//               />
-//             </div>
-//             <div className="form-control">
-//               <label className="label font-bold">Price</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryParentID}
-//           onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Price"
-//               />
-//             </div>
-//             <div className="form-control">
-//               <label className="label font-bold">Price</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryDescription}
-//                 onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Price"
-//               />
-//             </div>
-//             <div className="modal-action">
-//               <button type="button" className="btn" onClick={handleChange}>
-//                 Close
-//               </button>
-//               {!isMutating ? (
-//                 <button type="submit" className="btn btn-primary">
-//                   Save
-//                 </button>
-//               ) : (
-//                 <button type="button" className="btn loading">
-//                   Saving...
-//                 </button>
-//               )}
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default AddProduct;

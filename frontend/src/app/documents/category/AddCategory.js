@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react';
 import { KmsAPI } from '../../../dep/kms/kmsHandler';
 import {
-  useOutsideClick, useModal, alertAdd,
+  useOutsideClick, useModal, alertAdd, EmptyWarning,
 } from '@/components/Feature';
+import { RequiredFieldIndicator, FieldNumOnly } from '@/components/FormComponent';
 
 function AddCategory({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
@@ -17,28 +18,57 @@ function AddCategory({ fetchData }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    let parsedValue = value; // Initialize parsedValue with the original value
-
-    // Convert to integer if the input field name suggests it
+    let parsedValue = value;
+    let { categoryParentIDIsValid } = formData;
     if (name === 'CategoryParentID') {
-      parsedValue = parseInt(value, 10);
+      if (value.trim() === '') {
+        parsedValue = '';
+      } else if (isNaN(value)) {
+        categoryParentIDIsValid = false;
+      } else {
+        parsedValue = parseInt(value, 10);
+        categoryParentIDIsValid = true;
+      }
     }
+
+    console.log('Updated Data:', {
+      ...formData,
+      [name]: parsedValue,
+      categoryParentIDIsValid,
+    });
 
     setFormData((prevData) => ({
       ...prevData,
       [name]: parsedValue,
+      categoryParentIDIsValid,
     }));
   };
 
+  const handleCancel = () => {
+    setFormData({
+      CategoryName: '',
+      CategoryParentID: '',
+      CategoryDescription: '',
+    });
+    closeModal();
+  };
+
   const handleSave = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
+    e.preventDefault();
+
+    if (!formData.CategoryName.trim() || !formData.categoryParentIDIsValid) {
+      EmptyWarning({
+        type: 'error',
+        message: 'Required fields cannot be empty',
+      });
+      return;
+    }
 
     try {
       // Make the API call to save the data
       const response = await KmsAPI('POST', 'category', formData);
       alertAdd(response);
-      fetchData(); // Assuming fetchData is a function that fetches data again
-      closeModal();
+      fetchData();
     } catch (error) {
       console.log('Error occurred:', error);
       // Handle error, show a message, etc.
@@ -71,10 +101,12 @@ function AddCategory({ fetchData }) {
         }`}
 
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-40" ref={ref}>
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-            onClick={closeModal}
+            onClick={() => {
+              handleCancel();
+            }}
           >
             <svg
               className="w-6 h-6"
@@ -90,48 +122,73 @@ function AddCategory({ fetchData }) {
               />
             </svg>
           </button>
-          <h2 className="text-2xl font-semibold mb-4">Add Category</h2>
+          <h2 className="text-2xl font-semibold mb-6">Add Category</h2>
           <form onSubmit={handleSave}>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">CategoryName</label>
+            <div className="mb-6">
+              <label className="block font-semibold mb-1">
+                Category Name
+                <RequiredFieldIndicator />
+              </label>
               <input
                 type="text"
                 name="CategoryName"
                 value={formData.CategoryName}
                 onChange={handleInputChange}
-                className="border px-2 py-1 w-full"
+                className="border px-2 py-1 w-full rounded"
               />
             </div>
-            <div className="mb-4">
+            <div className="mb-6">
               <label className="block font-semibold mb-1">
-                CategoryParentID
+                Category Parent ID
+                {' '}
+                <RequiredFieldIndicator />
               </label>
-              <input
-                type="text"
-                name="CategoryParentID"
-                value={formData.CategoryParentID}
-                onChange={handleInputChange}
-                className="border px-2 py-1 w-full"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  name="CategoryParentID"
+                  value={formData.CategoryParentID}
+                  onChange={handleInputChange}
+                  className={`border px-2 py-1 w-full rounded${
+                    formData.categoryParentIDIsValid === false ? ' border-red-500' : ''
+                  }`}
+                />
+                {formData.categoryParentIDIsValid === false && (
+                <FieldNumOnly />
+                )}
+              </div>
             </div>
-            <div className="mb-4">
+
+            <div className="mb-6">
               <label className="block font-semibold mb-1">
-                CategoryDescription
+                Description
               </label>
-              <input
-                type="text"
+              <textarea
                 name="CategoryDescription"
                 value={formData.CategoryDescription}
                 onChange={handleInputChange}
-                className="border px-2 py-1 w-full"
+                className="border px-2 py-1 w-full rounded resize-none"
               />
             </div>
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Save
-            </button>
+            <div className="place-content-end mt-10 flex">
+              <button
+                type="button"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className={`bg-blue-500 text-white px-4 py-2 rounded ${
+                  formData.categoryParentIDIsValid === false ? 'bg-gray-300 cursor-not-allowed' : 'hover:bg-blue-600'
+                }`}
+                disabled={formData.categoryParentIDIsValid === false}
+              >
+                Save
+              </button>
+
+            </div>
           </form>
         </div>
       </div>

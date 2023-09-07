@@ -85,6 +85,7 @@ function HistoryTable() {
           <PaginationComp
             currentPage={currentPage}
             totalPages={pageInfo.TotalPage}
+            totalRow={pageInfo.TotalRow}
             itemsPerPage={itemsPerPage}
             handlePageChange={handlePageChange}
             upperLimit={pageInfo.UpperLimit}
@@ -94,6 +95,7 @@ function HistoryTable() {
           <ItmsPerPageComp
             itemsPerPage={itemsPerPage}
             setItemsPerPage={setItemsPerPage}
+            setCurrentPage={setCurrentPage}
           />
         </div>
       </div>

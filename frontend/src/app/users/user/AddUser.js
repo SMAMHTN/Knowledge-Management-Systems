@@ -1,27 +1,57 @@
 import React, { useState, useRef } from 'react';
 import { CoreAPI } from '../../../dep/core/coreHandler';
 import {
-  useOutsideClick, useModal, alertAdd,
+  useOutsideClick, useModal, alertAdd, EmptyWarning,
 } from '@/components/Feature';
+import { RequiredFieldIndicator, FieldNumOnly, FieldNEmailOnly } from '@/components/FormComponent';
 
 function AddUser({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const ref = useRef(null);
   const [formData, setFormData] = useState({
-    Username: 'smam',
-    Password: 'smam',
-    Name: 'Aldi Mulyawan',
-    Email: 'aldismartkid@gmail.com',
-    Address: 'Blora',
-    Phone: '081350488901',
-    RoleID: 3,
-    AppthemeID: 1,
-    Note: 'INI PERCOBAAN',
+    Username: '',
+    Password: '',
+    Name: '',
+    Email: '',
+    Address: '',
+    Phone: '',
+    RoleID: '',
+    AppthemeID: '',
+    Note: '',
     IsSuperAdmin: 0,
     IsActive: 1,
   });
-
+  const [emailError, setEmailError] = useState('');
   useOutsideClick(ref, closeModal);
+  const [roleIDIsValid, setRoleIDIsValid] = useState(true);
+  const [appthemeIDIsValid, setAppthemeIDIsValid] = useState(true);
+  const [phoneIsValid, setPhoneIsValid] = useState(true);
+
+  const validateAndSetValidity = (fieldName, value) => {
+    let isValid;
+
+    if (value.trim() === '') {
+      isValid = true;
+    } else if (!isNaN(value)) {
+      isValid = true;
+    } else {
+      isValid = false;
+    }
+
+    switch (fieldName) {
+      case 'AppthemeID':
+        setAppthemeIDIsValid(isValid);
+        break;
+      case 'RoleID':
+        setRoleIDIsValid(isValid);
+        break;
+      case 'Phone':
+        setPhoneIsValid(isValid);
+        break;
+      default:
+        break;
+    }
+  };
 
   const handleInputChange = (e) => {
     const {
@@ -31,39 +61,79 @@ function AddUser({ fetchData }) {
 
     if (type === 'checkbox') {
       parsedValue = checked ? 1 : 0;
-    } else if (name === 'DocType' || name === 'FileType') {
-      parsedValue = value === '' ? '[]' : `[${value}]`;
-    } else if (name === 'CategoryID' || name === 'RoleID' || name === 'AppthemeID') {
-      parsedValue = value.trim() === '' || isNaN(value) ? '' : parseInt(value, 10);
+    } else if (
+      name === 'Phone'
+      || name === 'RoleID'
+      || name === 'AppthemeID'
+    ) {
+      validateAndSetValidity(name, value);
+      if (value.trim() === '') {
+        parsedValue = '';
+      } else {
+        parsedValue = !isNaN(value) ? parseInt(value, 10) : value;
+      }
     } else {
-      parsedValue = value === '' ? 0 : value;
+      parsedValue = value === '' ? '' : value;
     }
 
     setFormData((prevData) => ({
       ...prevData,
       [name]: parsedValue,
+      roleIDIsValid,
+      appthemeIDIsValid,
+      phoneIsValid,
     }));
+  };
+  const handleCancel = () => {
+    setFormData({
+      Username: '',
+      Password: '',
+      Name: '',
+      Email: '',
+      Address: '',
+      Phone: '',
+      RoleID: '',
+      AppthemeID: '',
+      Note: '',
+      IsSuperAdmin: 0,
+      IsActive: 0,
+    });
+    closeModal();
   };
 
   const handleSave = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
+    e.preventDefault();
+    if (!formData.Username || !formData.Password || !formData.Name || !formData.Email || !formData.roleIDIsValid || !formData.appthemeIDIsValid) {
+      EmptyWarning({
+        type: 'error',
+        message: 'Required fields cannot be empty',
+      });
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formData.Email || !emailPattern.test(formData.Email)) {
+      setEmailError('Please insert a valid email');
+      return;
+    }
+
+    setEmailError('');
+
     try {
-      // Make the API call to save the data
+      console.log(formData);
       const response = await CoreAPI('POST', 'user', formData);
       alertAdd(response);
       fetchData();
-      closeModal();
     } catch (error) {
       console.log('Error occurred:', error);
-      // Handle error, show a message, etc.
     }
 
-    // Close the modal
     closeModal();
   };
 
   return (
-    <div>
+    <div className="">
       <button
         onClick={openModal}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -85,7 +155,7 @@ function AddUser({ fetchData }) {
         }`}
 
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-40" ref={ref}>
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh] overflow-y-auto max-h-[80vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={closeModal}
@@ -105,137 +175,176 @@ function AddUser({ fetchData }) {
             </svg>
           </button>
           <h2 className="text-2xl font-semibold mb-4">Add User</h2>
-          <form onSubmit={handleSave}>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="mb-4">
-                  <label className="block font-semibold mb-1">Username</label>
-                  <input
-                    type="text"
-                    name="Username"
-                    value={formData.Username}
-                    onChange={handleInputChange}
-                    className="border px-2 py-1 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block font-semibold mb-1">Password</label>
-                  <input
-                    type="text"
-                    name="Password"
-                    value={formData.Password}
-                    onChange={handleInputChange}
-                    className="border px-2 py-1 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block font-semibold mb-1">Name</label>
-                  <input
-                    type="text"
-                    name="Name"
-                    value={formData.Name}
-                    onChange={handleInputChange}
-                    className="border px-2 py-1 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block font-semibold mb-1">Email</label>
-                  <input
-                    type="text"
-                    name="Email"
-                    value={formData.Email}
-                    onChange={handleInputChange}
-                    className="border px-2 py-1 w-full"
-                  />
-                </div>
-              </div>
-              <div>
-                <div className="mb-4">
-                  <label className="block font-semibold mb-1">Address</label>
-                  <input
-                    type="text"
-                    name="Address"
-                    value={formData.Address}
-                    onChange={handleInputChange}
-                    className="border px-2 py-1 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block font-semibold mb-1">Phone</label>
-                  <input
-                    type="text"
-                    name="Phone"
-                    value={formData.Phone}
-                    onChange={handleInputChange}
-                    className="border px-2 py-1 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block font-semibold mb-1">RoleID</label>
-                  <input
-                    type="text"
-                    name="RoleID"
-                    value={formData.RoleID !== '' ? formData.RoleID : ''}
-                    onChange={handleInputChange}
-                    className="border px-2 py-1 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block font-semibold mb-1">AppthemeID</label>
-                  <input
-                    type="text"
-                    name="AppthemeID"
-                    value={formData.AppthemeID}
-                    onChange={handleInputChange}
-                    className="border px-2 py-1 w-full"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Note</label>
-              <input
-                type="text"
-                name="Note"
-                value={formData.Note}
-                onChange={handleInputChange}
-                className="border px-2 py-1 w-full"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="font-medium">
-                  <input
-                    type="checkbox"
-                    name="IsSuperAdmin"
-                    checked={formData.IsSuperAdmin === 1}
-                    onChange={handleInputChange}
-                    className="mr-2"
-                  />
-                  IsSuperAdmin
+          <div className="">
+            <form onSubmit={handleSave}>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">
+                  Username
+                  {' '}
+                  <RequiredFieldIndicator />
                 </label>
+                <input
+                  type="text"
+                  name="Username"
+                  value={formData.Username}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 w-full"
+                />
               </div>
-              <div>
-                <label className="font-medium">
-                  <input
-                    type="checkbox"
-                    name="IsActive"
-                    checked={formData.IsActive === 1}
-                    onChange={handleInputChange}
-                    className="mr-2"
-                  />
-                  IsActive
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">
+                  Password
+                  {' '}
+                  <RequiredFieldIndicator />
                 </label>
+                <input
+                  type="text"
+                  name="Password"
+                  value={formData.Password}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 w-full"
+                />
               </div>
-            </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">
+                  Name
+                  {' '}
+                  <RequiredFieldIndicator />
+                </label>
+                <input
+                  type="text"
+                  name="Name"
+                  value={formData.Name}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 w-full"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">
+                  Email
+                  {' '}
+                  <RequiredFieldIndicator />
+                </label>
+                <input
+                  type="text"
+                  name="Email"
+                  value={formData.Email}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 w-full"
+                />
+                {emailError && <FieldNEmailOnly />}
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">Address</label>
+                <input
+                  type="text"
+                  name="Address"
+                  value={formData.Address}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 w-full"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">Phone</label>
+                <input
+                  type="text"
+                  name="Phone"
+                  value={formData.Phone}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 w-full"
+                />
+                {!phoneIsValid && (
+                <FieldNumOnly />
+                )}
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">
+                  RoleID
+                  {' '}
+                  <RequiredFieldIndicator />
+                </label>
+                <input
+                  type="text"
+                  name="RoleID"
+                  value={formData.RoleID !== '' ? formData.RoleID : ''}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 w-full"
+                />
+                {!roleIDIsValid && (
+                <FieldNumOnly />
+                )}
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">
+                  AppthemeID
+                  <RequiredFieldIndicator />
+                </label>
+                <input
+                  type="text"
+                  name="AppthemeID"
+                  value={formData.AppthemeID}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 w-full"
+                />
+                {!appthemeIDIsValid && (
+                <FieldNumOnly />
+                )}
+              </div>
 
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Save
-            </button>
-          </form>
+              <div className="mb-4">
+                <label className="block font-semibold mb-1">Note</label>
+                <textarea
+                  name="Note"
+                  value={formData.Note}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 w-full rounded resize-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="font-medium">
+                    <input
+                      type="checkbox"
+                      name="IsSuperAdmin"
+                      checked={formData.IsSuperAdmin === 1}
+                      onChange={handleInputChange}
+                      className="mr-2"
+                    />
+                    Super Admin
+                  </label>
+                </div>
+                <div>
+                  <label className="font-medium">
+                    <input
+                      type="checkbox"
+                      name="IsActive"
+                      checked={formData.IsActive === 1}
+                      onChange={handleInputChange}
+                      className="mr-2"
+                    />
+                    Active
+                  </label>
+                </div>
+              </div>
+              <div className="place-content-end mt-10 flex">
+                <button
+                  type="button"
+                  className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Save
+                </button>
+              </div>
+
+            </form>
+          </div>
+
         </div>
       </div>
     </div>

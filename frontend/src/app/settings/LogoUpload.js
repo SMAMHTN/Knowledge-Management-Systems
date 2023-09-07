@@ -1,25 +1,18 @@
 import React, { useState } from 'react';
-import Image from 'next/image'; // Import the Next.js Image component
 
 function LogoUpload({ onUpload }) {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setSelectedFile(file);
-
-    // Display a preview of the selected image
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
   };
 
   const handleUpload = () => {
+    event.preventDefault();
+    console.log('Upload button clicked in LogoUpload');
     if (selectedFile) {
-      // Convert the selected image to base64
+      // Convert the selected image to base64 here
       const reader = new FileReader();
       reader.onload = () => {
         const base64String = reader.result.split(',')[1];
@@ -50,7 +43,6 @@ function LogoUpload({ onUpload }) {
         Upload
       </button>
     </div>
-
   );
 }
 

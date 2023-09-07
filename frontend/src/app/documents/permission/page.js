@@ -191,6 +191,7 @@ function PerTable(handleItemsPerPageChange) {
         <PaginationComp
           currentPage={currentPage}
           totalPages={pageInfo.TotalPage}
+          totalRow={pageInfo.TotalRow}
           itemsPerPage={itemsPerPage}
           handlePageChange={handlePageChange}
           upperLimit={pageInfo.UpperLimit}
@@ -200,6 +201,7 @@ function PerTable(handleItemsPerPageChange) {
         <ItmsPerPageComp
           itemsPerPage={itemsPerPage}
           setItemsPerPage={setItemsPerPage}
+          setCurrentPage={setCurrentPage}
         />
         <DeleteModal
           isOpen={isDeleteModalOpen}

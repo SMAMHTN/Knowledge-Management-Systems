@@ -145,6 +145,7 @@ function SystemSetting() {
   };
 
   const handleLogoUpload = (base64String) => {
+    console.log('Handling logo upload in SystemSetting:', base64String);
     setData({ ...data, CompanyLogo: base64String });
   };
 
@@ -162,22 +163,14 @@ function SystemSetting() {
                 onChange={(e) => setData({ ...data, CompanyName: e.target.value })}
               />
             </div>
-            <div className="mb-4">
-              <ShowLogo maxWidth="100px" maxHeight="100px" />
-            </div>
-            <LogoUpload onUpload={handleLogoUpload} />
             {/* <div className="mb-4">
-                <label className="block font-semibold mb-1">CompanyLogo</label>
-                <input
-                  type="text"
-                  value={data.CompanyLogo || ""}
-                  className="border px-2 py-1 w-full"
-                  onChange={(e) =>
-                    setData({ ...data, CompanyLogo: e.target.value })
-                  }
-                />
-              </div> */}
+              <ShowLogo maxWidth="100px" maxHeight="100px" />
+            </div> */}
 
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">CompanyLogo</label>
+              <LogoUpload onUpload={handleLogoUpload} />
+            </div>
             <div className="mb-4">
               <label className="block font-semibold mb-1">
                 CompanyAddress
@@ -190,7 +183,7 @@ function SystemSetting() {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">Timezone</label>
+              <label className="block font-semibold">Timezone</label>
               <TimezoneDropdown
                 selectedTimezone={data.TimeZone || initialTimezone}
                 onTimezoneChange={handleTimezoneChange}
@@ -206,7 +199,7 @@ function SystemSetting() {
                 >
 
                   {themeOptions.length > 0
-                      && themeOptions.find((theme) => theme.AppthemeID === selectedTheme)?.AppthemeName}
+                      && themeOptions.find((theme) => theme.AppthemeID === selectedTheme)?.AppthemeName || 'Select a theme'}
                 </button>
                 {isDropdownOpen && (
                 <ul className="absolute top-full left-0 w-full z-20 bg-white border rounded shadow mt-2 max-h-40 overflow-y-auto">
@@ -263,7 +256,7 @@ function SystemSetting() {
             </div>
             )}
             {selectedThemeColors.secondary && (
-            <div>
+            <div className="mb-4">
               <span>Secondary Color: </span>
               <span
                 style={{
@@ -286,8 +279,9 @@ function SystemSetting() {
               Update
             </button>
           </form>
-          <AddTheme fetchThemes={fetchThemes} />
+
           <div className="mb-4" />
+          <AddTheme fetchThemes={fetchThemes} />
         </div>
       </div>
     </section>

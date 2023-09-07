@@ -62,7 +62,7 @@ function UserTable() {
       setData(updatedData);
       alertDelete(responseDel);
       setIsDeleteModalOpen(false);
-      setDeletingCategoryID(null);
+      setDeletingUserID(null);
     } catch (error) {
       console.error('Error deleting category:', error);
     }
@@ -171,15 +171,16 @@ function UserTable() {
         <PaginationComp
           currentPage={currentPage}
           totalPages={pageInfo.TotalPage}
+          totalRow={pageInfo.TotalRow}
           itemsPerPage={itemsPerPage}
           handlePageChange={handlePageChange}
           upperLimit={pageInfo.UpperLimit}
           lowerLimit={pageInfo.LowerLimit}
         />
-
         <ItmsPerPageComp
           itemsPerPage={itemsPerPage}
           setItemsPerPage={setItemsPerPage}
+          setCurrentPage={setCurrentPage}
         />
         <DeleteModal
           isOpen={isDeleteModalOpen}

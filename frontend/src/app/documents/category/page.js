@@ -110,6 +110,7 @@ function CatTable() {
             <ItmsPerPageComp
               itemsPerPage={itemsPerPage}
               setItemsPerPage={setItemsPerPage}
+              setCurrentPage={setCurrentPage}
             />
           </div>
           <table className="w-full border">
@@ -158,6 +159,7 @@ function CatTable() {
         <PaginationComp
           currentPage={currentPage}
           totalPages={pageInfo.TotalPage}
+          totalRow={pageInfo.TotalRow}
           itemsPerPage={itemsPerPage}
           handlePageChange={handlePageChange}
           upperLimit={pageInfo.UpperLimit}
