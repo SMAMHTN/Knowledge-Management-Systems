@@ -148,7 +148,7 @@ function DocTable(handleItemsPerPageChange) {
               </tr>
             </thead>
             <tbody>
-              {data.map((article) => (
+              {Array.isArray(data) && data.map((article) => (
                 <tr key={article.ArticleID}>
                   <td className="px-4 py-2">{article.ArticleID}</td>
                   <td className="px-4 py-2 text-center">
