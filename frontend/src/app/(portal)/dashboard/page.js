@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { getUserData, Logout } from '@/dep/core/coreHandler';
+import { searchIcon, dashboardIcon } from '@/constants/icon';
 
 function Home() {
   const [error, setError] = useState('');
@@ -22,18 +23,40 @@ function Home() {
   }, []);
 
   return (
-    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-      {/* buat s.admin */}
-      <div className="max-w-md mx-auto p-4 mt-9">
-        <h2 className="text-2xl font-bold mb-4">Navigation</h2>
-        <div className="space-y-4">
+    <section className="h-screen flex flex-col flex-auto">
+      <div className=" flex flex-col">
+        <div className="px-4 py-2 bg-gray-300 tracking-wide font-medium shadow rounded mb-4">
+          <Link href="/dashboard" className="text-blue-500 hover:text-blue-800">
+            Dashboard
+          </Link>
+          / Overview
+        </div>
+        <div className="space-y-4 mb-4">
           {userData && (
-          <>
-            <h1>
-              Selamat datang
+          <h1>
+            Selamat datang
               {' '}
               {userData.Name}
-            </h1>
+          </h1>
+          )}
+          <div className="rounded-2xl shadow-3xl">
+            <form className="flex py-2 px-2 md:px-20 mb-4">
+              <span className="flex bg-white border-r-0 border rounded-tl rounded-bl pl-2 pr-3 shadow-md">{ searchIcon }</span>
+              <input
+                type="text"
+                placeholder=" Search Document here..."
+                className=" w-full text-[14px] outline-none pr-2 py-2 shadow-md"
+              />
+              <button
+                type="submit"
+                className=" text-light text-white shadow-md rounded-tr rounded-br bg-blue-500 hover:bg-blue-600 px-2 md:px-4"
+              >
+                Search
+              </button>
+            </form>
+          </div>
+          {userData && (
+          <>
             <Link href="/settings" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
               Settings
             </Link>
@@ -47,251 +70,6 @@ function Home() {
           )}
         </div>
       </div>
-      {/* buat user biasa */}
-
-      {/* <div className="h-full mt-14">
-          <div className="fixed w-full ml-1">
-            <h1 className="text-white text-2xl font-bold mb-4">Dashboard</h1>
-          </div>
-          <div className="container fixed mt-11 max-h-full w-5/6 md:w-3/4 overflow-y-auto overscroll-none bg-green-500">
-            <div className="rounded-lg bg-yellow-500 mb-48 ">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">2</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">3</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">4</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">5</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">5</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">6</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">7</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">8</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">9</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557 42</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">10</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">END</p>
-                    <p>End</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> */}
     </section>
   );
 }
