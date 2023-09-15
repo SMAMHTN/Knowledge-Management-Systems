@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import DateTimeTrue from '@/components/Navbar/DateTime.js';
 import {
   Accordion,
   AccordionContent,
@@ -17,7 +16,7 @@ function SidebarMobile({ initialTime, isSidebarOpen, toggleSidebar }) {
   return (
     <>
       {isSidebarOpen && <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-20 md:hidden" onClick={toggleSidebar} />}
-      <div className={`fixed ${isSidebarOpen ? '' : 'hidden'} md:hidden flex-col left-0 w-64 bg-neutral-50 text-black h-full transition-all duration-300 ease-in-out border-none z-30`}>
+      <div className={`fixed ${isSidebarOpen ? '' : 'hidden'} md:hidden flex-col left-0 w-64 bg-neutral-50 text-black h-full z-30`}>
         <div className="flex flex-col h-full">
           <div
             className="fixed z-20 flex h-14 items-center justify-between px-4 text-sm sm:px-16 md:hidden"
@@ -27,7 +26,7 @@ function SidebarMobile({ initialTime, isSidebarOpen, toggleSidebar }) {
             >
               <button
                 onClick={toggleSidebar}
-                className="ml-3 text-black hover:text-gray-300 focus:outline-none"
+                className="ml-3 text-black hover:text-gray-300"
               >
                 <svg
                   className="w-6 h-6"
@@ -194,22 +193,11 @@ function SidebarMobile({ initialTime, isSidebarOpen, toggleSidebar }) {
             </li>
             <li />
           </ul>
-        </div>
-        <div className="mb-14 px-5 py-3 hidden md:block text-center text-xs">
-          <DateTimeTrue initialTime={initialTime} />
+
         </div>
       </div>
     </>
 
   );
 }
-
-export async function getServerSideProps() {
-  return {
-    props: {
-      initialTime: new Date().toISOString(),
-    },
-  };
-}
-
 export default SidebarMobile;
