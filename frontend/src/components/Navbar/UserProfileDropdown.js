@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import userSetting from '@/constants/menu';
 import { getUserData, Logout } from '../../dep/core/coreHandler';
 import {
   DropdownMenu,
@@ -95,13 +96,9 @@ function UserProfile({ maxWidth, maxHeight }) {
         <DropdownMenuSeparator className="mx-1 bg-neutral-200" />
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <Link
-              href="/dashboard/settings"
-              className="w-full hover:underline"
-            >
-              Profile
+            <Link href={userSetting.link} className="w-full hover:underline">
+              {userSetting.title}
             </Link>
-
           </DropdownMenuItem>
           {/* <DropdownMenuItem>
             Billing
