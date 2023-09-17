@@ -9,18 +9,8 @@ export function RequiredFieldIndicator() {
   );
 }
 
-export function FieldNumOnly() {
+export function ErrorMessage({ error }) {
   return (
-    <p className="text-red-400 text-xs mt-1 absolute bottom">
-      This field can only contain numeric values
-    </p>
-  );
-}
-
-export function FieldNEmailOnly() {
-  return (
-    <p className="text-red-400 text-xs mt-1 absolute bottom">
-      Please insert a valid email
-    </p>
+    <p className="text-red-600">{error}</p>
   );
 }

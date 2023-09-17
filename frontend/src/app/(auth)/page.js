@@ -2,10 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image'; // Import the Next.js Image component
 import { Login, CoreAPIGET } from '../../dep/core/coreHandler';
 import ShowLogo from '@/components/Navbar/ShowLogo';
-// import { KmsAPIGET, KmsAPI } from "../../dep/kms/kmsHandler";
 
 export default function Page() {
   const [username, setUsername] = useState('');
@@ -33,7 +31,7 @@ export default function Page() {
   return (
     <>
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-300">
-        <div className="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-md w-full max-w-md">
+        <div className="flex flex-col bg-white shadow-md px-4 md:px-8 py-8 rounded w-full max-w-md">
           <div id="logo" className="flex flex-col mb-6 mx-auto">
             <ShowLogo maxWidth="80px" maxHeight="80px" />
           </div>
@@ -55,7 +53,7 @@ export default function Page() {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="text-sm sm:text-base placeholder-gray-500 pl-4 pr-4 rounded-lg border border-gray-400 w-full py-2 focus:outline-none focus:border-blue-400"
+                    className="text-sm sm:text-base placeholder-gray-500 pl-4 pr-4 rounded border border-gray-400 w-full py-2 focus:outline-none focus:border-blue-400"
                     placeholder="Username"
                   />
                 </div>
@@ -73,7 +71,7 @@ export default function Page() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="text-sm sm:text-base placeholder-gray-500 pl-4 pr-4 rounded-lg border border-gray-400 w-full py-2 focus:outline-none focus:border-blue-400"
+                    className="text-sm sm:text-base placeholder-gray-500 pl-4 pr-4 rounded border border-gray-400 w-full py-2 focus:outline-none focus:border-blue-400"
                     placeholder="Password"
                   />
                 </div>
@@ -92,14 +90,7 @@ export default function Page() {
           </div>
         </div>
       </div>
-      <div>
-        {/* <p>{message}</p>
-        <p>{a.Data.CategoryID}</p>
-        <p>{a.Data.CategoryName}</p>
-        <p>{a.Data.CategoryParentID}</p>
-        <p>{a.Data.CategoryDescription}</p>
-        <img src={`data:image/png;base64, ${a.Data.UserPhoto}`} alt="User" /> */}
-      </div>
+      <div />
     </>
   );
 }

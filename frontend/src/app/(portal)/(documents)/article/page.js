@@ -8,7 +8,7 @@ import { DeleteModal, alertDelete } from '@/components/Feature';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
 
-function DocTable(handleItemsPerPageChange) {
+function DocTable() {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [usNames, setUsNames] = useState({});

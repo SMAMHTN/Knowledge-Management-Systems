@@ -1,88 +1,144 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CoreAPI, CoreAPIGET } from '@/dep/core/coreHandler';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import { CoreAPIGET, CoreAPI } from '@/dep/core/coreHandler';
 import { alertUpdate } from '@/components/Feature';
+import { roleSchema } from '@/constants/schema';
+import { ErrorMessage } from '@/components/FormComponent';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 function UserDetails({ params }) {
-  const [data, setData] = useState([]);
+  const {
+    handleSubmit, control, setValue, getValues, formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      RoleID: '',
+      RoleName: '',
+      RoleParentID: '',
+      RoleDescription: '',
+    },
+    resolver: yupResolver(roleSchema),
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const response = await CoreAPIGET(`role?RoleID=${params.id}`);
-        setData(response.body.Data);
+        const { Data } = response.body;
+
+        Object.keys(Data).forEach((key) => {
+          setValue(key, Data[key]);
+        });
       } catch (error) {
-        // Handle errors here
         console.error('Error fetching user data:', error);
       }
     };
 
     fetchUserData();
-  }, [params.id]);
+  }, [params.id, setValue]);
 
-  const handleUpdate = async () => {
+  const onSubmit = async (formData) => {
     try {
-      data.RoleParentID = parseInt(data.RoleParentID);
-      const response = await CoreAPI('PUT', 'role', data);
+      const { error } = roleSchema.validate(formData);
+
+      if (error) {
+        console.error('Validation error:', error.details);
+        return;
+      }
+
+      const response = await CoreAPI('PUT', 'role', formData);
+      await new Promise((resolve) => setTimeout(resolve, 500));
       alertUpdate(response);
     } catch (error) {
       console.log(error);
       console.log('An error occurred');
-      // Handle error
     }
   };
 
   return (
-    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-      <div className="max-w-md ml-14 p-4 mt-9">
-        <div className="max-w-3xl mx-auto p-4">
-          <form action={handleUpdate}>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Role ID</label>
-              <input
-                type="text"
-                value={data.RoleID || ''}
-                className="border px-2 py-1 w-full"
-                readOnly
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Role Name</label>
-              <input
-                type="text"
-                value={data.RoleName || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, RoleName: e.target.value })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Role Parent ID</label>
-              <input
-                type="text"
-                value={data.RoleParentID || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, RoleParentID: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="font-medium">Description</label>
-              <textarea
-                className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                rows="4"
-                value={data.RoleDescription || ''}
-                onChange={(e) => setData({ ...data, RoleDescription: e.target.value })}
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Update
-            </button>
-          </form>
-        </div>
+    <section className="h-screen flex flex-col flex-auto">
+      <div className="flex flex-col">
+        <h2 className="text-2xl font-bol mb-1">Role Edit</h2>
+        <p className="text-sm mb-4">
+          Customize and manage your role details.
+        </p>
+        <Separator className="mb-4" />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="mb-4">
+            <label className="block font-medium mb-1">Role Name</label>
+            <Controller
+              name="RoleName"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <input
+                    {...field}
+                    type="text"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    placeholder="Role Name"
+                  />
+                  <p className="text-sm my-1">
+                    This is Role Name. Min 2 characters & Max 50 characters. Required.
+                  </p>
+                  {errors.RoleName && (<ErrorMessage error={errors.RoleName.message} />)}
+                </>
+              )}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-medium mb-1">Role Parent ID</label>
+            <Controller
+              name="RoleParentID"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <input
+                    {...field}
+                    type="text"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                    placeholder="Role Parent ID"
+                  />
+                  <p className="text-sm my-1">
+                    This is Role Parent ID. Number Only. Required.
+                  </p>
+                  {errors.RoleParentID && (<ErrorMessage error={errors.RoleParentID.message} />)}
+                </>
+              )}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-medium mb-1">Description</label>
+            <Controller
+              name="RoleDescription"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <textarea
+                    {...field}
+                    type="textarea"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                    placeholder="Role Description"
+                  />
+                  <p className="text-sm my-1">
+                    Give a brief explanation of the role
+                  </p>
+                  {errors.RoleDescription && (<ErrorMessage error={errors.RoleDescription.message} />)}
+                </>
+              )}
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="rounded bg-blue-500 text-white"
+          >
+            Update Role
+          </Button>
+        </form>
       </div>
     </section>
   );

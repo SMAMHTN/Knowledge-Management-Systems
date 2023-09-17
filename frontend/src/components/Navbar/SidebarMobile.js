@@ -6,7 +6,7 @@ import {
   menuUser, menuDoc, dashboard, systemSetting,
 } from '@/constants/menu';
 import {
-  dashboardIcon, settingsIcon, userIcon, docIcon, hamburgerIcon,
+  dashboardIcon, settingsIcon, userIcon, docIcon,
 } from '@/constants/icon';
 import {
   Accordion,
@@ -14,11 +14,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import HamburgerButton from './HamburgerButton';
 
 function SidebarMobile({ isSidebarOpen, toggleSidebar }) {
-  const handleCollapsibleSelect = () => {
-    toggleSidebar();
-  };
   return (
     <>
       {isSidebarOpen && <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-20 md:hidden" onClick={toggleSidebar} />}
@@ -30,12 +28,7 @@ function SidebarMobile({ isSidebarOpen, toggleSidebar }) {
             <div
               className="flex cursor-pointer items-center gap-2 hover:opacity-60"
             >
-              <button
-                onClick={toggleSidebar}
-                className="ml-3 text-black hover:text-gray-300"
-              >
-                {hamburgerIcon}
-              </button>
+              <HamburgerButton onClick={toggleSidebar} />
             </div>
           </div>
           <ul className="flex flex-col pr-4 pl-3 space-y-1 mr-2 mt-14">

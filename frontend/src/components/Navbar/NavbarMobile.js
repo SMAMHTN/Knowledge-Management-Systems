@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import UserProfileDropdown from './UserProfileDropdown';
 import SidebarMobile from './SidebarMobile';
-import { hamburgerIcon } from '@/constants/icon';
+import HamburgerButton from './HamburgerButton';
 
 function NavbarMobile() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -20,12 +20,7 @@ function NavbarMobile() {
         <div
           className="flex cursor-pointer items-center gap-2 hover:opacity-60"
         >
-          <button
-            onClick={toggleSidebar}
-            className="ml-3 text-black hover:text-gray-300 focus:outline-none"
-          >
-            {hamburgerIcon}
-          </button>
+          <HamburgerButton onClick={toggleSidebar} />
         </div>
         <div className="flex items-center gap-3 sm:gap-5">
           <UserProfileDropdown />

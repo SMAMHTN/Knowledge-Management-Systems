@@ -74,7 +74,7 @@ function UserProfile({ maxWidth, maxHeight }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
+          <Avatar className="h-8 w-8 shadow ">
             <AvatarImage />
             <AvatarFallback>{renderUserPhoto()}</AvatarFallback>
           </Avatar>

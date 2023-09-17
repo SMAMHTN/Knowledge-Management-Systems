@@ -33,14 +33,14 @@ function Home() {
         </div>
         <div className="space-y-4 mb-4">
           {userData && (
-          <h1>
+          <h1 className="mx-4 mb-8">
             Selamat datang
-              {' '}
-              {userData.Name}
+            {' '}
+            {userData.Name}
           </h1>
           )}
           <div className="rounded-2xl shadow-3xl">
-            <form className="flex py-2 px-2 md:px-20 mb-4">
+            <form className="flex py-2 px-2 md:px-20 mb-14">
               <span className="flex bg-white border-r-0 border rounded-tl rounded-bl pl-2 pr-3 shadow-md">{ searchIcon }</span>
               <input
                 type="text"
