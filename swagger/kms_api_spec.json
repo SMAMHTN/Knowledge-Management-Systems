@@ -1,0 +1,1165 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "KMS Microservice - Knowledge Management System",
+    "description": "This is Core API Specification for KMS Application",
+    "contact": {
+      "name": "Aldi Mulyawan",
+      "url": "https://smam.tech/linkedin",
+      "email": "personal@smam.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "Alpha"
+  },
+  "externalDocs": {
+    "description": "Github Repository",
+    "url": "https://github.com/smam-tech/Knowledge-Management-Systems"
+  },
+  "servers": [
+    {
+      "url": "http://code.smam.tech:5656"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Article",
+      "description": "Containing Article"
+    },
+    {
+      "name": "Category",
+      "description": "Contain Article Category"
+    },
+    {
+      "name": "Permission",
+      "description": "Regarding to Permission for accessing certain category"
+    },
+    {
+      "name": "File",
+      "description": "Contain File Upload/Download"
+    },
+    {
+      "name": "Doc",
+      "description": "Contain Doc Upload/Download"
+    }
+  ],
+  "paths": {
+    "/listarticle": {
+      "get": {
+        "summary": "Get list of article",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "num",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      }
+    },
+    "/article": {
+      "get": {
+        "summary": "Get a Article by ArticleID",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ArticleID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new Article",
+        "tags": [
+          "Article"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Article-post"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permission created successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an existing Article by ArticleID",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Article"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Permission updated successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Article by ArticleID",
+        "tags": [
+          "Article"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ArticleID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permission deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      }
+    },
+    "/listcategory": {
+      "get": {
+        "summary": "Get list of category",
+        "tags": [
+          "Category"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "num",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      }
+    },
+    "/category": {
+      "get": {
+        "summary": "Get a Category by CategoryID",
+        "tags": [
+          "Category"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "CategoryID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new Category",
+        "tags": [
+          "Category"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category-post"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permission created successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an existing Category by CategoryID",
+        "tags": [
+          "Category"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Permission updated successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a category by CategoryID",
+        "tags": [
+          "Category"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "CategoryID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permission deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      }
+    },
+    "/listpermission": {
+      "get": {
+        "summary": "Get list of permission",
+        "tags": [
+          "Permission"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "num",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "StatusCode": 200,
+                  "Data": [
+                    {
+                      "PermissionID": 1,
+                      "CategoryID": 1,
+                      "RoleID": 1,
+                      "Create": 1,
+                      "Read": 1,
+                      "Update": 1,
+                      "Delete": 1,
+                      "FileType": [],
+                      "DocType": []
+                    },
+                    {
+                      "PermissionID": 2,
+                      "CategoryID": 1,
+                      "RoleID": 2,
+                      "Create": 0,
+                      "Read": 0,
+                      "Update": 0,
+                      "Delete": 0,
+                      "FileType": [],
+                      "DocType": []
+                    },
+                    {
+                      "PermissionID": 9,
+                      "CategoryID": 2,
+                      "RoleID": 2,
+                      "Create": 1,
+                      "Read": 0,
+                      "Update": 1,
+                      "Delete": 0,
+                      "FileType": [],
+                      "DocType": []
+                    },
+                    {
+                      "PermissionID": 50,
+                      "CategoryID": 131,
+                      "RoleID": 2,
+                      "Create": 0,
+                      "Read": 0,
+                      "Update": 0,
+                      "Delete": 1,
+                      "FileType": [
+                        "exe",
+                        "-php"
+                      ],
+                      "DocType": [
+                        "*",
+                        "-doc"
+                      ]
+                    },
+                    {
+                      "PermissionID": 51,
+                      "CategoryID": 127,
+                      "RoleID": 1,
+                      "Create": 0,
+                      "Read": 1,
+                      "Update": 0,
+                      "Delete": 0,
+                      "FileType": [
+                        "-exe",
+                        "php"
+                      ],
+                      "DocType": [
+                        "*",
+                        "-doc"
+                      ]
+                    }
+                  ],
+                  "Info": {
+                    "UpperLimit": 5,
+                    "LowerLimit": 1,
+                    "TotalPage": 1,
+                    "TotalRow": 5,
+                    "CurrentPage": 1,
+                    "TotalShow": 5
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      }
+    },
+    "/permission": {
+      "get": {
+        "summary": "Get a permission by PermissionID",
+        "tags": [
+          "Permission"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "PermissionID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new permission",
+        "tags": [
+          "Permission"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Permission-post"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permission created successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an existing permission by PermissionID",
+        "tags": [
+          "Permission"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Permission"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Permission updated successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a permission by PermissionID",
+        "tags": [
+          "Permission"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "PermissionID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permission deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      }
+    },
+    "/file": {
+      "get": {
+        "summary": "Get a File by FileID",
+        "tags": [
+          "File"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "FileID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "post": {
+        "summary": "Upload a file with an ID",
+        "tags": [
+          "File"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "CategoryID",
+                  "File"
+                ],
+                "properties": {
+                  "CategoryID": {
+                    "type": "integer"
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Permission deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a File by FileID",
+        "tags": [
+          "File"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "FileID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      }
+    },
+    "/doc": {
+      "get": {
+        "summary": "Get a Doc by DocID",
+        "tags": [
+          "Doc"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "DocID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "post": {
+        "summary": "Upload a Doc with an ID",
+        "tags": [
+          "Doc"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "CategoryID",
+                  "File"
+                ],
+                "properties": {
+                  "CategoryID": {
+                    "type": "integer"
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Permission deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Doc by DocID",
+        "tags": [
+          "Doc"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "DocID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "You dont have appropriate permission"
+          },
+          "404": {
+            "description": "ID not found"
+          },
+          "500": {
+            "description": "Internal Server Error, Check Logging"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Permission-post": {
+        "type": "object",
+        "properties": {
+          "CategoryID": {
+            "type": "integer",
+            "example": 1
+          },
+          "RoleID": {
+            "type": "integer",
+            "example": 1
+          },
+          "Create": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 if allowed, 0 if not allowed"
+          },
+          "Read": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 if allowed, 0 if not allowed"
+          },
+          "Update": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 if allowed, 0 if not allowed"
+          },
+          "Delete": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 if allowed, 0 if not allowed"
+          },
+          "FileType": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "exe",
+              "iso"
+            ]
+          },
+          "DocType": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "json",
+              "docs"
+            ]
+          }
+        }
+      },
+      "Permission": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Permission-post"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "PermissionID": {
+                "type": "integer",
+                "example": 1
+              }
+            }
+          }
+        ]
+      },
+      "Category-post": {
+        "type": "object",
+        "properties": {
+          "CategoryName": {
+            "type": "string",
+            "example": "Technology"
+          },
+          "CategoryParentID": {
+            "type": "integer",
+            "example": 1
+          },
+          "CategoryDescription": {
+            "type": "string",
+            "example": "This category talk about all things for category"
+          }
+        }
+      },
+      "Category": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Category-post"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "CategoryID": {
+                "type": "integer",
+                "example": 2
+              }
+            }
+          }
+        ]
+      },
+      "Article-post": {
+        "type": "object",
+        "properties": {
+          "OwnerID": {
+            "type": "integer",
+            "example": 1
+          },
+          "LastEditedByID": {
+            "type": "integer",
+            "example": 1
+          },
+          "LastEditedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Tag": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "Title": {
+            "type": "string",
+            "example": "Blora city in central java"
+          },
+          "CategoryID": {
+            "type": "integer",
+            "example": 5
+          },
+          "Article": {
+            "type": "string",
+            "example": "A lot of stuff here"
+          },
+          "FileID": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "example": [
+              1,
+              2,
+              3
+            ]
+          },
+          "DocID": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "example": [
+              1,
+              2,
+              3
+            ]
+          },
+          "IsActive": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "Article": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Article-post"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "ArticleID": {
+                "type": "integer",
+                "example": 2
+              }
+            }
+          }
+        ]
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Basic Authentication with custom password format"
+      }
+    }
+  }
+}

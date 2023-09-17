@@ -49,7 +49,13 @@ func ListPermission(c echo.Context) error {
 		ListPermission, _ := ReadPermission(query + " " + LimitQuery)
 		var ListPermissionAPI []Permission_API
 		for _, x := range ListPermission {
-			tmp, _ := x.ToAPI()
+			tmp, err := x.ToAPI()
+			if err != nil {
+				Logger.Error(err.Error())
+				res.StatusCode = http.StatusInternalServerError
+				res.Data = err
+				return c.JSON(http.StatusInternalServerError, res)
+			}
 			ListPermissionAPI = append(ListPermissionAPI, tmp)
 		}
 		res.StatusCode = http.StatusOK
@@ -387,7 +393,7 @@ func GetAllFileTypePermission(c echo.Context, CategoryID int, RoleID int) (FileT
 	FinalQuery := fmt.Sprintf("WHERE RoleID IN (%s) AND CategoryID IN (%s)", roleIDListString, categoryIDListString)
 	PermissionList, err := ReadPermission(FinalQuery)
 	for _, val := range PermissionList {
-		TmpFileTypeList, err := dependency.ConvStringToStringArrayUniqueBracket(val.FileType)
+		TmpFileTypeList := dependency.ConvStringToStringArray(val.FileType)
 		if err != nil {
 			return nil, err
 		}
@@ -437,7 +443,7 @@ func GetAllDocTypePermission(c echo.Context, CategoryID int, RoleID int) (DocTyp
 	FinalQuery := fmt.Sprintf("WHERE RoleID IN (%s) AND CategoryID IN (%s)", roleIDListString, categoryIDListString)
 	PermissionList, err := ReadPermission(FinalQuery)
 	for _, val := range PermissionList {
-		TmpDocTypeList, err := dependency.ConvStringToStringArrayUniqueBracket(val.DocType)
+		TmpDocTypeList := dependency.ConvStringToStringArray(val.DocType)
 		if err != nil {
 			return nil, err
 		}
@@ -503,7 +509,7 @@ func (data Permission) ToAPI() (res Permission_API, err error) {
 		FileType:     []string{},
 		DocType:      []string{},
 	}
-	res.FileType = dependency.ConvStringToStringArray(data.DocType)
+	res.FileType = dependency.ConvStringToStringArray(data.FileType)
 	res.DocType = dependency.ConvStringToStringArray(data.DocType)
 	return res, nil
 }
@@ -520,7 +526,7 @@ func (data Permission_API) ToTable() (res Permission, err error) {
 		FileType:     "",
 		DocType:      "",
 	}
-	res.FileType, err = dependency.ConvStringArrayToString(data.DocType)
+	res.FileType, err = dependency.ConvStringArrayToString(data.FileType)
 	if err != nil {
 		return res, err
 	}

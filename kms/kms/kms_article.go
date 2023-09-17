@@ -64,6 +64,7 @@ func ListArticle(c echo.Context) error {
 		for _, x := range ArticleList {
 			tmp, err := x.ToAPI()
 			if err != nil {
+				Logger.Error(err.Error())
 				res.StatusCode = http.StatusInternalServerError
 				res.Data = err
 				return c.JSON(http.StatusInternalServerError, res)
