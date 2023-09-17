@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image'; // Import the Next.js Image component
 import { Login, CoreAPIGET } from '../../dep/core/coreHandler';
-import ShowLogo from '@/components/ShowLogo';
+import ShowLogo from '@/components/Navbar/ShowLogo';
 // import { KmsAPIGET, KmsAPI } from "../../dep/kms/kmsHandler";
 
 export default function Page() {
@@ -20,19 +20,14 @@ export default function Page() {
 
       if (response === true) {
         const response2 = await CoreAPIGET('loginuser');
-        // setNextlink("/tes/tes2/" + response2.body.Data.UserID)
+
         router.push('/dashboard/');
         setMessage('Login successful!');
-        // Perform any additional actions after successful login
       } else {
-        // setNextlink("/tes")
         setMessage('Login failed!');
-        // Handle login failure
       }
     } catch (error) {
-      // console.log(error);
       setMessage('An error occurred during login.');
-      // Handle error
     }
   };
   return (
@@ -84,18 +79,7 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className="flex items-center mb-6 -mt-4">
-                <div className="flex ml-auto">
-                  <a
-                    href="#"
-                    className="inline-flex text-xs sm:text-sm text-blue-500 hover:text-blue-700"
-                  >
-                    Forgot Your Password?
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex w-full">
+              <div className="flex w-full mt-10">
                 <button
                   type="submit"
                   href={nextlink}
@@ -105,15 +89,6 @@ export default function Page() {
                 </button>
               </div>
             </form>
-          </div>
-          <div className="flex justify-center items-center mt-6">
-            <a
-              href="#"
-              target="_blank"
-              className="inline-flex items-center font-bold text-blue-500 hover:text-blue-700 text-xs text-center"
-            >
-              <span className="ml-2">You don&apos;t have an account?</span>
-            </a>
           </div>
         </div>
       </div>
