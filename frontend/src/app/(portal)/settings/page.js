@@ -7,6 +7,7 @@ import { CoreAPI, CoreAPIGET } from '@/dep/core/coreHandler';
 import AddTheme from './AddTheme';
 import LogoUpload from './LogoUpload';
 import TimezoneDropdown from '@/components/TimezoneDropdown';
+import { Separator } from '@/components/ui/separator';
 
 function SystemSetting() {
   const router = useRouter();
@@ -82,29 +83,25 @@ function SystemSetting() {
     }));
   };
   const handleUpdate = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
     try {
       console.log('Updating data:', data);
 
-      // Convert selectedTheme to integer
       const selectedThemeId = parseInt(selectedTheme);
 
       const updatedData = {
-        // Only include fields that need to be updated
         CompanyName: data.CompanyName,
         CompanyLogo: data.CompanyLogo,
         CompanyAddress: data.CompanyAddress,
-        TimeZone: data.TimeZone, // Use the locally managed TimeZone
-        AppthemeID: selectedThemeId, // Use the integer value
+        TimeZone: data.TimeZone,
+        AppthemeID: selectedThemeId,
       };
 
       const response = await CoreAPI('PUT', 'setting', updatedData);
       console.log('Update response:', response);
       console.log('Updated theme:', selectedThemeId);
-
-      // If the update is successful, fetch the data again
       if (response.status === 200) {
-        fetchData(); // Call the fetchData function to fetch the updated data
+        fetchData();
       }
     } catch (error) {
       console.log('Error:', error);
@@ -149,58 +146,62 @@ function SystemSetting() {
   };
 
   return (
-    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-      <div className="max-w-md ml-14 p-4 mt-9">
-        <div className="max-w-3xl mx-auto p-4">
-          <form>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">CompanyName</label>
-              <input
-                type="text"
-                value={data.CompanyName || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, CompanyName: e.target.value })}
-              />
-            </div>
-            {/* <div className="mb-4">
+    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+      <div className="flex flex-col w-full">
+        <h2 className="text-2xl font-semibold mb-1">System Settings</h2>
+        <p className="text-xs mb-4">
+          Customize and manage your Company Profile and system settings.
+        </p>
+        <Separator className="mb-4" />
+        <form>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">CompanyName</label>
+            <input
+              type="text"
+              value={data.CompanyName || ''}
+              className="border px-2 py-1 w-full"
+              onChange={(e) => setData({ ...data, CompanyName: e.target.value })}
+            />
+          </div>
+          {/* <div className="mb-4">
               <ShowLogo maxWidth="100px" maxHeight="100px" />
             </div> */}
 
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">CompanyLogo</label>
-              <LogoUpload onUpload={handleLogoUpload} />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">
-                CompanyAddress
-              </label>
-              <input
-                type="text"
-                value={data.CompanyAddress || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, CompanyAddress: e.target.value })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold">Timezone</label>
-              <TimezoneDropdown
-                selectedTimezone={data.TimeZone || initialTimezone}
-                onTimezoneChange={handleTimezoneChange}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Theme App</label>
-              <div className="relative inline-block" style={{ minWidth: '200px' }}>
-                <button
-                  type="button"
-                  onClick={toggleDropdown}
-                  className="border bg-white px-3 py-2 w-full text-left rounded"
-                >
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">CompanyLogo</label>
+            <LogoUpload onUpload={handleLogoUpload} />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">
+              CompanyAddress
+            </label>
+            <input
+              type="text"
+              value={data.CompanyAddress || ''}
+              className="border px-2 py-1 w-full"
+              onChange={(e) => setData({ ...data, CompanyAddress: e.target.value })}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold">Timezone</label>
+            <TimezoneDropdown
+              selectedTimezone={data.TimeZone || initialTimezone}
+              onTimezoneChange={handleTimezoneChange}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Theme App</label>
+            <div className="relative inline-block" style={{ minWidth: '200px' }}>
+              <button
+                type="button"
+                onClick={toggleDropdown}
+                className="border bg-white px-3 py-2 w-full text-left rounded"
+              >
 
-                  {themeOptions.length > 0
+                {themeOptions.length > 0
                       && themeOptions.find((theme) => theme.AppthemeID === selectedTheme)?.AppthemeName || 'Select a theme'}
-                </button>
-                {isDropdownOpen && (
+              </button>
+              {isDropdownOpen && (
                 <ul className="absolute top-full left-0 w-full z-20 bg-white border rounded shadow mt-2 max-h-40 overflow-y-auto">
                   {themeOptions.map((theme) => (
                     <li
@@ -221,25 +222,25 @@ function SystemSetting() {
                     </li>
                   ))}
                 </ul>
-                )}
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                  <svg
-                    className="fill-current h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
+              )}
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg
+                  className="fill-current h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </div>
             </div>
+          </div>
 
-            {/* Display the primary and secondary colors */}
-            {selectedThemeColors.primary && (
+          {/* Display the primary and secondary colors */}
+          {selectedThemeColors.primary && (
             <div className="mb-2">
               <span>Primary Color: </span>
               <span
@@ -253,8 +254,8 @@ function SystemSetting() {
                 }}
               />
             </div>
-            )}
-            {selectedThemeColors.secondary && (
+          )}
+          {selectedThemeColors.secondary && (
             <div className="mb-4">
               <span>Secondary Color: </span>
               <span
@@ -268,20 +269,17 @@ function SystemSetting() {
                 }}
               />
             </div>
-            )}
-
-            <button
-              type="button"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-              onClick={handleUpdate}
-            >
-              Update
-            </button>
-          </form>
-
-          <div className="mb-4" />
-          <AddTheme fetchThemes={fetchThemes} />
-        </div>
+          )}
+          <button
+            type="button"
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+            onClick={handleUpdate}
+          >
+            Update
+          </button>
+        </form>
+        <div className="mb-4" />
+        <AddTheme fetchThemes={fetchThemes} />
       </div>
     </section>
   );

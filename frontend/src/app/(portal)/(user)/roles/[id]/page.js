@@ -7,7 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { CoreAPIGET, CoreAPI } from '@/dep/core/coreHandler';
 import { alertUpdate } from '@/components/Feature';
 import { roleSchema } from '@/constants/schema';
-import { ErrorMessage } from '@/components/FormComponent';
+import { ErrorMessage, RequiredFieldIndicator } from '@/components/FormComponent';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
@@ -62,7 +62,7 @@ function UserDetails({ params }) {
   return (
     <section className="h-screen flex flex-col flex-auto">
       <div className="flex flex-col">
-        <h2 className="text-2xl font-bol mb-1">Role Edit</h2>
+        <h2 className="text-2xl font-semibold mb-1">Edit Role</h2>
         <p className="text-xs mb-4">
           Customize and manage your role details.
         </p>
@@ -79,10 +79,10 @@ function UserDetails({ params }) {
                     {...field}
                     type="text"
                     className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-                    placeholder="Role Name"
+                    placeholder="Public"
                   />
                   <p className="text-xs mt-1">
-                    This is Role Name. Min 2 characters & Max 50 characters. Required.
+                    Min 2 characters & Max 50 characters. Required.
                   </p>
                   {errors.RoleName && (<ErrorMessage error={errors.RoleName.message} />)}
                 </>
@@ -90,7 +90,11 @@ function UserDetails({ params }) {
             />
           </div>
           <div className="mb-4">
-            <label className="block font-medium mb-1">Role Parent ID</label>
+            <label className="block font-medium mb-1">
+              Role Parent ID
+              {' '}
+              <RequiredFieldIndicator />
+            </label>
             <Controller
               name="RoleParentID"
               control={control}
@@ -103,7 +107,7 @@ function UserDetails({ params }) {
                     placeholder="Role Parent ID"
                   />
                   <p className="text-xs mt-1">
-                    This is Role Parent ID. Number Only. Required.
+                    Input a valid Role Parent ID. Number Only. Required.
                   </p>
                   {errors.RoleParentID && (<ErrorMessage error={errors.RoleParentID.message} />)}
                 </>
@@ -121,10 +125,10 @@ function UserDetails({ params }) {
                     {...field}
                     type="textarea"
                     className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
-                    placeholder="Role Description"
+                    placeholder="Designed for public"
                   />
                   <p className="text-xs mt-1">
-                    Give a brief explanation of the role
+                    Give a brief explanation of the role.
                   </p>
                   {errors.RoleDescription && (<ErrorMessage error={errors.RoleDescription.message} />)}
                 </>

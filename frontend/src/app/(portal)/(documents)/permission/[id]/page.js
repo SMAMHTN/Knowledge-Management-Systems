@@ -86,7 +86,7 @@ function PermissionDetail({ params }) {
   return (
     <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
       <div className="flex flex-col w-full">
-        <h2 className="text-2xl font-semibold mb-1">Permission Edit</h2>
+        <h2 className="text-2xl font-semibold mb-1"> Edit Permission</h2>
         <p className="text-xs mb-4 ">
           Customize and manage your Permission details
         </p>
@@ -119,7 +119,7 @@ function PermissionDetail({ params }) {
                     placeholder="Category ID"
                   />
                   <p className="text-xs mt-1">
-                    This is Category ID. Numbers Only. Required.
+                    Input a valid Category ID. Number Only. Required.
                   </p>
                   {errors.CategoryID && (<ErrorMessage error={errors.CategoryID.message} />)}
                 </>
@@ -143,7 +143,7 @@ function PermissionDetail({ params }) {
                     placeholder="Role ID"
                   />
                   <p className="text-xs mt-1">
-                    This is Role ID. Numbers Only. Required.
+                    Input a valid Role ID. Number Only. Required.
                   </p>
                   {errors.RoleID && (<ErrorMessage error={errors.RoleID.message} />)}
                 </>
@@ -237,11 +237,11 @@ function PermissionDetail({ params }) {
                     placeholder="*, php, py, -exe"
                   />
                   <p className="text-xs mt-1">
-                    This is Document Type. format : * for accept all, - to exclude.
+                    Format : * for accept all, - to exclude.
                     <br />
-                    example : * accept allowed
+                    example : *, -exe means all allowed except .exe files.
                     <br />
-                    example : php, -py accept php and exclude py
+                    example : php, -py accept .php and exclude .py, and exclude all file type.
                   </p>
                   {errors.FileType && (<ErrorMessage error={errors.FileType.message} />)}
                 </>
@@ -249,7 +249,7 @@ function PermissionDetail({ params }) {
             />
           </div>
           <div className="mb-4">
-            <label className="block font-medium mb-1">Doc Type</label>
+            <label className="block font-medium mb-1">Document Type</label>
             <Controller
               name="DocType"
               control={control}
@@ -262,11 +262,11 @@ function PermissionDetail({ params }) {
                     placeholder="*, doc, docx, -pdf"
                   />
                   <p className="text-xs mt-1">
-                    This is Document Type. format : * for accept all, - to exclude.
+                    Format : * for accept all, - to exclude.
                     <br />
-                    example : * accept allowed
+                    example : *, -doc means all allowed except .doc document type.
                     <br />
-                    example : php, -py accept php and exclude py
+                    example : doc, pdf, -docx means accepting .doc, .pdf and exclude .docx, and exclude all document type.
                   </p>
                   {errors.DocType && (<ErrorMessage error={errors.DocType.message} />)}
                 </>

@@ -90,7 +90,7 @@ function AddPermission({ fetchData }) {
         }`}
 
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh]" ref={ref}>
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh] overflow-y-auto max-h-[80vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={handleClose}
@@ -114,7 +114,7 @@ function AddPermission({ fetchData }) {
                       placeholder="Category ID"
                     />
                     <p className="text-xs mt-1">
-                      This is Category ID. Numbers Only. Required.
+                      Input a valid Category ID. Number Only. Required.
                     </p>
                     {errors.CategoryID && (<ErrorMessage error={errors.CategoryID.message} />)}
                   </>
@@ -135,7 +135,7 @@ function AddPermission({ fetchData }) {
                       placeholder="Role ID"
                     />
                     <p className="text-xs mt-1">
-                      This is Role ID. Numbers Only. Required.
+                      Input a valid Role ID. Number Only. Required.
                     </p>
                     {errors.RoleID && (<ErrorMessage error={errors.RoleID.message} />)}
                   </>
@@ -225,11 +225,11 @@ function AddPermission({ fetchData }) {
                       placeholder="*, php, py, -exe"
                     />
                     <p className="text-xs mt-1">
-                      This is Document Type. format : * for accept all, - to exclude.
+                      Format : * for accept all, - to exclude.
                       <br />
-                      example : * accept allowed
+                      example : *, -exe means all allowed except .exe files.
                       <br />
-                      example : php, -py accept php and exclude py
+                      example : php, -py means accept .php and exclude .py, and exclude all file type
                     </p>
                     {errors.FileType && (<ErrorMessage error={errors.FileType.message} />)}
                   </>
@@ -237,7 +237,7 @@ function AddPermission({ fetchData }) {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-medium mb-1">Doc Type</label>
+              <label className="block font-medium mb-1">Document Type</label>
               <Controller
                 name="DocType"
                 control={control}
@@ -250,31 +250,33 @@ function AddPermission({ fetchData }) {
                       placeholder="*, doc, docx, -pdf"
                     />
                     <p className="text-xs mt-1">
-                      This is Document Type. format : * for accept all, - to exclude.
+                      Format : * for accept all, - to exclude.
                       <br />
-                      example : * accept allowed
+                      example : *, -doc means all allowed except .doc document type.
                       <br />
-                      example : php, -py accept php and exclude py
+                      example : doc, pdf, -docx means accepting .doc, .pdf and exclude .docx, and exclude all document type.
                     </p>
                     {errors.DocType && (<ErrorMessage error={errors.DocType.message} />)}
                   </>
                 )}
               />
             </div>
-            <button
-              type="button"
-              className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
-              onClick={handleClose}
-            >
-              Cancel
-            </button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="rounded bg-blue-500 text-white"
-            >
-              Add Permission
-            </Button>
+            <div className="place-content-end mt-10 flex">
+              <button
+                type="button"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+                onClick={handleClose}
+              >
+                Cancel
+              </button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="rounded bg-blue-500 text-white"
+              >
+                Add Permission
+              </Button>
+            </div>
           </form>
         </div>
       </div>

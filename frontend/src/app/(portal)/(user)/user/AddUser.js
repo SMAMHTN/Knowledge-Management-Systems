@@ -109,7 +109,7 @@ function AddUser({ fetchData }) {
                       placeholder="JohnDoe"
                     />
                     <p className="text-xs mt-1">
-                      This is Username. Min 2 characters & Max 50 characters. Required.
+                      Min 2 characters & Max 50 characters. Required.
                     </p>
                     {errors.Username && (<ErrorMessage error={errors.Username.message} />)}
                   </>
@@ -117,7 +117,7 @@ function AddUser({ fetchData }) {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">
+              <label className="block font-medium mb-1">
                 Password
                 <RequiredFieldIndicator />
               </label>
@@ -133,7 +133,7 @@ function AddUser({ fetchData }) {
                       placeholder="*******"
                     />
                     <p className="text-xs mt-1">
-                      This is password. Min 2 characters & Max 50 characters. Required.
+                      Min 8 characters & Max 50 characters. Required.
                     </p>
                     {errors.Password && (<ErrorMessage error={errors.Password.message} />)}
                   </>
@@ -141,7 +141,7 @@ function AddUser({ fetchData }) {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">
+              <label className="block font-medium mb-1">
                 Name
                 <RequiredFieldIndicator />
               </label>
@@ -157,7 +157,7 @@ function AddUser({ fetchData }) {
                       placeholder="John Doe"
                     />
                     <p className="text-xs mt-1">
-                      This is Name. Min 2 characters & Max 50 characters. Required.
+                      Min 2 characters & Max 50 characters. Required.
                     </p>
                     {errors.Name && (<ErrorMessage error={errors.Name.message} />)}
                   </>
@@ -165,7 +165,7 @@ function AddUser({ fetchData }) {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">
+              <label className="block font-medium mb-1">
                 Email
                 <RequiredFieldIndicator />
               </label>
@@ -180,16 +180,13 @@ function AddUser({ fetchData }) {
                       className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
                       placeholder="johndoe@mail.com"
                     />
-                    <p className="text-xs mt-1">
-                      This is Email.
-                    </p>
                     {errors.Email && (<ErrorMessage error={errors.Email.message} />)}
                   </>
                 )}
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">Address</label>
+              <label className="block font-medium mb-1">Address</label>
               <Controller
                 name="Address"
                 control={control}
@@ -201,16 +198,13 @@ function AddUser({ fetchData }) {
                       className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
                       placeholder="Bekasi, West Java, Indonesia"
                     />
-                    <p className="text-xs mt-1">
-                      This is Address. Required.
-                    </p>
                     {errors.Address && (<ErrorMessage error={errors.Address.message} />)}
                   </>
                 )}
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">Phone</label>
+              <label className="block font-medium mb-1">Phone</label>
               <Controller
                 name="Phone"
                 control={control}
@@ -223,7 +217,7 @@ function AddUser({ fetchData }) {
                       placeholder="081234567891"
                     />
                     <p className="text-xs mt-1">
-                      This is Phone. Number Only. Required.
+                      Phone Number. Number Only.
                     </p>
                     {errors.Phone && (<ErrorMessage error={errors.Phone.message} />)}
                   </>
@@ -231,7 +225,7 @@ function AddUser({ fetchData }) {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">
+              <label className="block font-medium mb-1">
                 Role ID
                 <RequiredFieldIndicator />
               </label>
@@ -247,7 +241,7 @@ function AddUser({ fetchData }) {
                       placeholder="Role ID"
                     />
                     <p className="text-xs mt-1">
-                      This is Role ID. Number Only. Required.
+                      Input a valid Role ID. Number Only. Required.
                     </p>
                     {errors.RoleID && (<ErrorMessage error={errors.RoleID.message} />)}
                   </>
@@ -255,7 +249,7 @@ function AddUser({ fetchData }) {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">
+              <label className="block font-medium mb-1">
                 AppthemeID
                 <RequiredFieldIndicator />
               </label>
@@ -271,7 +265,7 @@ function AddUser({ fetchData }) {
                       placeholder="App Theme ID"
                     />
                     <p className="text-xs mt-1">
-                      This is Theme App. Number Only. Required.
+                      Input a valid Theme App. Number Only. Required.
                     </p>
                     {errors.AppthemeID && (<ErrorMessage error={errors.AppthemeID.message} />)}
                   </>
@@ -280,7 +274,7 @@ function AddUser({ fetchData }) {
             </div>
 
             <div className="mb-4">
-              <label className="block font-semibold mb-1">Note</label>
+              <label className="block font-medium mb-1">Note</label>
               <Controller
                 name="Note"
                 control={control}
@@ -289,11 +283,11 @@ function AddUser({ fetchData }) {
                     <textarea
                       {...field}
                       type="textarea"
-                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
                       placeholder="John Doe is a farmer, he likes grass as his breakfast"
                     />
                     <p className="text-xs mt-1">
-                      Give a brief explanation of the the user
+                      Give a brief explanation of the the user.
                     </p>
                     {errors.Note && (<ErrorMessage error={errors.Note.message} />)}
                   </>

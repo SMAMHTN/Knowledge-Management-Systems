@@ -3,7 +3,7 @@ import React from 'react';
 export function RequiredFieldIndicator() {
   return (
     <span className="text-red-600" aria-label="Required Field" title="Required Field">
-      *
+      &nbsp;*
     </span>
   );
 }

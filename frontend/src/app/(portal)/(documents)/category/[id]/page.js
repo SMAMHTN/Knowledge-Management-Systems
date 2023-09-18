@@ -63,7 +63,7 @@ function CategoryDetail({ params }) {
   return (
     <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
       <div className="flex flex-col w-full">
-        <h2 className="text-2xl font-semibold mb-1">Category Edit</h2>
+        <h2 className="text-2xl font-semibold mb-1">Edit Category</h2>
         <p className="text-xs mb-4">
           Customize and manage your category details.
         </p>
@@ -74,7 +74,6 @@ function CategoryDetail({ params }) {
               Category Name
               <RequiredFieldIndicator />
             </label>
-
             <Controller
               name="CategoryName"
               control={control}
@@ -84,10 +83,10 @@ function CategoryDetail({ params }) {
                     {...field}
                     type="text"
                     className="text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-                    placeholder="Category Name"
+                    placeholder="Parent"
                   />
                   <p className="text-xs mt-1">
-                    This is Category Name. Min 2 characters & Max 50 characters. Required.
+                    Min 2 characters & Max 50 characters. Required.
                   </p>
                   {errors.CategoryName && (<ErrorMessage error={errors.CategoryName.message} />)}
                 </>
@@ -111,7 +110,7 @@ function CategoryDetail({ params }) {
                     placeholder="Category Parent ID"
                   />
                   <p className="text-xs mt-1">
-                    This is Category Parent ID. Number Only. Required.
+                    Input a valid Characters Parent ID. Number Only. Required.
                   </p>
                   {errors.CategoryParentID && (<ErrorMessage error={errors.CategoryParentID.message} />)}
                 </>
@@ -128,11 +127,11 @@ function CategoryDetail({ params }) {
                   <textarea
                     {...field}
                     type="textarea"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
-                    placeholder="Category Description"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                    placeholder="This is a Parent category that does...."
                   />
                   <p className="text-xs mt-1">
-                    Give a brief explanation of the category
+                    Give a brief explanation of the category.
                   </p>
                   {errors.CategoryDescription && (<ErrorMessage error={errors.CategoryDescription.message} />)}
                 </>

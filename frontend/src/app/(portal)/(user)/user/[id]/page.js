@@ -71,14 +71,17 @@ function UserDetails({ params }) {
   return (
     <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
       <div className="flex flex-col w-full">
-        <h2 className="text-2xl font-semibold mb-1">User Edit</h2>
+        <h2 className="text-2xl font-semibold mb-1">Edit User</h2>
         <p className="text-xs mb-4">
           Customize and manage your user details.
         </p>
         <Separator className="mb-4" />
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label className="block font-medium mb-1">Username</label>
+            <label className="block font-medium mb-1">
+              Username
+              <RequiredFieldIndicator />
+            </label>
             <Controller
               name="Username"
               control={control}
@@ -91,7 +94,7 @@ function UserDetails({ params }) {
                     placeholder="JohnDoe"
                   />
                   <p className="text-xs mt-1">
-                    This is Username. Min 2 characters & Max 50 characters. Required.
+                    Min 2 characters & Max 50 characters. Required.
                   </p>
                   {errors.Username && (<ErrorMessage error={errors.Username.message} />)}
                 </>
@@ -99,7 +102,11 @@ function UserDetails({ params }) {
             />
           </div>
           <div className="mb-4">
-            <label className="block font-medium mb-1">Password</label>
+            <label className="block font-medium mb-1">
+              Password
+              {' '}
+              <RequiredFieldIndicator />
+            </label>
             <Controller
               name="Password"
               control={control}
@@ -112,7 +119,7 @@ function UserDetails({ params }) {
                     placeholder="*******"
                   />
                   <p className="text-xs mt-1">
-                    This is password. Min 2 characters & Max 50 characters. Required.
+                    Min 8 characters & Max 50 characters. Required.
                   </p>
                   {errors.Password && (<ErrorMessage error={errors.Password.message} />)}
                 </>
@@ -120,7 +127,10 @@ function UserDetails({ params }) {
             />
           </div>
           <div className="mb-4">
-            <label className="block font-medium mb-1">Name</label>
+            <label className="block font-medium mb-1">
+              Name
+              <RequiredFieldIndicator />
+            </label>
             <Controller
               name="Name"
               control={control}
@@ -133,7 +143,7 @@ function UserDetails({ params }) {
                     placeholder="John Doe"
                   />
                   <p className="text-xs mt-1">
-                    This is Name. Min 2 characters & Max 50 characters. Required.
+                    Min 2 characters & Max 50 characters. Required.
                   </p>
                   {errors.Name && (<ErrorMessage error={errors.Name.message} />)}
                 </>
@@ -141,7 +151,10 @@ function UserDetails({ params }) {
             />
           </div>
           <div className="mb-4">
-            <label className="block font-semibold mb-1">Email</label>
+            <label className="block font-medium mb-1">
+              Email
+              <RequiredFieldIndicator />
+            </label>
             <Controller
               name="Email"
               control={control}
@@ -153,16 +166,13 @@ function UserDetails({ params }) {
                     className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
                     placeholder="johndoe@mail.com"
                   />
-                  <p className="text-xs mt-1">
-                    This is Email.
-                  </p>
                   {errors.Email && (<ErrorMessage error={errors.Email.message} />)}
                 </>
               )}
             />
           </div>
           <div className="mb-4">
-            <label className="block font-semibold mb-1">Address</label>
+            <label className="block font-medium mb-1">Address</label>
             <Controller
               name="Address"
               control={control}
@@ -174,16 +184,13 @@ function UserDetails({ params }) {
                     className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
                     placeholder="Bekasi, West Java, Indonesia"
                   />
-                  <p className="text-xs mt-1">
-                    This is Address. Required.
-                  </p>
                   {errors.Address && (<ErrorMessage error={errors.Address.message} />)}
                 </>
               )}
             />
           </div>
           <div className="mb-4">
-            <label className="block font-semibold mb-1">Phone</label>
+            <label className="block font-medium mb-1">Phone</label>
             <Controller
               name="Phone"
               control={control}
@@ -196,7 +203,7 @@ function UserDetails({ params }) {
                     placeholder="081234567891"
                   />
                   <p className="text-xs mt-1">
-                    This is Phone. Number Only. Required.
+                    Phone Number. Number Only.
                   </p>
                   {errors.Phone && (<ErrorMessage error={errors.Phone.message} />)}
                 </>
@@ -204,7 +211,10 @@ function UserDetails({ params }) {
             />
           </div>
           <div className="mb-4">
-            <label className="block font-semibold mb-1">Role ID</label>
+            <label className="block font-medium mb-1">
+              Role ID
+              <RequiredFieldIndicator />
+            </label>
             <Controller
               name="RoleID"
               control={control}
@@ -217,7 +227,7 @@ function UserDetails({ params }) {
                     placeholder="Role ID"
                   />
                   <p className="text-xs mt-1">
-                    This is Role ID. Number Only. Required.
+                    Input a valid Role ID. Number Only. Required.
                   </p>
                   {errors.RoleID && (<ErrorMessage error={errors.RoleID.message} />)}
                 </>
@@ -238,9 +248,30 @@ function UserDetails({ params }) {
                     placeholder="App Theme ID"
                   />
                   <p className="text-xs mt-1">
-                    This is Theme App. Number Only. Required.
+                    Input a valid Theme App. Number Only. Required.
                   </p>
                   {errors.AppthemeID && (<ErrorMessage error={errors.AppThemeID.message} />)}
+                </>
+              )}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-medium mb-1">Note</label>
+            <Controller
+              name="Note"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <textarea
+                    {...field}
+                    type="textarea"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                    placeholder="John Doe is a farmer, he likes grass as his breakfast"
+                  />
+                  <p className="text-xs mt-1">
+                    Give a brief explanation of the the user.
+                  </p>
+                  {errors.Note && (<ErrorMessage error={errors.Note.message} />)}
                 </>
               )}
             />

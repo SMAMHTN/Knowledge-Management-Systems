@@ -5,6 +5,7 @@ const numOnly = 'This field can only contain numeric values';
 const integerMsg = 'This field must be a whole number';
 const noHTMLMsg = 'HTML tags are not allowed';
 const maxCharMsg = 'This field must be no more than 50 characters';
+const minCharMsg = 'This field must be equal or more than 8 characters';
 const validMailMsg = 'Put a valid Email Address';
 const hasHtmlTagsRegex = /<[a-z][\s\S]*>/i;
 
@@ -69,7 +70,8 @@ export const userSchema = yup.object().shape({
   Password: yup
     .string()
     .required(requiredMsg)
-    .max(50, maxCharMsg),
+    .max(50, maxCharMsg)
+    .min(8, minCharMsg),
   Name: yup
     .string()
     .required(requiredMsg)
@@ -80,12 +82,9 @@ export const userSchema = yup.object().shape({
     .required(requiredMsg)
     .max(50, maxCharMsg),
   Address: yup
-    .string()
-    .required(requiredMsg)
-    .max(50, maxCharMsg),
+    .string(),
   Phone: yup
     .string()
-    .required(requiredMsg)
     .max(50, maxCharMsg),
   RoleID: yup
     .number(numOnly)
