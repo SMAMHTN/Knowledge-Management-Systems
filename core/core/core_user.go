@@ -8,27 +8,20 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (data User) UpdateFromAPI() error {
-	var err error
-	data.UserPhoto, err = dependency.Base64ToBytes(data.UserPhotoBase64)
-	if err != nil {
-		return err
-	}
-	data.IsActive = dependency.BooltoInt(data.IsActiveBool)
-	data.IsSuperAdmin = dependency.BooltoInt(data.IsActiveBool)
-
-	upd, err := Database.Prepare("UPDATE core.core_user SET UserPhoto=?, Username=?, Password=?, Name=?, Email=?, Address=?, Phone=?, RoleID=?, AppthemeID=?, Note=?, IsSuperAdmin=?, IsActive=? WHERE UserID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.UserPhoto, data.Username,
-		data.Password, data.Name, data.Email, data.Address, data.Phone, data.RoleID,
-		data.AppthemeID, data.Note, data.IsSuperAdmin, data.IsActive, data.UserID)
-	if err != nil {
-		return err
-	}
-	return nil
+type User_API struct {
+	UserID       int    `json:"UserID" query:"UserID"`
+	UserPhoto    string `json:"UserPhoto"`
+	Username     string `json:"Username" query:"Username"`
+	Password     string `json:"Password"`
+	Name         string `json:"Name"`
+	Email        string `json:"Email"`
+	Address      string `json:"Address"`
+	Phone        string `json:"Phone"`
+	RoleID       int    `json:"RoleID"`
+	AppthemeID   int    `json:"AppthemeID"`
+	Note         string `json:"Note"`
+	IsSuperAdmin bool   `json:"IsSuperAdmin"`
+	IsActive     bool   `json:"IsActive"`
 }
 
 func ListUser(c echo.Context) error {
@@ -54,8 +47,12 @@ func ListUser(c echo.Context) error {
 		}
 		LimitQuery, res.Info = limit.LimitMaker(TotalRow)
 		listUser, _ := ReadUserWithoutPhoto(query + " " + LimitQuery)
+		var listUserAPI []User_API
+		for _, y := range listUser {
+			listUserAPI = append(listUserAPI, y.ToAPI())
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = listUser
+		res.Data = listUserAPI
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -76,7 +73,7 @@ func ShowUser(c echo.Context) error {
 	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(User)
+	u := new(User_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -86,24 +83,40 @@ func ShowUser(c echo.Context) error {
 	}
 	if u.UserID == now_user.UserID || u.UserID == 0 {
 		u.UserID = now_user.UserID
-		err = u.Read()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Read()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusNotFound
 			res.Data = "USER NOT FOUND"
 			return c.JSON(http.StatusNotFound, res)
 		}
+		*u = uOri.ToAPI()
 		res.StatusCode = http.StatusOK
 		res.Data = u
 		return c.JSON(http.StatusOK, res)
 	} else if permission {
-		err = u.Read()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Read()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusNotFound
 			res.Data = "USER NOT FOUND"
 			return c.JSON(http.StatusNotFound, res)
 		}
+		*u = uOri.ToAPI()
 		res.StatusCode = http.StatusOK
 		res.Data = u
 		return c.JSON(http.StatusOK, res)
@@ -118,7 +131,7 @@ func AddUser(c echo.Context) error {
 	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(User)
+	u := new(User_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -127,14 +140,22 @@ func AddUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		_, err = u.CreateFromAPI()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		_, err = uOri.Create()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
 		}
-		u.Read()
+		uOri.Read()
+		*u = uOri.ToAPI()
 		res.StatusCode = http.StatusOK
 		res.Data = u
 		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Added User : "+u.Name+"("+u.Username+")"+"("+strconv.Itoa(u.UserID)+")")
@@ -153,7 +174,7 @@ func EditUser(c echo.Context) error {
 	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(User)
+	u := new(User_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -163,14 +184,22 @@ func EditUser(c echo.Context) error {
 	}
 	if u.UserID == now_user.UserID || u.UserID == 0 {
 		u.UserID = now_user.UserID
-		err = u.UpdateFromAPI()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Update()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
 		}
-		u.Read()
+		uOri.Read()
+		*u = uOri.ToAPI()
 		res.StatusCode = http.StatusOK
 		res.Data = u
 		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Edited User : "+u.Name+"("+u.Username+")"+"("+strconv.Itoa(u.UserID)+")")
@@ -180,14 +209,22 @@ func EditUser(c echo.Context) error {
 		return c.JSON(http.StatusOK, res)
 	}
 	if permission {
-		err = u.UpdateFromAPI()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Update()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
 		}
-		u.Read()
+		uOri.Read()
+		*u = uOri.ToAPI()
 		res.StatusCode = http.StatusOK
 		res.Data = u
 		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Edited User : "+u.Name+"("+u.Username+")"+"("+strconv.Itoa(u.UserID)+")")
@@ -206,7 +243,7 @@ func DeleteUser(c echo.Context) error {
 	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(User)
+	u := new(User_API)
 	err = c.Bind(u)
 	if u.UserID == 1 {
 		res.StatusCode = http.StatusBadRequest
@@ -219,7 +256,14 @@ func DeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		err = u.Delete()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Delete()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
@@ -227,7 +271,7 @@ func DeleteUser(c echo.Context) error {
 			return c.JSON(http.StatusConflict, res)
 		}
 		res.StatusCode = http.StatusOK
-		res.Data = "DELETED USER " + strconv.Itoa(u.UserID)
+		res.Data = "DELETED USER " + strconv.Itoa(uOri.UserID)
 		err = RecordHistory(c, "Theme", "User "+now_user.Name+"("+now_user.Username+") Deleted User : "+u.Name+"("+u.Username+")"+"("+strconv.Itoa(u.UserID)+")")
 		if err != nil {
 			Logger.Warn(err.Error())
@@ -244,7 +288,7 @@ func DeleteUser(c echo.Context) error {
 func CheckUserExist(c echo.Context) error {
 	var err error
 	res := Response{}
-	u := new(User)
+	u := new(User_API)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -252,7 +296,14 @@ func CheckUserExist(c echo.Context) error {
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	err = u.CheckExist()
+	uOri, err := u.ToTable()
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	err = uOri.CheckExist()
 	if err != nil {
 		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusNotFound
@@ -261,4 +312,38 @@ func CheckUserExist(c echo.Context) error {
 	res.StatusCode = http.StatusOK
 	res.Data = u
 	return c.JSON(http.StatusOK, res)
+}
+
+func (data User) ToAPI() (res User_API) {
+	res.UserID = data.UserID
+	res.UserPhoto = dependency.BytesToBase64(data.UserPhoto)
+	res.Username = data.Username
+	res.Password = data.Password
+	res.Name = data.Name
+	res.Email = data.Email
+	res.Address = data.Address
+	res.Phone = data.Phone
+	res.RoleID = data.RoleID
+	res.AppthemeID = data.AppthemeID
+	res.Note = data.Note
+	res.IsSuperAdmin = data.IsSuperAdmin == 1
+	res.IsActive = data.IsActive == 1
+	return res
+}
+
+func (data User_API) ToTable() (res User, err error) {
+	res.UserID = data.UserID
+	res.UserPhoto, err = dependency.Base64ToBytes(data.UserPhoto)
+	res.Username = data.Username
+	res.Password = data.Password
+	res.Name = data.Name
+	res.Email = data.Email
+	res.Address = data.Address
+	res.Phone = data.Phone
+	res.RoleID = data.RoleID
+	res.AppthemeID = data.AppthemeID
+	res.Note = data.Note
+	res.IsSuperAdmin = dependency.BooltoInt(data.IsSuperAdmin)
+	res.IsActive = dependency.BooltoInt(data.IsActive)
+	return res, err
 }

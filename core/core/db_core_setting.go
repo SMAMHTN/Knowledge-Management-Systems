@@ -8,13 +8,12 @@ import (
 )
 
 type Setting struct {
-	CompanyID         int    `json:"CompanyID" query:"CompanyID"`
-	CompanyName       string `json:"CompanyName"`
-	CompanyLogo       []byte `json:"-"`
-	CompanyLogoBase64 string `json:"CompanyLogo"`
-	CompanyAddress    string `json:"CompanyAddress"`
-	TimeZone          string `json:"TimeZone"`
-	AppthemeID        int    `json:"AppthemeID"`
+	CompanyID      int    `json:"CompanyID" query:"CompanyID"`
+	CompanyName    string `json:"CompanyName"`
+	CompanyLogo    []byte `json:"CompanyLogo"`
+	CompanyAddress string `json:"CompanyAddress"`
+	TimeZone       string `json:"TimeZone"`
+	AppthemeID     int    `json:"AppthemeID"`
 }
 
 func GetTime() time.Time {
@@ -80,25 +79,6 @@ func (data *Setting) Read() error {
 	} else {
 		return errors.New("please insert companyid")
 	}
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (data *Setting) ReadAPI() error {
-	err := data.Read()
-	data.CompanyLogoBase64 = dependency.BytesToBase64(data.CompanyLogo)
-	return err
-}
-
-func (data *Setting) UpdateAPI() error {
-	var err error
-	data.CompanyLogo, err = dependency.Base64ToBytes(data.CompanyLogoBase64)
-	if err != nil {
-		return err
-	}
-	err = data.Update()
 	if err != nil {
 		return err
 	}

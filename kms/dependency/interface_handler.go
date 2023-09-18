@@ -5,6 +5,14 @@ import (
 	"fmt"
 )
 
+func InterfacetoBool(data interface{}) (bool, error) {
+	if val, ok := data.(bool); ok {
+		return val, nil
+	} else {
+		return false, errors.New("convert failed: failed to convert interface to bool")
+	}
+}
+
 func InterfaceToInt(val interface{}) (int, error) {
 	switch val := val.(type) {
 	case int:
