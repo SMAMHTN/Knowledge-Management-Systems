@@ -105,3 +105,7 @@ export const userSchema = yup.object().shape({
   IsSuperAdmin: yup.boolean(),
   IsActive: yup.boolean(),
 });
+
+export const themeSchema = yup.object().shape({
+  AppthemeName: yup.string().required(requiredMsg),
+});

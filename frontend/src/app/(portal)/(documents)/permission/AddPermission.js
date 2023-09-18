@@ -101,7 +101,10 @@ function AddPermission({ fetchData }) {
           <Separator className="mb-4" />
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-4">
-              <label className="block font-medium mb-1">Category ID</label>
+              <label className="block font-medium mb-1">
+                Category ID
+                <RequiredFieldIndicator />
+              </label>
               <Controller
                 name="CategoryID"
                 control={control}
@@ -122,7 +125,10 @@ function AddPermission({ fetchData }) {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-medium mb-1">Role ID</label>
+              <label className="block font-medium mb-1">
+                Role ID
+                <RequiredFieldIndicator />
+              </label>
               <Controller
                 name="RoleID"
                 control={control}

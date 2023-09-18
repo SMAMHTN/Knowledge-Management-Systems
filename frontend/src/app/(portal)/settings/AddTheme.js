@@ -1,78 +1,69 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { CoreAPI } from '@/dep/core/coreHandler';
-import { useOutsideClick, useModal } from '@/components/Feature';
+
+import { themeSchema } from '@/constants/schema';
+import { ErrorMessage, RequiredFieldIndicator } from '@/components/FormComponent';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { useOutsideClick, useModal, alertAdd } from '@/components/Feature';
+import { closeIcon } from '@/constants/icon';
 
 function AddTheme({ fetchThemes }) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const ref = useRef(null);
-  const [formData, setFormData] = useState({
-    AppthemeName: '',
-    AppthemeValue: '',
-  });
   const [primaryColor, setPrimaryColor] = useState('#000000');
   const [secondaryColor, setSecondaryColor] = useState('#000000');
+  const {
+    handleSubmit, control, reset, formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(themeSchema),
+    defaultValues: {
+      AppthemeName: '',
+    },
+  });
 
   useOutsideClick(ref, closeModal);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleClose = () => {
+    reset();
+    closeModal();
+    setPrimaryColor('#000000');
+    setSecondaryColor('#000000');
   };
 
   const handlePrimaryColorChange = (e) => {
     const rawColorValue = e.target.value;
     const formattedColorValue = rawColorValue.toUpperCase();
     setPrimaryColor(formattedColorValue);
-    setFormData((prevData) => ({
-      ...prevData,
-      AppthemeValue: JSON.stringify({
-        primary_color: formattedColorValue,
-        secondary_color: prevData.AppthemeValue
-          ? JSON.parse(prevData.AppthemeValue).secondary_color
-          : secondaryColor,
-      }),
-    }));
   };
 
   const handleSecondaryColorChange = (e) => {
     const rawColorValue = e.target.value;
     const formattedColorValue = rawColorValue.toUpperCase();
     setSecondaryColor(formattedColorValue);
-    setFormData((prevData) => ({
-      ...prevData,
-      AppthemeValue: JSON.stringify({
-        primary_color: prevData.AppthemeValue
-          ? JSON.parse(prevData.AppthemeValue).primary_color
-          : primaryColor,
-        secondary_color: formattedColorValue,
-      }),
-    }));
   };
 
-  const handleSave = async (e) => {
+  const onSubmit = async (data, e) => {
     e.preventDefault();
-    console.log(formData);
     try {
       const updatedFormData = {
-        ...formData,
+        ...data,
         AppthemeValue: JSON.stringify({
           primary_color: primaryColor,
           secondary_color: secondaryColor,
         }),
       };
 
-      await CoreAPI('POST', 'theme', updatedFormData);
+      const response = await CoreAPI('POST', 'theme', updatedFormData);
 
       fetchThemes();
-      console.log('Data saved successfully.');
+      alertAdd(response);
+      handleClose();
     } catch (error) {
       console.log('Error occurred:', error);
     }
-
-    closeModal();
   };
   return (
     <div>
@@ -97,62 +88,79 @@ function AddTheme({ fetchThemes }) {
         }`}
 
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-40" ref={ref}>
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-            onClick={closeModal}
+            onClick={handleClose}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            {closeIcon}
           </button>
-          <h2 className="text-2xl font-semibold mb-4">New Theme</h2>
-          <form onSubmit={handleSave}>
-            <div>
+          <h2 className="text-2xl font-semibold mb-2">Add Theme</h2>
+          <Separator className="mb-4" />
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="mb-6">
+              <label className="block font-medium mb-1">
+                Theme Name
+                <RequiredFieldIndicator />
+              </label>
+              <Controller
+                name="AppthemeName"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      type="text"
+                      {...field}
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                      placeholder="Orange Juice orange theme"
+                    />
+                    <p className="text-xs mt-1">
+                      Min 2 characters & Max 50 characters. Required.
+                    </p>
+                    {errors.AppthemeName && (<ErrorMessage error={errors.AppthemeName.message} />)}
+                  </>
+                )}
+              />
+            </div>
+            <label className="block font-medium mb-1">Color</label>
+            <p className="text-xs mt-1 mb-6">
+              Choose primary and secondary color for your new theme.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+
               <div className="mb-4">
-                <label className="block font-semibold mb-1">AppthemeName</label>
-                <input
-                  type="text"
-                  name="AppthemeName"
-                  value={formData.AppthemeName}
-                  onChange={handleInputChange}
-                  className="border px-2 py-1 w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">Primary Color</label>
+                <label className="block font-normal mb-1">Primary</label>
                 <input
                   type="color"
-                  value={formData.primaryColor}
+                  value={primaryColor}
                   onChange={handlePrimaryColorChange}
                 />
               </div>
               <div className="mb-4">
-                <label className="block font-semibold mb-1">Secondary Color</label>
+                <label className="block font-normal mb-1">Secondary</label>
                 <input
                   type="color"
-                  value={formData.secondaryColor}
+                  value={secondaryColor}
                   onChange={handleSecondaryColorChange}
                 />
               </div>
             </div>
-
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Save
-            </button>
+            <div className="place-content-end mt-10 flex">
+              <button
+                type="button"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+                onClick={handleClose}
+              >
+                Cancel
+              </button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="rounded bg-blue-500 text-white"
+              >
+                Add Theme
+              </Button>
+            </div>
           </form>
         </div>
       </div>
@@ -161,125 +169,3 @@ function AddTheme({ fetchThemes }) {
 }
 
 export default AddTheme;
-
-// "use client";
-// import React, { useState } from "react";
-// import { useState, useEffect } from "react";
-// import { useRouter } from "next/navigation";
-// import { KmsAPI } from "@/dep/kms/kmsHandler";
-
-// function AddProduct() {
-//   const [formData, setFormData] = useState({
-//     CategoryName: "",
-//     CategoryParentID: "",
-//     CategoryDescription: "",
-//   });
-//   const [modal, setModal] = useState(false);
-//   const [isMutating, setIsMutating] = useState(false);
-
-//   const router = useRouter();
-
-//   function handleSubmit(e) {
-//     e.preventDefault();
-
-//     setIsMutating(true);
-
-// // Use useEffect to fetch data
-// useEffect(() => {
-//   const fetchData = async () => {
-//     try {
-//       await KmsAPI("POST", "category", data);
-//       setIsMutating(false);
-//       router.refresh();
-//       setModal(false);
-//     } catch (error) {
-//       console.log("Error occurred:", error);
-//       setIsMutating(false);
-//       // Handle error, show a message, etc.
-//     }
-//   };
-
-//   fetchData();
-// }, [data, router]); // Add data and router as dependencies for useEffect
-//   }
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prevData) => ({
-//       ...prevData,
-//       [name]: value,
-//     }));
-//   };
-
-//   function handleChange() {
-//     setModal(!modal);
-//   }
-
-//   return (
-//     <div>
-//       <button  onClick={handleChange} className="bg-blue-500 text-white rounded px-2 py-1">
-//         Add New +
-//       </button>
-//       <input
-//         type="checkbox"
-//         checked={modal}
-//         onChange={handleChange}
-//         className="modal-toggle"
-//       />
-
-//       <div className="modal">
-//         <div className="modal-box">
-//           <h3 className="font-bold text-lg">Add New Product</h3>
-//           <form onSubmit={handleSubmit}>
-//             <div className="form-control">
-//               <label className="label font-bold">CategoryName</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryName}
-//           onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Product Name"
-//               />
-//             </div>
-//             <div className="form-control">
-//               <label className="label font-bold">Price</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryParentID}
-//           onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Price"
-//               />
-//             </div>
-//             <div className="form-control">
-//               <label className="label font-bold">Price</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryDescription}
-//                 onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Price"
-//               />
-//             </div>
-//             <div className="modal-action">
-//               <button type="button" className="btn" onClick={handleChange}>
-//                 Close
-//               </button>
-//               {!isMutating ? (
-//                 <button type="submit" className="btn btn-primary">
-//                   Save
-//                 </button>
-//               ) : (
-//                 <button type="button" className="btn loading">
-//                   Saving...
-//                 </button>
-//               )}
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default AddProduct;

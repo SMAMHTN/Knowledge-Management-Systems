@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -13,7 +13,7 @@ import { Separator } from '@/components/ui/separator';
 
 function UserDetails({ params }) {
   const {
-    handleSubmit, control, setValue, getValues, formState: { errors, isSubmitting },
+    handleSubmit, control, setValue, formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       RoleID: '',
