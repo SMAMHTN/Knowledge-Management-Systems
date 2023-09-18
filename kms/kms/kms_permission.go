@@ -16,10 +16,10 @@ type Permission_API struct {
 	PermissionID int `json:"PermissionID" query:"PermissionID"`
 	CategoryID   int
 	RoleID       int
-	PCreate      int `json:"Create"`
-	PRead        int `json:"Read"`
-	PUpdate      int `json:"Update"`
-	PDelete      int `json:"Delete"`
+	PCreate      bool `json:"Create"`
+	PRead        bool `json:"Read"`
+	PUpdate      bool `json:"Update"`
+	PDelete      bool `json:"Delete"`
 	FileType     []string
 	DocType      []string
 }
@@ -502,10 +502,10 @@ func (data Permission) ToAPI() (res Permission_API, err error) {
 		PermissionID: data.PermissionID,
 		CategoryID:   data.CategoryID,
 		RoleID:       data.RoleID,
-		PCreate:      data.PCreate,
-		PRead:        data.PRead,
-		PUpdate:      data.PUpdate,
-		PDelete:      data.PDelete,
+		PCreate:      data.PCreate == 1,
+		PRead:        data.PRead == 1,
+		PUpdate:      data.PUpdate == 1,
+		PDelete:      data.PDelete == 1,
 		FileType:     []string{},
 		DocType:      []string{},
 	}
@@ -519,10 +519,10 @@ func (data Permission_API) ToTable() (res Permission, err error) {
 		PermissionID: data.PermissionID,
 		CategoryID:   data.CategoryID,
 		RoleID:       data.RoleID,
-		PCreate:      data.PCreate,
-		PRead:        data.PRead,
-		PUpdate:      data.PUpdate,
-		PDelete:      data.PDelete,
+		PCreate:      dependency.BooltoInt(data.PCreate),
+		PRead:        dependency.BooltoInt(data.PRead),
+		PUpdate:      dependency.BooltoInt(data.PUpdate),
+		PDelete:      dependency.BooltoInt(data.PDelete),
 		FileType:     "",
 		DocType:      "",
 	}

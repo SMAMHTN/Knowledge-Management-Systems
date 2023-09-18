@@ -34,7 +34,7 @@ type Article_API struct {
 	Article        string
 	FileID         []int
 	DocID          []int
-	IsActive       int
+	IsActive       bool
 }
 
 func ListArticle(c echo.Context) error {
@@ -432,7 +432,7 @@ func (data Article_Table) ToAPI() (res Article_API, err error) {
 	if err != nil {
 		return res, err
 	}
-	res.IsActive = data.IsActive
+	res.IsActive = data.IsActive == 1
 	res.LastEditedByID = data.LastEditedByID
 	res.LastEditedTime = data.LastEditedTime
 	res.OwnerID = data.OwnerID
@@ -453,7 +453,7 @@ func (data Article_API) ToTable() (res Article_Table, err error) {
 	if err != nil {
 		return res, err
 	}
-	res.IsActive = data.IsActive
+	res.IsActive = dependency.BooltoInt(data.IsActive)
 	res.LastEditedByID = data.LastEditedByID
 	res.LastEditedTime = data.LastEditedTime
 	res.OwnerID = data.OwnerID

@@ -7,20 +7,22 @@ import (
 )
 
 type User struct {
-	UserID          int    `json:"UserID" query:"UserID"`
-	UserPhoto       []byte `json:"-"`
-	UserPhotoBase64 string `json:"UserPhoto"`
-	Username        string `json:"Username" query:"Username"`
-	Password        string `json:"Password"`
-	Name            string `json:"Name"`
-	Email           string `json:"Email"`
-	Address         string `json:"Address"`
-	Phone           string `json:"Phone"`
-	RoleID          int    `json:"RoleID"`
-	AppthemeID      int    `json:"AppthemeID"`
-	Note            string `json:"Note"`
-	IsSuperAdmin    int    `json:"IsSuperAdmin"`
-	IsActive        int    `json:"IsActive"`
+	UserID           int    `json:"UserID" query:"UserID"`
+	UserPhoto        []byte `json:"-"`
+	UserPhotoBase64  string `json:"UserPhoto"`
+	Username         string `json:"Username" query:"Username"`
+	Password         string `json:"Password"`
+	Name             string `json:"Name"`
+	Email            string `json:"Email"`
+	Address          string `json:"Address"`
+	Phone            string `json:"Phone"`
+	RoleID           int    `json:"RoleID"`
+	AppthemeID       int    `json:"AppthemeID"`
+	Note             string `json:"Note"`
+	IsSuperAdminBool bool   `json:"IsSuperAdmin"`
+	IsSuperAdmin     int    `json:"-"`
+	IsActiveBool     bool   `json:"IsActive"`
+	IsActive         int    `json:"-"`
 }
 
 func ReadUser(args string) ([]User, error) {
@@ -118,6 +120,8 @@ func (data *User) Read() error {
 		return errors.New("please insert UserID or Username")
 	}
 	data.UserPhotoBase64 = dependency.BytesToBase64(data.UserPhoto)
+	data.IsActive = dependency.BooltoInt(data.IsActiveBool)
+	data.IsSuperAdmin = dependency.BooltoInt(data.IsActiveBool)
 	if err != nil {
 		return err
 	}
@@ -153,6 +157,8 @@ func (data *User) ReadWithoutPhoto() error {
 		return errors.New("please insert UserID or Username")
 	}
 	data.UserPhotoBase64 = dependency.BytesToBase64(data.UserPhoto)
+	data.IsActive = dependency.BooltoInt(data.IsActiveBool)
+	data.IsSuperAdmin = dependency.BooltoInt(data.IsActiveBool)
 	if err != nil {
 		return err
 	}
@@ -170,6 +176,8 @@ func (data *User) ReadLogin() error {
 		return errors.New("please insert Username & Password")
 	}
 	data.UserPhotoBase64 = dependency.BytesToBase64(data.UserPhoto)
+	data.IsActive = dependency.BooltoInt(data.IsActiveBool)
+	data.IsSuperAdmin = dependency.BooltoInt(data.IsActiveBool)
 	if err != nil {
 		return err
 	}
@@ -220,6 +228,8 @@ func (data User) CreateFromAPI() (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	data.IsActive = dependency.BooltoInt(data.IsActiveBool)
+	data.IsSuperAdmin = dependency.BooltoInt(data.IsActiveBool)
 
 	ins, err := Database.Prepare("INSERT INTO core.core_user (UserPhoto, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
 	if err != nil {

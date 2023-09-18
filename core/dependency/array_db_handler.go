@@ -2,6 +2,7 @@ package dependency
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -38,7 +39,7 @@ func ConvStringToIntArray(str string) ([]int, error) {
 	var intArray []int
 	for _, strVal := range strValues {
 		num := 0
-		_, err := fmt.Sscanf(strVal, "%d", &num)
+		num, err := strconv.Atoi(strVal)
 		if err != nil {
 			return nil, err
 		}

@@ -14,6 +14,8 @@ func (data User) UpdateFromAPI() error {
 	if err != nil {
 		return err
 	}
+	data.IsActive = dependency.BooltoInt(data.IsActiveBool)
+	data.IsSuperAdmin = dependency.BooltoInt(data.IsActiveBool)
 
 	upd, err := Database.Prepare("UPDATE core.core_user SET UserPhoto=?, Username=?, Password=?, Name=?, Email=?, Address=?, Phone=?, RoleID=?, AppthemeID=?, Note=?, IsSuperAdmin=?, IsActive=? WHERE UserID=?;")
 	if err != nil {
