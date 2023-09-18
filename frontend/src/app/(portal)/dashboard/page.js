@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { getUserData, Logout } from '@/dep/core/coreHandler';
 import { searchIcon, dashboardIcon } from '@/constants/icon';
+import { Separator } from '@/components/ui/separator';
 
 function Home() {
   const [error, setError] = useState('');
@@ -23,22 +24,18 @@ function Home() {
   }, []);
 
   return (
-    <section className="h-screen flex flex-col flex-auto">
-      <div className=" flex flex-col">
-        <div className="px-4 py-2 bg-gray-300 tracking-wide font-medium shadow rounded mb-4">
-          <Link href="/dashboard" className="text-blue-500 hover:text-blue-800">
-            Dashboard
-          </Link>
-          / Overview
-        </div>
-        <div className="space-y-4 mb-4">
-          {userData && (
-          <h1 className="mx-4 mb-8">
-            Selamat datang
-            {' '}
+    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+      <div className="flex flex-col w-full">
+        <h2 className="text-2xl font-semibold mb-1">Dashboard</h2>
+        {userData && (
+          <p className="mb-4 font-medium">
+            Welcome &nbsp;
             {userData.Name}
-          </h1>
-          )}
+          </p>
+        )}
+        <Separator className="mb-4" />
+        <div className="space-y-4 mb-4">
+
           <div className="rounded-2xl shadow-3xl">
             <form className="flex py-2 px-2 md:px-20 mb-14">
               <span className="flex bg-white border-r-0 border rounded-tl rounded-bl pl-2 pr-3 shadow-md">{ searchIcon }</span>

@@ -7,6 +7,7 @@ import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import AddCategory from './AddCategory';
 import { DeleteModal, alertDelete } from '@/components/Feature';
 import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
+import { Separator } from '@/components/ui/separator';
 
 function CatTable() {
   const router = useRouter();
@@ -100,66 +101,64 @@ function CatTable() {
   };
 
   return (
-    <section className="h-screen flex flex-col flex-auto">
-      <div className="flex flex-col">
-        <div className="px-4 py-2 bg-gray-300 tracking-wide font-medium shadow rounded mb-4">
-          <Link href="/category" className="text-blue-500 hover:text-blue-800">
-            Category
-          </Link>
+    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+      <div className="flex flex-col w-full">
+        <h2 className="text-2xl font-semibold mb-1">List Category</h2>
+        <p className="text-xs mb-4">
+          view and access list of categories.
+        </p>
+        <Separator className="mb-4" />
+        <div className="my-2">
+          <AddCategory fetchData={fetchData} />
+          <ItmsPerPageComp
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+            setCurrentPage={setCurrentPage}
+          />
         </div>
-
-        <div className="max-w-3xl mx-auto p-4">
-          <div className="my-2">
-            <AddCategory fetchData={fetchData} />
-            <ItmsPerPageComp
-              itemsPerPage={itemsPerPage}
-              setItemsPerPage={setItemsPerPage}
-              setCurrentPage={setCurrentPage}
-            />
-          </div>
-          <table className="w-full border">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2">ID</th>
-                <th className="px-4 py-2">Name</th>
-                <th className="px-4 py-2">Parent Name</th>
-                <th className="px-4 py-2">Action</th>
+        <table className="w-full border">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2">ID</th>
+              <th className="px-4 py-2">Name</th>
+              <th className="px-4 py-2">Parent Name</th>
+              <th className="px-4 py-2">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((category) => (
+              <tr key={category.CategoryID}>
+                <td className="px-4 py-2">{category.CategoryID}</td>
+                <td className="px-4 py-2">{category.CategoryName}</td>
+                <td className="px-4 py-2 text-center">
+                  {' '}
+                  {catNames[category.CategoryParentID] === category.CategoryName ? '-' : catNames[category.CategoryParentID] || category.CategoryParentID}
+                </td>
+                <td className="px-4 py-2 flex justify-end items-center">
+                  <button
+                    onClick={() => handleNavigate(category.CategoryID)}
+                    className="bg-yellow-500 text-white rounded px-2 py-1"
+                  >
+                    View
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDeletingCategoryID(category.CategoryID);
+                      setDeleteMessage(
+                        `Are you sure you would like to delete "${category.CategoryName}" category? This action cannot be undone.`,
+                      );
+                      setIsDeleteModalOpen(true);
+                    }}
+                    className="bg-red-500 text-white rounded px-2 py-1 ml-2"
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {data.map((category) => (
-                <tr key={category.CategoryID}>
-                  <td className="px-4 py-2">{category.CategoryID}</td>
-                  <td className="px-4 py-2">{category.CategoryName}</td>
-                  <td className="px-4 py-2 text-center">
-                    {' '}
-                    {catNames[category.CategoryParentID] === category.CategoryName ? '-' : catNames[category.CategoryParentID] || category.CategoryParentID}
-                  </td>
-                  <td className="px-4 py-2 flex justify-end items-center">
-                    <button
-                      onClick={() => handleNavigate(category.CategoryID)}
-                      className="bg-yellow-500 text-white rounded px-2 py-1"
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDeletingCategoryID(category.CategoryID);
-                        setDeleteMessage(
-                          `Are you sure you would like to delete "${category.CategoryName}" category? This action cannot be undone.`,
-                        );
-                        setIsDeleteModalOpen(true);
-                      }}
-                      className="bg-red-500 text-white rounded px-2 py-1 ml-2"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
+
         <PaginationComp
           currentPage={currentPage}
           totalPages={pageInfo.TotalPage}

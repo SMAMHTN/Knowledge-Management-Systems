@@ -5,6 +5,7 @@ import { CoreAPI, CoreAPIGET, getUserData } from '@/dep/core/coreHandler';
 import { alertUpdate } from '@/components/Feature';
 import LogoUpload from '@/app/(portal)/settings/LogoUpload';
 import ProfileImage from '@/components/Navbar/ShowUserPhoto';
+import { Separator } from '@/components/ui/separator';
 
 function UserSettings() {
   const [data, setData] = useState({});
@@ -95,10 +96,13 @@ function UserSettings() {
     setData({ ...data, UserPhoto: base64String });
   };
   return (
-    <section className="max-w-screen-xl h-screen relative mt-9">
-      <div className="mx-auto p-4">
-        <h2 className="text-2xl font-bold mb-4">User Settings</h2>
-
+    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+      <div className="flex flex-col w-full">
+        <h2 className="text-2xl font-semibold mb-1">Profile settings</h2>
+        <p className="text-xs mb-4">
+          Customize and manage your profile details.
+        </p>
+        <Separator className="mb-4" />
         {/* Small Viewport Table (Without Left Column) */}
         <table className="w-full block sm:hidden">
           <tbody>

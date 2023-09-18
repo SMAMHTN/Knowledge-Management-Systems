@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
 
@@ -55,54 +56,52 @@ function HistoryTable() {
     setCurrentPage(pageNumber);
   };
   return (
-    <section className="h-screen flex flex-col flex-auto">
-      <div className="flex flex-col">
-        <div className="px-4 py-2 bg-gray-300 tracking-wide font-medium shadow rounded mb-4">
-          <Link href="/activity-log" className="text-blue-500 hover:text-blue-800">
-            Activity Log
-          </Link>
-        </div>
-        <div className="max-w-3xl mx-auto p-4">
-
-          <table className="w-full border">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2">Type</th>
-                <th className="px-4 py-2">Changes</th>
-                <th className="px-4 py-2">User</th>
-                <th className="px-4 py-2">Time</th>
+    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+      <div className="flex flex-col w-full">
+        <h2 className="text-2xl font-semibold mb-1">List Roles</h2>
+        <p className="text-xs mb-4">
+          view and access list of roles.
+        </p>
+        <Separator className="mb-4" />
+        <table className="w-full border">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2">Type</th>
+              <th className="px-4 py-2">Changes</th>
+              <th className="px-4 py-2">User</th>
+              <th className="px-4 py-2">Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((history) => (
+              <tr key={history.HistoryID} className="border-b">
+                <td className="px-4 py-2">{history.ActivityType}</td>
+                <td className="px-4 py-2">{history.Changes}</td>
+                <td className="px-4 py-2">
+                  {' '}
+                  {usNames[history.UserID] || '-'}
+                </td>
+                <td className="px-4 py-2">{history.Time}</td>
               </tr>
-            </thead>
-            <tbody>
-              {data.map((history) => (
-                <tr key={history.HistoryID} className="border-b">
-                  <td className="px-4 py-2">{history.ActivityType}</td>
-                  <td className="px-4 py-2">{history.Changes}</td>
-                  <td className="px-4 py-2">
-                    {' '}
-                    {usNames[history.UserID] || '-'}
-                  </td>
-                  <td className="px-4 py-2">{history.Time}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <PaginationComp
-            currentPage={currentPage}
-            totalPages={pageInfo.TotalPage}
-            totalRow={pageInfo.TotalRow}
-            itemsPerPage={itemsPerPage}
-            handlePageChange={handlePageChange}
-            upperLimit={pageInfo.UpperLimit}
-            lowerLimit={pageInfo.LowerLimit}
-          />
+            ))}
+          </tbody>
+        </table>
+        <PaginationComp
+          currentPage={currentPage}
+          totalPages={pageInfo.TotalPage}
+          totalRow={pageInfo.TotalRow}
+          itemsPerPage={itemsPerPage}
+          handlePageChange={handlePageChange}
+          upperLimit={pageInfo.UpperLimit}
+          lowerLimit={pageInfo.LowerLimit}
+        />
 
-          <ItmsPerPageComp
-            itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
-            setCurrentPage={setCurrentPage}
-          />
-        </div>
+        <ItmsPerPageComp
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+          setCurrentPage={setCurrentPage}
+        />
+
       </div>
     </section>
   );

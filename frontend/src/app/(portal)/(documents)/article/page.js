@@ -7,6 +7,7 @@ import AddArticle from './AddArticle';
 import { DeleteModal, alertDelete } from '@/components/Feature';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
+import { Separator } from '@/components/ui/separator';
 
 function DocTable() {
   const router = useRouter();
@@ -126,75 +127,76 @@ function DocTable() {
     setCurrentPage(pageNumber);
   };
   return (
-    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-      {/* buat s.admin */}
-      <div className="max-w-md ml-14 p-4 mt-9">
-        <div className="max-w-3xl mx-auto p-4">
-          <h2 className="text-2xl font-bold mb-4">Doc Table</h2>
-          <div className="my-2"><AddArticle fetchData={fetchData} /></div>
-
-          <table className="w-full border">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2">ID</th>
-                <th className="px-4 py-2">Owner</th>
-                <th className="px-4 py-2">Last Edited</th>
-                <th className="px-4 py-2">Tag</th>
-                <th className="px-4 py-2">Title</th>
-                <th className="px-4 py-2">Category</th>
-                <th className="px-4 py-2">Article</th>
-                <th className="px-4 py-2">Active</th>
-                <th className="px-4 py-2">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array.isArray(data) && data.map((article) => (
-                <tr key={article.ArticleID}>
-                  <td className="px-4 py-2">{article.ArticleID}</td>
-                  <td className="px-4 py-2 text-center">
-                    {' '}
-                    {usNames[article.OwnerID] || '-'}
-                  </td>
-                  <td className="px-4 py-2">{article.LastEditedTime}</td>
-                  <td className="px-4 py-2">{article.Tag}</td>
-                  <td className="px-4 py-2">{article.Title}</td>
-                  <td className="px-4 py-2 text-center">
-                    {' '}
-                    {catNames[article.CategoryID] || '-'}
-                  </td>
-                  <td className="px-4 py-2">{article.Article}</td>
-                  <td className="px-4 py-2">{article.IsActive}</td>
-                  {/* <td className="px-4 py-2 whitespace-nowrap overflow-hidden overflow-ellipsis">
+    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+      <div className="flex flex-col w-full">
+        <h2 className="text-2xl font-semibold mb-1">List Article</h2>
+        <p className="text-xs mb-4">
+          view and access list of articles.
+        </p>
+        <Separator className="mb-4" />
+        <div className="my-2"><AddArticle fetchData={fetchData} /></div>
+        <table className="w-full border">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2">ID</th>
+              <th className="px-4 py-2">Owner</th>
+              <th className="px-4 py-2">Last Edited</th>
+              <th className="px-4 py-2">Tag</th>
+              <th className="px-4 py-2">Title</th>
+              <th className="px-4 py-2">Category</th>
+              <th className="px-4 py-2">Article</th>
+              <th className="px-4 py-2">Active</th>
+              <th className="px-4 py-2">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.isArray(data) && data.map((article) => (
+              <tr key={article.ArticleID}>
+                <td className="px-4 py-2">{article.ArticleID}</td>
+                <td className="px-4 py-2 text-center">
+                  {' '}
+                  {usNames[article.OwnerID] || '-'}
+                </td>
+                <td className="px-4 py-2">{article.LastEditedTime}</td>
+                <td className="px-4 py-2">{article.Tag}</td>
+                <td className="px-4 py-2">{article.Title}</td>
+                <td className="px-4 py-2 text-center">
+                  {' '}
+                  {catNames[article.CategoryID] || '-'}
+                </td>
+                <td className="px-4 py-2">{article.Article}</td>
+                <td className="px-4 py-2">{article.IsActive}</td>
+                {/* <td className="px-4 py-2 whitespace-nowrap overflow-hidden overflow-ellipsis">
                       {truncateText(article.DocType, 15)}
                     </td>
                     <td className="px-4 py-2">
                       {truncateText(article.DocLoc, 20)}
                     </td> */}
-                  <td className="px-4 py-2 flex justify-end items-center">
-                    <button
-                      onClick={() => handleNavigate(article.ArticleID)}
-                      className="bg-yellow-500 text-white rounded px-2 py-1"
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDeletingArticleID(article.ArticleID);
-                        setDeleteMessage(
-                          `Are you sure you would like to delete "${article.Title}" Article? This action cannot be undone.`,
-                        );
-                        setIsDeleteModalOpen(true);
-                      }}
-                      className="bg-red-500 text-white rounded px-2 py-1 ml-2"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                <td className="px-4 py-2 flex justify-end items-center">
+                  <button
+                    onClick={() => handleNavigate(article.ArticleID)}
+                    className="bg-yellow-500 text-white rounded px-2 py-1"
+                  >
+                    View
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDeletingArticleID(article.ArticleID);
+                      setDeleteMessage(
+                        `Are you sure you would like to delete "${article.Title}" Article? This action cannot be undone.`,
+                      );
+                      setIsDeleteModalOpen(true);
+                    }}
+                    className="bg-red-500 text-white rounded px-2 py-1 ml-2"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
         <PaginationComp
           currentPage={currentPage}
           totalPages={pageInfo.TotalPage}

@@ -6,6 +6,7 @@ import { CoreAPIGET, CoreAPI } from '@/dep/core/coreHandler';
 import AddUser from './AddUser';
 import { DeleteModal, alertDelete } from '@/components/Feature';
 import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
+import { Separator } from '@/components/ui/separator';
 
 function UserTable() {
   const router = useRouter();
@@ -99,75 +100,77 @@ function UserTable() {
     setCurrentPage(pageNumber);
   };
   return (
-    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-      {/* buat s.admin */}
-      <div className="max-w-md ml-14 p-4 mt-9">
-        <div className="max-w-3xl mx-auto p-4">
-          <h2 className="text-2xl font-bold mb-4">User Table</h2>
-          <div className="my-2">
-            <AddUser fetchData={fetchData} />
-          </div>
-
-          <table className="w-full border">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2">UserID</th>
-                <th className="px-4 py-2">Username</th>
-                <th className="px-4 py-2">Full Name</th>
-                <th className="px-4 py-2">Status</th>
-                <th className="px-4 py-2">Roles</th>
-                <th className="px-4 py-2">Email</th>
-                <th className="px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data ? (
-                data.map((user) => (
-                  <tr key={user.UserID}>
-                    <td className="px-4 py-2">{user.UserID}</td>
-                    <td className="px-4 py-2">{user.Username}</td>
-                    <td className="px-4 py-2 whitespace-nowrap overflow-hidden overflow-ellipsis">
-                      {truncateText(user.Name, 15)}
-                    </td>
-                    <td className="text-center">
-                      {user.IsActive === 1 ? 'Active' : 'Not Active'}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {' '}
-                      {roleNames[user.RoleID] || '-'}
-                    </td>
-                    <td className="px-4 py-2">
-                      {truncateText(user.Email, 20)}
-                    </td>
-                    <td className="px-4 py-2 flex justify-end items-center">
-                      <button
-                        onClick={() => handleNavigate(user.UserID)}
-                        className="bg-yellow-500 text-white rounded px-2 py-1"
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => {
-                          setDeletingUserID(user.UserID);
-                          setDeleteMessage(
-                            `Are you sure you would like to delete user "${user.Username}"? This action cannot be undone.`,
-                          );
-                          setIsDeleteModalOpen(true);
-                        }}
-                        className="bg-red-500 text-white rounded px-2 py-1 ml-2"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))) : (
-                  <tr>
-                    <td colSpan="7">Loading data...</td>
-                  </tr>
-              )}
-            </tbody>
-          </table>
+    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+      <div className="flex flex-col w-full">
+        <h2 className="text-2xl font-semibold mb-1">List User</h2>
+        <p className="text-xs mb-4">
+          view and access list of user profiles.
+        </p>
+        <Separator className="mb-4" />
+        <div className="my-2">
+          <AddUser fetchData={fetchData} />
         </div>
+
+        <table className="w-full border">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2">UserID</th>
+              <th className="px-4 py-2">Username</th>
+              <th className="px-4 py-2">Full Name</th>
+              <th className="px-4 py-2">Status</th>
+              <th className="px-4 py-2">Roles</th>
+              <th className="px-4 py-2">Email</th>
+              <th className="px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data ? (
+              data.map((user) => (
+                <tr key={user.UserID}>
+                  <td className="px-4 py-2">{user.UserID}</td>
+                  <td className="px-4 py-2">{user.Username}</td>
+                  <td className="px-4 py-2 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                    {truncateText(user.Name, 15)}
+                  </td>
+                  <td className="text-center">
+                    {user.IsActive === 1 ? 'Active' : 'Not Active'}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    {' '}
+                    {roleNames[user.RoleID] || '-'}
+                  </td>
+                  <td className="px-4 py-2">
+                    {truncateText(user.Email, 20)}
+                  </td>
+                  <td className="px-4 py-2 flex justify-end items-center">
+                    <button
+                      onClick={() => handleNavigate(user.UserID)}
+                      className="bg-yellow-500 text-white rounded px-2 py-1"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDeletingUserID(user.UserID);
+                        setDeleteMessage(
+                          `Are you sure you would like to delete user "${user.Username}"? This action cannot be undone.`,
+                        );
+                        setIsDeleteModalOpen(true);
+                      }}
+                      className="bg-red-500 text-white rounded px-2 py-1 ml-2"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))) : (
+                <tr>
+                  <td colSpan="7">Loading data...</td>
+                </tr>
+            )}
+          </tbody>
+        </table>
+
         <PaginationComp
           currentPage={currentPage}
           totalPages={pageInfo.TotalPage}
