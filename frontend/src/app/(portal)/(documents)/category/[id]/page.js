@@ -41,7 +41,8 @@ function CategoryDetail({ params }) {
     fetchUserData();
   }, [params.id, setValue]);
 
-  const onSubmit = async (formData) => {
+  const onSubmit = async (formData, e) => {
+    e.preventDefault();
     try {
       const { error } = catSchema.validate(formData);
 
@@ -62,8 +63,8 @@ function CategoryDetail({ params }) {
   return (
     <section className="h-screen flex flex-col flex-auto">
       <div className="flex flex-col">
-        <h2 className="text-2xl font-bol mb-1">Category Edit</h2>
-        <p className="text-sm mb-4">
+        <h2 className="text-2xl font-bold mb-1">Category Edit</h2>
+        <p className="text-xs mb-4">
           Customize and manage your category details.
         </p>
         <Separator className="mb-4" />
@@ -81,7 +82,7 @@ function CategoryDetail({ params }) {
                     className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
                     placeholder="Category Name"
                   />
-                  <p className="text-sm my-1">
+                  <p className="text-xs my-1">
                     This is Category Name. Min 2 characters & Max 50 characters. Required.
                   </p>
                   {errors.CategoryName && (<ErrorMessage error={errors.CategoryName.message} />)}
@@ -102,7 +103,7 @@ function CategoryDetail({ params }) {
                     className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
                     placeholder="Category Parent ID"
                   />
-                  <p className="text-sm my-1">
+                  <p className="text-xs my-1">
                     This is Category Parent ID. Number Only. Required.
                   </p>
                   {errors.CategoryParentID && (<ErrorMessage error={errors.CategoryParentID.message} />)}
@@ -123,7 +124,7 @@ function CategoryDetail({ params }) {
                     className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
                     placeholder="Category Description"
                   />
-                  <p className="text-sm my-1">
+                  <p className="text-xs my-1">
                     Give a brief explanation of the category
                   </p>
                   {errors.CategoryDescription && (<ErrorMessage error={errors.CategoryDescription.message} />)}

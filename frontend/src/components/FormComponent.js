@@ -11,6 +11,6 @@ export function RequiredFieldIndicator() {
 
 export function ErrorMessage({ error }) {
   return (
-    <p className="text-red-600">{error}</p>
+    <p className="text-red-600 text-xs">{error}</p>
   );
 }

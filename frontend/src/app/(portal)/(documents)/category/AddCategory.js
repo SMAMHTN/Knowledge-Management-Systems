@@ -1,80 +1,55 @@
 import { useState, useRef } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { KmsAPI } from '@/dep/kms/kmsHandler';
+
+import { catSchema } from '@/constants/schema';
+import { RequiredFieldIndicator, ErrorMessage } from '@/components/FormComponent';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import {
-  useOutsideClick, useModal, alertAdd, EmptyWarning,
+  useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';
-import { RequiredFieldIndicator, FieldNumOnly } from '@/components/FormComponent';
+import { closeIcon } from '@/constants/icon';
 
 function AddCategory({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const ref = useRef(null);
-  const [formData, setFormData] = useState({
-    CategoryName: '',
-    CategoryParentID: '',
-    CategoryDescription: '',
+  const {
+    handleSubmit, control, setValue, getValues, reset, formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      CategoryName: '',
+      CategoryParentID: '',
+      CategoryDescription: '',
+    },
+    resolver: yupResolver(catSchema),
   });
 
   useOutsideClick(ref, closeModal);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    let parsedValue = value;
-    let { categoryParentIDIsValid } = formData;
-    if (name === 'CategoryParentID') {
-      if (value.trim() === '') {
-        parsedValue = '';
-      } else if (isNaN(value)) {
-        categoryParentIDIsValid = false;
-      } else {
-        parsedValue = parseInt(value, 10);
-        categoryParentIDIsValid = true;
-      }
-    }
-
-    console.log('Updated Data:', {
-      ...formData,
-      [name]: parsedValue,
-      categoryParentIDIsValid,
-    });
-
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: parsedValue,
-      categoryParentIDIsValid,
-    }));
-  };
-
   const handleCancel = () => {
-    setFormData({
-      CategoryName: '',
-      CategoryParentID: '',
-      CategoryDescription: '',
-    });
+    reset();
     closeModal();
   };
 
-  const handleSave = async (e) => {
+  const onSubmit = async (formData, e) => {
     e.preventDefault();
-
-    if (!formData.CategoryName.trim() || !formData.categoryParentIDIsValid) {
-      EmptyWarning({
-        type: 'error',
-        message: 'Required fields cannot be empty',
-      });
-      return;
-    }
-
     try {
-      // Make the API call to save the data
-      const response = await KmsAPI('POST', 'category', formData);
-      alertAdd(response);
-      fetchData();
-    } catch (error) {
-      console.log('Error occurred:', error);
-      // Handle error, show a message, etc.
-    }
+      const { error } = catSchema.validate(formData);
 
-    // Close the modal
+      if (error) {
+        console.error('Validation error:', error.details);
+        return;
+      }
+
+      const response = await KmsAPI('POST', 'category', formData);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      alertAdd(response);
+    } catch (error) {
+      console.log(error);
+      console.log('An error occurred');
+    }
     closeModal();
   };
 
@@ -104,70 +79,84 @@ function AddCategory({ fetchData }) {
         <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-            onClick={() => {
-              handleCancel();
-            }}
+            onClick={() => { handleCancel(); }}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            { closeIcon }
           </button>
-          <h2 className="text-2xl font-semibold mb-6">Add Category</h2>
-          <form onSubmit={handleSave}>
+          <h2 className="text-2xl font-bold mb-2">Add Category</h2>
+          <Separator className="mb-4" />
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-6">
-              <label className="block font-semibold mb-1">
+              <label className="block font-medium mb-1">
                 Category Name
                 <RequiredFieldIndicator />
               </label>
-              <input
-                type="text"
+              <Controller
                 name="CategoryName"
-                value={formData.CategoryName}
-                onChange={handleInputChange}
-                className="border px-2 py-1 w-full rounded"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      {...field}
+                      type="text"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                      placeholder="Category Name"
+                    />
+                    <p className="text-xs my-1">
+                      This is Category Name. Min 2 characters & Max 50 characters. Required.
+                    </p>
+                    {errors.CategoryName && (<ErrorMessage error={errors.CategoryName.message} />)}
+                  </>
+                )}
               />
             </div>
             <div className="mb-6">
-              <label className="block font-semibold mb-1">
+              <label className="block font-medium mb-1">
                 Category Parent ID
                 {' '}
                 <RequiredFieldIndicator />
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="CategoryParentID"
-                  value={formData.CategoryParentID}
-                  onChange={handleInputChange}
-                  className={`border px-2 py-1 w-full rounded${
-                    formData.categoryParentIDIsValid === false ? ' border-red-500' : ''
-                  }`}
-                />
-                {formData.categoryParentIDIsValid === false && (
-                <FieldNumOnly />
+              <Controller
+                name="CategoryParentID"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      {...field}
+                      type="text"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                      placeholder="Category Parent ID"
+                    />
+                    <p className="text-xs my-1">
+                      This is Category Parent ID. Number Only. Required.
+                    </p>
+                    {errors.CategoryParentID && (<ErrorMessage error={errors.CategoryParentID.message} />)}
+                  </>
                 )}
-              </div>
+              />
             </div>
 
             <div className="mb-6">
-              <label className="block font-semibold mb-1">
+              <label className="block font-medium mb-1">
                 Description
               </label>
-              <textarea
+              <Controller
                 name="CategoryDescription"
-                value={formData.CategoryDescription}
-                onChange={handleInputChange}
-                className="border px-2 py-1 w-full rounded resize-none"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <textarea
+                      {...field}
+                      type="textarea"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                      placeholder="Category Description"
+                    />
+                    <p className="text-xs my-1">
+                      Give a brief explanation of the category.
+                    </p>
+                    {errors.CategoryDescription && (<ErrorMessage error={errors.CategoryDescription.message} />)}
+                  </>
+                )}
               />
             </div>
             <div className="place-content-end mt-10 flex">
@@ -178,15 +167,13 @@ function AddCategory({ fetchData }) {
               >
                 Cancel
               </button>
-              <button
+              <Button
                 type="submit"
-                className={`bg-blue-500 text-white px-4 py-2 rounded ${
-                  formData.categoryParentIDIsValid === false ? 'bg-gray-300 cursor-not-allowed' : 'hover:bg-blue-600'
-                }`}
-                disabled={formData.categoryParentIDIsValid === false}
+                disabled={isSubmitting}
+                className="rounded bg-blue-500 text-white"
               >
-                Save
-              </button>
+                Add Category
+              </Button>
 
             </div>
           </form>
