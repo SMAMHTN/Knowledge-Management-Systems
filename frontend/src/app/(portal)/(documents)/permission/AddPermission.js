@@ -1,130 +1,70 @@
-import React, { useState, useRef } from 'react';
-import { KmsAPI } from '@/dep/kms/kmsHandler';
+import { useRef } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import { permSchema } from '@/constants/schema';
+import { RequiredFieldIndicator, ErrorMessage } from '@/components/FormComponent';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import {
-  useOutsideClick, useModal, alertAdd, EmptyWarning,
+  useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';
-import { RequiredFieldIndicator, FieldNumOnly } from '@/components/FormComponent';
+import { closeIcon } from '@/constants/icon';
 
 function AddPermission({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const ref = useRef(null);
-  const [formData, setFormData] = useState({
-    CategoryID: '',
-    RoleID: '',
-    Create: 0,
-    Read: 0,
-    Update: 0,
-    Delete: 0,
-    FileType: '',
-    DocType: '',
-  });
-  useOutsideClick(ref, closeModal);
-  const [roleIDIsValid, setRoleIDIsValid] = useState(true);
-  const [categoryIDIsValid, setcategoryIDIsValid] = useState(true);
-
-  const validateAndSetValidity = (fieldName, value) => {
-    let isValid;
-
-    if (value.trim() === '') {
-      isValid = true;
-    } else if (!isNaN(value)) {
-      isValid = true;
-    } else {
-      isValid = false;
-    }
-
-    switch (fieldName) {
-      case 'RoleID':
-        setRoleIDIsValid(isValid);
-        break;
-      case 'CategoryID':
-        setcategoryIDIsValid(isValid);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const {
-      name, value, type, checked,
-    } = e.target;
-    let parsedValue;
-
-    if (type === 'checkbox') {
-      parsedValue = checked ? 1 : 0;
-    } else if (
-      name === 'CategoryID'
-      || name === 'RoleID'
-    ) {
-      validateAndSetValidity(name, value);
-      if (value.trim() === '') {
-        parsedValue = '';
-      } else {
-        parsedValue = !isNaN(value) ? parseInt(value, 10) : value;
-      }
-    } else {
-      parsedValue = value === '' ? '' : value;
-    }
-    console.log(`name: ${name}, value: ${value}, parsedValue: ${parsedValue}`);
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: parsedValue,
-    }));
-  };
-
-  const handleCancel = () => {
-    setFormData({
+  const {
+    handleSubmit, control, reset, formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
       CategoryID: '',
       RoleID: '',
-      Create: 0,
-      Read: 0,
-      Update: 0,
-      Delete: 0,
+      Create: false,
+      Read: false,
+      Update: false,
+      Delete: false,
       FileType: '',
       DocType: '',
-    });
+    },
+    resolver: yupResolver(permSchema),
+  });
+
+  useOutsideClick(ref, closeModal);
+
+  const handleClose = () => {
+    reset();
     closeModal();
   };
-  function splitStringToArray(inputString) {
-    if (typeof inputString === 'string') {
-      return inputString
-        .split(',')
-        .map((item) => item.trim().replace(/\s+/g, ''))
-        .filter((item) => item !== '');
-    }
 
-    return [];
-  }
-
-  const handleSave = async (e) => {
+  const onSubmit = async (formData, e) => {
     e.preventDefault();
-
-    if (!formData.CategoryID || !formData.RoleID) {
-      EmptyWarning({
-        type: 'error',
-        message: 'Required fields cannot be empty',
-      });
-      return;
-    }
-
-    formData.DocType = splitStringToArray(formData.DocType);
-    formData.FileType = splitStringToArray(formData.FileType);
-
-    console.log(formData);
     try {
-      console.log(formData);
+      // change filetype and doctype to an []string
+      const splitAndTrim = (value) => {
+        if (typeof value === 'string') {
+          return value.split(',').map((item) => item.trim());
+        }
+        return value;
+      };
+
+      formData.FileType = splitAndTrim(formData.FileType);
+      formData.DocType = splitAndTrim(formData.DocType);
+
+      const { error } = permSchema.validate(formData);
+      if (error) {
+        console.error('Validation error:', error.details);
+        return;
+      }
       const response = await KmsAPI('POST', 'permission', formData);
-
-      alertAdd(response);
-
+      await new Promise((resolve) => setTimeout(resolve, 300));
       fetchData();
+      alertAdd(response);
+      handleClose();
     } catch (error) {
-      console.log('Error occurred:', error);
-      // Handle error, show a message, etc.
+      console.log(error);
+      console.log('An error occurred');
     }
-
-    closeModal();
   };
 
   return (
@@ -153,142 +93,188 @@ function AddPermission({ fetchData }) {
         <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-            onClick={closeModal}
+            onClick={handleClose}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            { closeIcon }
           </button>
-          <h2 className="text-2xl font-semibold mb-4">Add Permission</h2>
-          <form onSubmit={handleSave}>
+          <h2 className="text-2xl font-semibold mb-2">Add Permission</h2>
+          <Separator className="mb-4" />
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">
-                CategoryID
-                {' '}
-                <RequiredFieldIndicator />
-              </label>
-              <input
-                type="text"
+              <label className="block font-medium mb-1">Category ID</label>
+              <Controller
                 name="CategoryID"
-                value={formData.CategoryID}
-                onChange={handleInputChange}
-                className="border px-2 py-1 w-full"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      type="text"
+                      {...field}
+                      className=" text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                      placeholder="Category ID"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Category ID. Numbers Only. Required.
+                    </p>
+                    {errors.CategoryID && (<ErrorMessage error={errors.CategoryID.message} />)}
+                  </>
+                )}
               />
-              {!categoryIDIsValid && (
-              <FieldNumOnly />
-              )}
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">
-                RoleID
-                {' '}
-                <RequiredFieldIndicator />
-              </label>
-              <input
-                type="text"
+              <label className="block font-medium mb-1">Role ID</label>
+              <Controller
                 name="RoleID"
-                value={formData.RoleID}
-                onChange={handleInputChange}
-                className="border px-2 py-1 w-full"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      type="text"
+                      {...field}
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                      placeholder="Role ID"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Role ID. Numbers Only. Required.
+                    </p>
+                    {errors.RoleID && (<ErrorMessage error={errors.RoleID.message} />)}
+                  </>
+                )}
               />
-              {!roleIDIsValid && (
-                <FieldNumOnly />
-              )}
             </div>
-
-            <div>
-              <label className="font-medium">
-                <input
-                  type="checkbox"
-                  name="Create"
-                  checked={formData.Create === 1}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                />
-                Create
-              </label>
-            </div>
-            <div>
-              <label className="font-medium">
-                <input
-                  type="checkbox"
-                  name="Read"
-                  checked={formData.Read === 1}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                />
-                Read
-              </label>
-            </div>
-            <div>
-              <label className="font-medium">
-                <input
-                  type="checkbox"
-                  name="Update"
-                  checked={formData.Update === 1}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                />
-                Update
-              </label>
-            </div>
-            <div>
-              <label className="font-medium">
-                <input
-                  type="checkbox"
-                  name="Delete"
-                  checked={formData.Delete === 1}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                />
-                Delete
-              </label>
+            <div className="mb-2">
+              <label className="block font-medium mb-1">Action Permissions</label>
+              <div className="grid grid-cols-2 gap-2 w-1/2">
+                <div>
+                  <Controller
+                    name="Create"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <input
+                          {...field}
+                          type="checkbox"
+                          className="mr-2 text-blue-500"
+                        />
+                        <span className="text-sm sm:text-base">Create</span>
+                      </>
+                    )}
+                  />
+                </div>
+                <div>
+                  <Controller
+                    name="Read"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <input
+                          {...field}
+                          type="checkbox"
+                          className="mr-2 text-blue-500"
+                        />
+                        <span className="text-sm sm:text-base">Read</span>
+                      </>
+                    )}
+                  />
+                </div>
+                <div>
+                  <Controller
+                    name="Update"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <input
+                          {...field}
+                          type="checkbox"
+                          className="mr-2 text-blue-500"
+                        />
+                        <span className="text-sm sm:text-base">Update</span>
+                      </>
+                    )}
+                  />
+                </div>
+                <div>
+                  <Controller
+                    name="Delete"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <input
+                          {...field}
+                          type="checkbox"
+                          className="mr-2 text-blue-500"
+                        />
+                        <span className="text-sm sm:text-base">Delete</span>
+                      </>
+                    )}
+                  />
+                </div>
+              </div>
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">FileType</label>
-              <input
-                type="text"
+              <label className="block font-medium mb-1">File Type</label>
+              <Controller
                 name="FileType"
-                value={formData.FileType}
-                onChange={handleInputChange}
-                className="border px-2 py-1 w-full"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      type="text"
+                      {...field}
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                      placeholder="*, php, py, -exe"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Document Type. format : * for accept all, - to exclude.
+                      <br />
+                      example : * accept allowed
+                      <br />
+                      example : php, -py accept php and exclude py
+                    </p>
+                    {errors.FileType && (<ErrorMessage error={errors.FileType.message} />)}
+                  </>
+                )}
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">DocType</label>
-              <input
-                type="text"
+              <label className="block font-medium mb-1">Doc Type</label>
+              <Controller
                 name="DocType"
-                value={formData.DocType}
-                onChange={handleInputChange}
-                className="border px-2 py-1 w-full"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      type="text"
+                      {...field}
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                      placeholder="*, doc, docx, -pdf"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Document Type. format : * for accept all, - to exclude.
+                      <br />
+                      example : * accept allowed
+                      <br />
+                      example : php, -py accept php and exclude py
+                    </p>
+                    {errors.DocType && (<ErrorMessage error={errors.DocType.message} />)}
+                  </>
+                )}
               />
             </div>
-            <div className="place-content-end mt-10 flex">
-              <button
-                type="button"
-                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
-                onClick={handleCancel}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Save
-              </button>
-            </div>
+            <button
+              type="button"
+              className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+              onClick={handleClose}
+            >
+              Cancel
+            </button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="rounded bg-blue-500 text-white"
+            >
+              Add Permission
+            </Button>
           </form>
         </div>
       </div>

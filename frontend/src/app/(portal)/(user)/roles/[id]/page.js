@@ -51,7 +51,7 @@ function UserDetails({ params }) {
       }
 
       const response = await CoreAPI('PUT', 'role', formData);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       alertUpdate(response);
     } catch (error) {
       console.log(error);
@@ -63,7 +63,7 @@ function UserDetails({ params }) {
     <section className="h-screen flex flex-col flex-auto">
       <div className="flex flex-col">
         <h2 className="text-2xl font-bol mb-1">Role Edit</h2>
-        <p className="text-sm mb-4">
+        <p className="text-xs mb-4">
           Customize and manage your role details.
         </p>
         <Separator className="mb-4" />
@@ -81,7 +81,7 @@ function UserDetails({ params }) {
                     className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
                     placeholder="Role Name"
                   />
-                  <p className="text-sm my-1">
+                  <p className="text-xs mt-1">
                     This is Role Name. Min 2 characters & Max 50 characters. Required.
                   </p>
                   {errors.RoleName && (<ErrorMessage error={errors.RoleName.message} />)}
@@ -102,7 +102,7 @@ function UserDetails({ params }) {
                     className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
                     placeholder="Role Parent ID"
                   />
-                  <p className="text-sm my-1">
+                  <p className="text-xs mt-1">
                     This is Role Parent ID. Number Only. Required.
                   </p>
                   {errors.RoleParentID && (<ErrorMessage error={errors.RoleParentID.message} />)}
@@ -120,10 +120,10 @@ function UserDetails({ params }) {
                   <textarea
                     {...field}
                     type="textarea"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
                     placeholder="Role Description"
                   />
-                  <p className="text-sm my-1">
+                  <p className="text-xs mt-1">
                     Give a brief explanation of the role
                   </p>
                   {errors.RoleDescription && (<ErrorMessage error={errors.RoleDescription.message} />)}

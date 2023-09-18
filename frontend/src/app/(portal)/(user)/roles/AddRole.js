@@ -1,69 +1,56 @@
-import React, { useState, useRef } from 'react';
+import { useRef } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { CoreAPI } from '@/dep/core/coreHandler';
+
+import { roleSchema } from '@/constants/schema';
+import { RequiredFieldIndicator, ErrorMessage } from '@/components/FormComponent';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import {
-  useOutsideClick, useModal, alertAdd, EmptyWarning,
+  useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';
-import { RequiredFieldIndicator, FieldNumOnly } from '@/components/FormComponent';
+import { closeIcon } from '@/constants/icon';
 
 function AddRole({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const ref = useRef(null);
-  const [formData, setFormData] = useState({
-    RoleName: 'testing23.3',
-    RoleParentID: 3,
-    RoleDescription: '11/08/23',
+  const {
+    handleSubmit, control, reset, formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      RoleName: '',
+      RoleParentID: '',
+      RoleDescription: '',
+    },
+    resolver: yupResolver(roleSchema),
   });
 
   useOutsideClick(ref, closeModal);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    let parsedValue = value;
-    let { roleParentIDIsValid } = formData;
-    if (name === 'RoleParentID') {
-      if (value.trim() === '') {
-        parsedValue = '';
-      } else if (isNaN(value)) {
-        roleParentIDIsValid = false;
-      } else {
-        parsedValue = parseInt(value, 10);
-        roleParentIDIsValid = true;
-      }
-    }
-
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: parsedValue,
-      roleParentIDIsValid,
-    }));
-  };
-  const handleCancel = () => {
-    setFormData({
-      RoleName: '',
-      RoleParentID: 1,
-      RoleDescription: '',
-    });
+  const handleClose = () => {
+    reset();
     closeModal();
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    if (!formData.RoleName || !formData.roleParentIDIsValid) {
-      EmptyWarning({
-        type: 'error',
-        message: 'Required fields cannot be empty',
-      });
-      return;
-    }
-
+  const onSubmit = async (formData) => {
     try {
+      const { error } = roleSchema.validate(formData);
+
+      if (error) {
+        console.error('Validation error:', error.details);
+        return;
+      }
+
       const response = await CoreAPI('POST', 'role', formData);
-      alertAdd(response);
+      await new Promise((resolve) => setTimeout(resolve, 300));
       fetchData();
+      alertAdd(response);
+      handleClose();
     } catch (error) {
-      console.log('Error occurred:', error);
+      console.log(error);
+      console.log('An error occurred');
     }
-    closeModal();
   };
 
   return (
@@ -92,85 +79,99 @@ function AddRole({ fetchData }) {
         <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-            onClick={closeModal}
+            onClick={handleClose}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            {closeIcon}
           </button>
-          <h2 className="text-2xl font-semibold mb-4">Add Roles</h2>
-          <form onSubmit={handleSave}>
-            <div className="mb-4">
+          <h2 className="text-2xl font-bold mb-2">Add Role</h2>
+          <Separator className="mb-4" />
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="mb-6">
               <label className="block font-semibold mb-1">
                 Role Name
-                {' '}
                 <RequiredFieldIndicator />
               </label>
-              <input
-                type="text"
+              <Controller
                 name="RoleName"
-                value={formData.RoleName}
-                onChange={handleInputChange}
-                className="border px-2 py-1 w-full"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      {...field}
+                      type="text"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                      placeholder="Role Name"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Role Name. Min 2 characters & Max 50 characters. Required.
+                    </p>
+                    {errors.RoleName && (<ErrorMessage error={errors.RoleName.message} />)}
+                  </>
+                )}
               />
             </div>
             <div className="mb-6">
               <label className="block font-semibold mb-1">
                 Role Parent ID
-                {' '}
                 <RequiredFieldIndicator />
               </label>
-              <input
-                type="text"
+              <Controller
                 name="RoleParentID"
-                value={formData.RoleParentID}
-                onChange={handleInputChange}
-                className={`border px-2 py-1 w-full rounded${
-                  formData.roleParentIDIsValid === false ? ' border-red-500' : ''
-                }`}
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      {...field}
+                      type="text"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                      placeholder="Role Parent ID"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Role Parent ID. Number Only. Required.
+                    </p>
+                    {errors.RoleParentID && (<ErrorMessage error={errors.RoleParentID.message} />)}
+                  </>
+                )}
               />
-              {formData.roleParentIDIsValid === false && (
-                <FieldNumOnly />
-              )}
             </div>
             <div className="mb-6">
               <label className="block font-semibold mb-1">
                 Description
               </label>
-              <textarea
+              <Controller
                 name="RoleDescription"
-                value={formData.RoleDescription}
-                onChange={handleInputChange}
-                className="border px-2 py-1 w-full rounded resize-none"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <textarea
+                      {...field}
+                      type="textarea"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                      placeholder="Role Description"
+                    />
+                    <p className="text-xs mt-1">
+                      Give a brief explanation of the role
+                    </p>
+                    {errors.RoleDescription && (<ErrorMessage error={errors.RoleDescription.message} />)}
+                  </>
+                )}
               />
             </div>
             <div className="place-content-end mt-10 flex">
               <button
                 type="button"
                 className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
-                onClick={handleCancel}
+                onClick={handleClose}
               >
                 Cancel
               </button>
-              <button
+              <Button
                 type="submit"
-                className={`bg-blue-500 text-white px-4 py-2 rounded ${
-                  formData.roleParentIDIsValid === false ? 'bg-gray-300 cursor-not-allowed' : 'hover:bg-blue-600'
-                }`}
-                disabled={formData.roleParentIDIsValid === false}
+                disabled={isSubmitting}
+                className="rounded bg-blue-500 text-white"
               >
-                Save
-              </button>
+                Add
+              </Button>
             </div>
           </form>
         </div>

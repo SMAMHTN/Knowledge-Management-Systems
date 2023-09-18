@@ -119,7 +119,7 @@ function AddArticle({ fetchData }) {
               />
             </svg>
           </button>
-          <h2 className="text-2xl font-semibold mb-4">Add Document</h2>
+          <h2 className="text-2xl font-semibold mb-4">Add Article</h2>
           <form onSubmit={handleSave} className="grid grid-cols-2 gap-4">
             <div className="mb-4">
               <label className="block font-semibold mb-1">Title</label>

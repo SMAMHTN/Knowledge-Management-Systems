@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { KmsAPI } from '@/dep/kms/kmsHandler';
@@ -16,7 +16,7 @@ function AddCategory({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const ref = useRef(null);
   const {
-    handleSubmit, control, setValue, getValues, reset, formState: { errors, isSubmitting },
+    handleSubmit, control, reset, formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       CategoryName: '',
@@ -28,7 +28,7 @@ function AddCategory({ fetchData }) {
 
   useOutsideClick(ref, closeModal);
 
-  const handleCancel = () => {
+  const handleClose = () => {
     reset();
     closeModal();
   };
@@ -44,13 +44,14 @@ function AddCategory({ fetchData }) {
       }
 
       const response = await KmsAPI('POST', 'category', formData);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      fetchData();
       alertAdd(response);
+      handleClose();
     } catch (error) {
       console.log(error);
       console.log('An error occurred');
     }
-    closeModal();
   };
 
   return (
@@ -79,11 +80,11 @@ function AddCategory({ fetchData }) {
         <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-            onClick={() => { handleCancel(); }}
+            onClick={handleClose}
           >
             { closeIcon }
           </button>
-          <h2 className="text-2xl font-bold mb-2">Add Category</h2>
+          <h2 className="text-2xl font-semibold mb-2">Add Category</h2>
           <Separator className="mb-4" />
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-6">
@@ -102,7 +103,7 @@ function AddCategory({ fetchData }) {
                       className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
                       placeholder="Category Name"
                     />
-                    <p className="text-xs my-1">
+                    <p className="text-xs mt-1">
                       This is Category Name. Min 2 characters & Max 50 characters. Required.
                     </p>
                     {errors.CategoryName && (<ErrorMessage error={errors.CategoryName.message} />)}
@@ -127,7 +128,7 @@ function AddCategory({ fetchData }) {
                       className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
                       placeholder="Category Parent ID"
                     />
-                    <p className="text-xs my-1">
+                    <p className="text-xs mt-1">
                       This is Category Parent ID. Number Only. Required.
                     </p>
                     {errors.CategoryParentID && (<ErrorMessage error={errors.CategoryParentID.message} />)}
@@ -151,7 +152,7 @@ function AddCategory({ fetchData }) {
                       className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
                       placeholder="Category Description"
                     />
-                    <p className="text-xs my-1">
+                    <p className="text-xs mt-1">
                       Give a brief explanation of the category.
                     </p>
                     {errors.CategoryDescription && (<ErrorMessage error={errors.CategoryDescription.message} />)}
@@ -163,7 +164,7 @@ function AddCategory({ fetchData }) {
               <button
                 type="button"
                 className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
-                onClick={handleCancel}
+                onClick={handleClose}
               >
                 Cancel
               </button>
@@ -172,7 +173,7 @@ function AddCategory({ fetchData }) {
                 disabled={isSubmitting}
                 className="rounded bg-blue-500 text-white"
               >
-                Add Category
+                Add
               </Button>
 
             </div>
@@ -184,125 +185,3 @@ function AddCategory({ fetchData }) {
 }
 
 export default AddCategory;
-
-// "use client";
-// import React, { useState } from "react";
-// import { useState, useEffect } from "react";
-// import { useRouter } from "next/navigation";
-// import { KmsAPI } from "@/dep/kms/kmsHandler";
-
-// function AddProduct() {
-//   const [formData, setFormData] = useState({
-//     CategoryName: "",
-//     CategoryParentID: "",
-//     CategoryDescription: "",
-//   });
-//   const [modal, setModal] = useState(false);
-//   const [isMutating, setIsMutating] = useState(false);
-
-//   const router = useRouter();
-
-//   function handleSubmit(e) {
-//     e.preventDefault();
-
-//     setIsMutating(true);
-
-// // Use useEffect to fetch data
-// useEffect(() => {
-//   const fetchData = async () => {
-//     try {
-//       await KmsAPI("POST", "category", data);
-//       setIsMutating(false);
-//       router.refresh();
-//       setModal(false);
-//     } catch (error) {
-//       console.log("Error occurred:", error);
-//       setIsMutating(false);
-//       // Handle error, show a message, etc.
-//     }
-//   };
-
-//   fetchData();
-// }, [data, router]); // Add data and router as dependencies for useEffect
-//   }
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prevData) => ({
-//       ...prevData,
-//       [name]: value,
-//     }));
-//   };
-
-//   function handleChange() {
-//     setModal(!modal);
-//   }
-
-//   return (
-//     <div>
-//       <button  onClick={handleChange} className="bg-blue-500 text-white rounded px-2 py-1">
-//         Add New +
-//       </button>
-//       <input
-//         type="checkbox"
-//         checked={modal}
-//         onChange={handleChange}
-//         className="modal-toggle"
-//       />
-
-//       <div className="modal">
-//         <div className="modal-box">
-//           <h3 className="font-bold text-lg">Add New Product</h3>
-//           <form onSubmit={handleSubmit}>
-//             <div className="form-control">
-//               <label className="label font-bold">CategoryName</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryName}
-//           onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Product Name"
-//               />
-//             </div>
-//             <div className="form-control">
-//               <label className="label font-bold">Price</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryParentID}
-//           onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Price"
-//               />
-//             </div>
-//             <div className="form-control">
-//               <label className="label font-bold">Price</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryDescription}
-//                 onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Price"
-//               />
-//             </div>
-//             <div className="modal-action">
-//               <button type="button" className="btn" onClick={handleChange}>
-//                 Close
-//               </button>
-//               {!isMutating ? (
-//                 <button type="submit" className="btn btn-primary">
-//                   Save
-//                 </button>
-//               ) : (
-//                 <button type="button" className="btn loading">
-//                   Saving...
-//                 </button>
-//               )}
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default AddProduct;

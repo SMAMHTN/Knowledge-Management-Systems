@@ -1,91 +1,22 @@
-import React, { useState, useRef } from 'react';
-import { CoreAPI } from '@/dep/core/coreHandler';
-import {
-  useOutsideClick, useModal, alertAdd, EmptyWarning,
-} from '@/components/Feature';
-import { RequiredFieldIndicator, FieldNumOnly, FieldNEmailOnly } from '@/components/FormComponent';
+import { useRef } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import { CoreAPI, CoreAPIGET } from '@/dep/core/coreHandler';
+import { userSchema } from '@/constants/schema';
+import { RequiredFieldIndicator, ErrorMessage } from '@/components/FormComponent';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { useOutsideClick, useModal, alertAdd } from '@/components/Feature';
+import { closeIcon } from '@/constants/icon';
 
 function AddUser({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const ref = useRef(null);
-  const [formData, setFormData] = useState({
-    Username: '',
-    Password: '',
-    Name: '',
-    Email: '',
-    Address: '',
-    Phone: '',
-    RoleID: '',
-    AppthemeID: '',
-    Note: '',
-    IsSuperAdmin: 0,
-    IsActive: 1,
-  });
-  const [emailError, setEmailError] = useState('');
-  useOutsideClick(ref, closeModal);
-  const [roleIDIsValid, setRoleIDIsValid] = useState(true);
-  const [appthemeIDIsValid, setAppthemeIDIsValid] = useState(true);
-  const [phoneIsValid, setPhoneIsValid] = useState(true);
-
-  const validateAndSetValidity = (fieldName, value) => {
-    let isValid;
-
-    if (value.trim() === '') {
-      isValid = true;
-    } else if (!isNaN(value)) {
-      isValid = true;
-    } else {
-      isValid = false;
-    }
-
-    switch (fieldName) {
-      case 'AppthemeID':
-        setAppthemeIDIsValid(isValid);
-        break;
-      case 'RoleID':
-        setRoleIDIsValid(isValid);
-        break;
-      case 'Phone':
-        setPhoneIsValid(isValid);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const {
-      name, value, type, checked,
-    } = e.target;
-    let parsedValue;
-
-    if (type === 'checkbox') {
-      parsedValue = checked ? 1 : 0;
-    } else if (
-      name === 'Phone'
-      || name === 'RoleID'
-      || name === 'AppthemeID'
-    ) {
-      validateAndSetValidity(name, value);
-      if (value.trim() === '') {
-        parsedValue = '';
-      } else {
-        parsedValue = !isNaN(value) ? parseInt(value, 10) : value;
-      }
-    } else {
-      parsedValue = value === '' ? '' : value;
-    }
-
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: parsedValue,
-      roleIDIsValid,
-      appthemeIDIsValid,
-      phoneIsValid,
-    }));
-  };
-  const handleCancel = () => {
-    setFormData({
+  const {
+    handleSubmit, control, reset, formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
       Username: '',
       Password: '',
       Name: '',
@@ -95,41 +26,37 @@ function AddUser({ fetchData }) {
       RoleID: '',
       AppthemeID: '',
       Note: '',
-      IsSuperAdmin: 0,
-      IsActive: 0,
-    });
+      IsSuperAdmin: false,
+      IsActive: false,
+    },
+    resolver: yupResolver(userSchema),
+  });
+  useOutsideClick(ref, closeModal);
+
+  const handleClose = () => {
+    reset();
     closeModal();
   };
 
-  const handleSave = async (e) => {
+  const onSubmit = async (formData, e) => {
     e.preventDefault();
-    if (!formData.Username || !formData.Password || !formData.Name || !formData.Email || !formData.roleIDIsValid || !formData.appthemeIDIsValid) {
-      EmptyWarning({
-        type: 'error',
-        message: 'Required fields cannot be empty',
-      });
-      return;
-    }
-
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!formData.Email || !emailPattern.test(formData.Email)) {
-      setEmailError('Please insert a valid email');
-      return;
-    }
-
-    setEmailError('');
-
     try {
-      console.log(formData);
-      const response = await CoreAPI('POST', 'user', formData);
-      alertAdd(response);
-      fetchData();
-    } catch (error) {
-      console.log('Error occurred:', error);
-    }
+      const { error } = userSchema.validate(formData);
 
-    closeModal();
+      if (error) {
+        console.error('Validation error:', error.details);
+        return;
+      }
+
+      const response = await KmsAPI('POST', 'user', formData);
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      fetchData();
+      alertAdd(response);
+      handleClose();
+    } catch (error) {
+      console.log(error);
+      console.log('An error occurred');
+    }
   };
 
   return (
@@ -158,193 +85,272 @@ function AddUser({ fetchData }) {
         <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh] overflow-y-auto max-h-[80vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-            onClick={closeModal}
+            onClick={handleClose}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            {closeIcon}
           </button>
-          <h2 className="text-2xl font-semibold mb-4">Add User</h2>
-          <div className="">
-            <form onSubmit={handleSave}>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">
-                  Username
-                  {' '}
-                  <RequiredFieldIndicator />
-                </label>
-                <input
-                  type="text"
-                  name="Username"
-                  value={formData.Username}
-                  onChange={handleInputChange}
-                  className="border px-2 py-1 w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">
-                  Password
-                  {' '}
-                  <RequiredFieldIndicator />
-                </label>
-                <input
-                  type="text"
-                  name="Password"
-                  value={formData.Password}
-                  onChange={handleInputChange}
-                  className="border px-2 py-1 w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">
-                  Name
-                  {' '}
-                  <RequiredFieldIndicator />
-                </label>
-                <input
-                  type="text"
-                  name="Name"
-                  value={formData.Name}
-                  onChange={handleInputChange}
-                  className="border px-2 py-1 w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">
-                  Email
-                  {' '}
-                  <RequiredFieldIndicator />
-                </label>
-                <input
-                  type="text"
-                  name="Email"
-                  value={formData.Email}
-                  onChange={handleInputChange}
-                  className="border px-2 py-1 w-full"
-                />
-                {emailError && <FieldNEmailOnly />}
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">Address</label>
-                <input
-                  type="text"
-                  name="Address"
-                  value={formData.Address}
-                  onChange={handleInputChange}
-                  className="border px-2 py-1 w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">Phone</label>
-                <input
-                  type="text"
-                  name="Phone"
-                  value={formData.Phone}
-                  onChange={handleInputChange}
-                  className="border px-2 py-1 w-full"
-                />
-                {!phoneIsValid && (
-                <FieldNumOnly />
-                )}
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">
-                  RoleID
-                  {' '}
-                  <RequiredFieldIndicator />
-                </label>
-                <input
-                  type="text"
-                  name="RoleID"
-                  value={formData.RoleID !== '' ? formData.RoleID : ''}
-                  onChange={handleInputChange}
-                  className="border px-2 py-1 w-full"
-                />
-                {!roleIDIsValid && (
-                <FieldNumOnly />
-                )}
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">
-                  AppthemeID
-                  <RequiredFieldIndicator />
-                </label>
-                <input
-                  type="text"
-                  name="AppthemeID"
-                  value={formData.AppthemeID}
-                  onChange={handleInputChange}
-                  className="border px-2 py-1 w-full"
-                />
-                {!appthemeIDIsValid && (
-                <FieldNumOnly />
-                )}
-              </div>
-
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">Note</label>
-                <textarea
-                  name="Note"
-                  value={formData.Note}
-                  onChange={handleInputChange}
-                  className="border px-2 py-1 w-full rounded resize-none"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="font-medium">
+          <h2 className="text-2xl font-semibold mb-2">Add User</h2>
+          <Separator className="mb-4" />
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="mb-4">
+              <label className="block font-medium mb-1">
+                Username
+                <RequiredFieldIndicator />
+              </label>
+              <Controller
+                name="Username"
+                control={control}
+                render={({ field }) => (
+                  <>
                     <input
-                      type="checkbox"
-                      name="IsSuperAdmin"
-                      checked={formData.IsSuperAdmin === 1}
-                      onChange={handleInputChange}
-                      className="mr-2"
+                      {...field}
+                      type="text"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                      placeholder="JohnDoe"
                     />
-                    Super Admin
-                  </label>
-                </div>
-                <div>
-                  <label className="font-medium">
+                    <p className="text-xs mt-1">
+                      This is Username. Min 2 characters & Max 50 characters. Required.
+                    </p>
+                    {errors.Username && (<ErrorMessage error={errors.Username.message} />)}
+                  </>
+                )}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">
+                Password
+                <RequiredFieldIndicator />
+              </label>
+              <Controller
+                name="Password"
+                control={control}
+                render={({ field }) => (
+                  <>
                     <input
-                      type="checkbox"
-                      name="IsActive"
-                      checked={formData.IsActive === 1}
-                      onChange={handleInputChange}
-                      className="mr-2"
+                      {...field}
+                      type="password"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                      placeholder="*******"
                     />
-                    Active
-                  </label>
-                </div>
-              </div>
-              <div className="place-content-end mt-10 flex">
-                <button
-                  type="button"
-                  className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Save
-                </button>
-              </div>
+                    <p className="text-xs mt-1">
+                      This is password. Min 2 characters & Max 50 characters. Required.
+                    </p>
+                    {errors.Password && (<ErrorMessage error={errors.Password.message} />)}
+                  </>
+                )}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">
+                Name
+                <RequiredFieldIndicator />
+              </label>
+              <Controller
+                name="Name"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      {...field}
+                      type="text"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                      placeholder="John Doe"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Name. Min 2 characters & Max 50 characters. Required.
+                    </p>
+                    {errors.Name && (<ErrorMessage error={errors.Name.message} />)}
+                  </>
+                )}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">
+                Email
+                <RequiredFieldIndicator />
+              </label>
+              <Controller
+                name="Email"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      {...field}
+                      type="email"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                      placeholder="johndoe@mail.com"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Email.
+                    </p>
+                    {errors.Email && (<ErrorMessage error={errors.Email.message} />)}
+                  </>
+                )}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Address</label>
+              <Controller
+                name="Address"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      {...field}
+                      type="text"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                      placeholder="Bekasi, West Java, Indonesia"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Address. Required.
+                    </p>
+                    {errors.Address && (<ErrorMessage error={errors.Address.message} />)}
+                  </>
+                )}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Phone</label>
+              <Controller
+                name="Phone"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      {...field}
+                      type="text"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                      placeholder="081234567891"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Phone. Number Only. Required.
+                    </p>
+                    {errors.Phone && (<ErrorMessage error={errors.Phone.message} />)}
+                  </>
+                )}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">
+                Role ID
+                <RequiredFieldIndicator />
+              </label>
+              <Controller
+                name="RoleID"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      {...field}
+                      type="text"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                      placeholder="Role ID"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Role ID. Number Only. Required.
+                    </p>
+                    {errors.RoleID && (<ErrorMessage error={errors.RoleID.message} />)}
+                  </>
+                )}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">
+                AppthemeID
+                <RequiredFieldIndicator />
+              </label>
+              <Controller
+                name="AppthemeID"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <input
+                      {...field}
+                      type="text"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                      placeholder="App Theme ID"
+                    />
+                    <p className="text-xs mt-1">
+                      This is Theme App. Number Only. Required.
+                    </p>
+                    {errors.AppthemeID && (<ErrorMessage error={errors.AppthemeID.message} />)}
+                  </>
+                )}
+              />
+            </div>
 
-            </form>
-          </div>
-
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Note</label>
+              <Controller
+                name="Note"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <textarea
+                      {...field}
+                      type="textarea"
+                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                      placeholder="John Doe is a farmer, he likes grass as his breakfast"
+                    />
+                    <p className="text-xs mt-1">
+                      Give a brief explanation of the the user
+                    </p>
+                    {errors.Note && (<ErrorMessage error={errors.Note.message} />)}
+                  </>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2 w-5/6">
+              <div>
+                <Controller
+                  name="IsSuperAdmin"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <input
+                        {...field}
+                        type="checkbox"
+                        className="mr-2 text-blue-500"
+                      />
+                      <span className="text-sm sm:text-base">Super Admin</span>
+                    </>
+                  )}
+                />
+              </div>
+              <div>
+                <Controller
+                  name="IsActive"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <input
+                        {...field}
+                        type="checkbox"
+                        className="mr-2 text-blue-500"
+                      />
+                      <span className="text-sm sm:text-base">Active</span>
+                    </>
+                  )}
+                />
+              </div>
+            </div>
+            <div className="place-content-end mt-10 flex">
+              <button
+                type="button"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+                onClick={handleClose}
+              >
+                Cancel
+              </button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="rounded bg-blue-500 text-white"
+              >
+                Add User
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -352,125 +358,3 @@ function AddUser({ fetchData }) {
 }
 
 export default AddUser;
-
-// "use client";
-// import React, { useState } from "react";
-// import { useState, useEffect } from "react";
-// import { useRouter } from "next/navigation";
-// import { KmsAPI } from "@/dep/kms/kmsHandler";
-
-// function AddProduct() {
-//   const [formData, setFormData] = useState({
-//     CategoryName: "",
-//     CategoryParentID: "",
-//     CategoryDescription: "",
-//   });
-//   const [modal, setModal] = useState(false);
-//   const [isMutating, setIsMutating] = useState(false);
-
-//   const router = useRouter();
-
-//   function handleSubmit(e) {
-//     e.preventDefault();
-
-//     setIsMutating(true);
-
-// // Use useEffect to fetch data
-// useEffect(() => {
-//   const fetchData = async () => {
-//     try {
-//       await KmsAPI("POST", "category", data);
-//       setIsMutating(false);
-//       router.refresh();
-//       setModal(false);
-//     } catch (error) {
-//       console.log("Error occurred:", error);
-//       setIsMutating(false);
-//       // Handle error, show a message, etc.
-//     }
-//   };
-
-//   fetchData();
-// }, [data, router]); // Add data and router as dependencies for useEffect
-//   }
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prevData) => ({
-//       ...prevData,
-//       [name]: value,
-//     }));
-//   };
-
-//   function handleChange() {
-//     setModal(!modal);
-//   }
-
-//   return (
-//     <div>
-//       <button  onClick={handleChange} className="bg-blue-500 text-white rounded px-2 py-1">
-//         Add New +
-//       </button>
-//       <input
-//         type="checkbox"
-//         checked={modal}
-//         onChange={handleChange}
-//         className="modal-toggle"
-//       />
-
-//       <div className="modal">
-//         <div className="modal-box">
-//           <h3 className="font-bold text-lg">Add New Product</h3>
-//           <form onSubmit={handleSubmit}>
-//             <div className="form-control">
-//               <label className="label font-bold">CategoryName</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryName}
-//           onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Product Name"
-//               />
-//             </div>
-//             <div className="form-control">
-//               <label className="label font-bold">Price</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryParentID}
-//           onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Price"
-//               />
-//             </div>
-//             <div className="form-control">
-//               <label className="label font-bold">Price</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryDescription}
-//                 onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Price"
-//               />
-//             </div>
-//             <div className="modal-action">
-//               <button type="button" className="btn" onClick={handleChange}>
-//                 Close
-//               </button>
-//               {!isMutating ? (
-//                 <button type="submit" className="btn btn-primary">
-//                   Save
-//                 </button>
-//               ) : (
-//                 <button type="button" className="btn loading">
-//                   Saving...
-//                 </button>
-//               )}
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default AddProduct;

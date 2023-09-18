@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import { alertUpdate } from '@/components/Feature';
 import { catSchema } from '@/constants/schema';
-import { ErrorMessage } from '@/components/FormComponent';
+import { ErrorMessage, RequiredFieldIndicator } from '@/components/FormComponent';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
 function CategoryDetail({ params }) {
   const {
-    handleSubmit, control, setValue, getValues, formState: { errors, isSubmitting },
+    handleSubmit, control, setValue, formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       CategoryID: '',
@@ -52,7 +52,7 @@ function CategoryDetail({ params }) {
       }
 
       const response = await KmsAPI('PUT', 'category', formData);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       alertUpdate(response);
     } catch (error) {
       console.log(error);
@@ -61,16 +61,20 @@ function CategoryDetail({ params }) {
   };
 
   return (
-    <section className="h-screen flex flex-col flex-auto">
-      <div className="flex flex-col">
-        <h2 className="text-2xl font-bold mb-1">Category Edit</h2>
+    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+      <div className="flex flex-col w-full">
+        <h2 className="text-2xl font-semibold mb-1">Category Edit</h2>
         <p className="text-xs mb-4">
           Customize and manage your category details.
         </p>
         <Separator className="mb-4" />
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label className="block font-medium mb-1">Category Name</label>
+            <label className="block font-medium mb-1">
+              Category Name
+              <RequiredFieldIndicator />
+            </label>
+
             <Controller
               name="CategoryName"
               control={control}
@@ -79,10 +83,10 @@ function CategoryDetail({ params }) {
                   <input
                     {...field}
                     type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
                     placeholder="Category Name"
                   />
-                  <p className="text-xs my-1">
+                  <p className="text-xs mt-1">
                     This is Category Name. Min 2 characters & Max 50 characters. Required.
                   </p>
                   {errors.CategoryName && (<ErrorMessage error={errors.CategoryName.message} />)}
@@ -91,7 +95,10 @@ function CategoryDetail({ params }) {
             />
           </div>
           <div className="mb-4">
-            <label className="block font-medium mb-1">Category Parent ID</label>
+            <label className="block font-medium mb-1">
+              Category Parent ID
+              <RequiredFieldIndicator />
+            </label>
             <Controller
               name="CategoryParentID"
               control={control}
@@ -103,7 +110,7 @@ function CategoryDetail({ params }) {
                     className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
                     placeholder="Category Parent ID"
                   />
-                  <p className="text-xs my-1">
+                  <p className="text-xs mt-1">
                     This is Category Parent ID. Number Only. Required.
                   </p>
                   {errors.CategoryParentID && (<ErrorMessage error={errors.CategoryParentID.message} />)}
@@ -124,7 +131,7 @@ function CategoryDetail({ params }) {
                     className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
                     placeholder="Category Description"
                   />
-                  <p className="text-xs my-1">
+                  <p className="text-xs mt-1">
                     Give a brief explanation of the category
                   </p>
                   {errors.CategoryDescription && (<ErrorMessage error={errors.CategoryDescription.message} />)}
