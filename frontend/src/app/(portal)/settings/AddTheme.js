@@ -67,13 +67,13 @@ function AddTheme({ fetchThemes }) {
   };
   return (
     <div>
-      <button
+      <Button
+        type="button"
         onClick={openModal}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        className="rounded bg-blue-500 text-white"
       >
-        Add New Theme
-      </button>
-
+        Add Theme
+      </Button>
       {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
@@ -88,7 +88,7 @@ function AddTheme({ fetchThemes }) {
         }`}
 
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh]" ref={ref}>
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[50vh]" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={handleClose}

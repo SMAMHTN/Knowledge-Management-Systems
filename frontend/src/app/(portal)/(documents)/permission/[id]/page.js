@@ -36,7 +36,6 @@ function PermissionDetail({ params }) {
         const response = await KmsAPIGET(`permission?PermissionID=${params.id}`);
         setData(response.body.Data);
 
-        // Pre-fill the form fields with data values
         Object.keys(response.body.Data).forEach((key) => {
           if (key !== 'PermissionID') {
             // Ensure FileType is an array
@@ -152,21 +151,21 @@ function PermissionDetail({ params }) {
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">Action Permissions</label>
-            <div className="grid grid-cols-2 gap-2 w-1/2">
+            <div className="grid grid-cols-2 gap-2 md:w-1/2 w-full">
               <div>
                 <Controller
                   name="Create"
                   control={control}
                   render={({ field }) => (
-                    <>
+                    <div className="flex items-center my-2 md:my-0">
                       <input
                         {...field}
                         type="checkbox"
                         checked={field.value}
-                        className="mr-2 text-blue-500"
+                        className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
                       />
                       <span className="text-sm sm:text-base">Create</span>
-                    </>
+                    </div>
                   )}
                 />
               </div>
@@ -175,15 +174,15 @@ function PermissionDetail({ params }) {
                   name="Read"
                   control={control}
                   render={({ field }) => (
-                    <>
+                    <div className="flex items-center my-2 md:my-0">
                       <input
                         {...field}
                         type="checkbox"
                         checked={field.value}
-                        className="mr-2 text-blue-500"
+                        className="mr-2 text-blue-500  w-6 h-6 md:w-4 md:h-4"
                       />
                       <span className="text-sm sm:text-base">Read</span>
-                    </>
+                    </div>
                   )}
                 />
               </div>
@@ -192,15 +191,15 @@ function PermissionDetail({ params }) {
                   name="Update"
                   control={control}
                   render={({ field }) => (
-                    <>
+                    <div className="flex items-center my-2 md:my-0">
                       <input
                         {...field}
                         type="checkbox"
                         checked={field.value}
-                        className="mr-2 text-blue-500"
+                        className="mr-2 text-blue-500  w-6 h-6 md:w-4 md:h-4"
                       />
                       <span className="text-sm sm:text-base">Update</span>
-                    </>
+                    </div>
                   )}
                 />
               </div>
@@ -209,15 +208,15 @@ function PermissionDetail({ params }) {
                   name="Delete"
                   control={control}
                   render={({ field }) => (
-                    <>
+                    <div className="flex items-center my-2 md:my-0">
                       <input
                         {...field}
                         type="checkbox"
                         checked={field.value}
-                        className="mr-2 text-blue-500"
+                        className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
                       />
                       <span className="text-sm sm:text-base">Delete</span>
-                    </>
+                    </div>
                   )}
                 />
               </div>
@@ -276,7 +275,7 @@ function PermissionDetail({ params }) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded bg-blue-500 text-white"
+            className="rounded bg-blue-500 text-white w-full md:w-36"
           >
             Update Permission
           </Button>

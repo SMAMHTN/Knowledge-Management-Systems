@@ -276,21 +276,21 @@ function UserDetails({ params }) {
               )}
             />
           </div>
-          <div className="grid grid-cols-2 gap-2 w-5/6">
+          <div className="grid grid-cols-2 gap-2 w-5/6 mb-4">
             <div>
               <Controller
                 name="IsSuperAdmin"
                 control={control}
                 render={({ field }) => (
-                  <>
+                  <div className="flex items-center my-2 md:my-0">
                     <input
                       {...field}
                       type="checkbox"
                       checked={field.value}
-                      className="mr-2 text-blue-500"
+                      className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
                     />
                     <span className="text-sm sm:text-base">Super Admin</span>
-                  </>
+                  </div>
                 )}
               />
             </div>
@@ -299,15 +299,15 @@ function UserDetails({ params }) {
                 name="IsActive"
                 control={control}
                 render={({ field }) => (
-                  <>
+                  <div className="flex items-center my-2 md:my-0">
                     <input
                       {...field}
                       type="checkbox"
                       checked={field.value}
-                      className="mr-2 text-blue-500"
+                      className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
                     />
                     <span className="text-sm sm:text-base">Active</span>
-                  </>
+                  </div>
                 )}
               />
             </div>
@@ -315,7 +315,7 @@ function UserDetails({ params }) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded bg-blue-500 text-white"
+            className="rounded bg-blue-500 text-white w-full md:w-36"
           >
             Update User
           </Button>

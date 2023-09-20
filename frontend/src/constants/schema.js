@@ -109,3 +109,8 @@ export const userSchema = yup.object().shape({
 export const themeSchema = yup.object().shape({
   AppthemeName: yup.string().required(requiredMsg),
 });
+
+export const settingsSchema = yup.object().shape({
+  CompanyName: yup.string().required(requiredMsg),
+  CompanyAddress: yup.string().required(requiredMsg),
+});

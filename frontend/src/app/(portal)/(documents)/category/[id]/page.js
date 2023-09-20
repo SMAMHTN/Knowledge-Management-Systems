@@ -141,7 +141,7 @@ function CategoryDetail({ params }) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded bg-blue-500 text-white"
+            className="rounded bg-blue-500 text-white w-full md:w-36"
           >
             Update Category
           </Button>

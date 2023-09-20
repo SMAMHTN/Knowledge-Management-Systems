@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 function LogoUpload({ onUpload }) {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -30,18 +31,24 @@ function LogoUpload({ onUpload }) {
   };
 
   return (
-    <div className="flex items-center">
+    <div className="flex flex-col">
+
       <input
-        type="file"
+        className="block px-2 py-1 md:max-w-md mb-1 text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
         accept=".jpg, .jpeg, .png"
+        type="file"
         onChange={handleFileChange}
       />
-      <button
+      <p className="text-xs mt-1 mb-4">
+        Upload a file from your device. Image should be a .jpg, .jpeg, .png file
+      </p>
+      <Button
+        type="button"
         onClick={handleUpload}
-        className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded ml-2"
+        className="rounded bg-blue-500 text-white w-full md:w-36"
       >
-        Upload
-      </button>
+        Upload logo
+      </Button>
     </div>
   );
 }

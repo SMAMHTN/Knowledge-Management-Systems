@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import timezones from 'timezones-list';
+import { ChevronDown } from 'lucide-react';
 
 function TimezoneDropdown({ selectedTimezone, onTimezoneChange }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -35,10 +36,10 @@ function TimezoneDropdown({ selectedTimezone, onTimezoneChange }) {
   }, [dropdownOpen]);
 
   return (
-    <div className="mt-4">
-      <div className="relative inline-block w-full max-w-xs" ref={dropdownRef}>
+    <div className="">
+      <div className="relative inline-block w-full md:max-w-xs" ref={dropdownRef}>
         <button
-          className="bg-white border rounded px-3 py-2 w-full text-left"
+          className="bg-white border rounded px-2 py-1 w-full text-left"
           onClick={(e) => toggleDropdown(e)}
         >
           {selectedTimezone || 'Select a timezone'}
@@ -57,17 +58,7 @@ function TimezoneDropdown({ selectedTimezone, onTimezoneChange }) {
           </ul>
         )}
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-          <svg
-            className="fill-current h-4 w-4"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
+          <ChevronDown className={`h-4 w-4 transition-transform transform ${dropdownOpen ? 'rotate-180' : 'rotate-0'} ease-in-out duration-200`} />
         </div>
       </div>
     </div>

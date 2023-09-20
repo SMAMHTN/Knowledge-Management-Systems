@@ -2,36 +2,56 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 
+import { settingsSchema } from '@/constants/schema';
 import { CoreAPI, CoreAPIGET } from '@/dep/core/coreHandler';
+import { alertUpdate } from '@/components/Feature';
+import ThemeApp from '@/components/AppThemeDropdown';
 import AddTheme from './AddTheme';
 import LogoUpload from './LogoUpload';
 import TimezoneDropdown from '@/components/TimezoneDropdown';
 import { Separator } from '@/components/ui/separator';
+import { ErrorMessage, RequiredFieldIndicator } from '@/components/FormComponent';
+import { Button } from '@/components/ui/button';
 
 function SystemSetting() {
   const router = useRouter();
-  const [data, setData] = useState({});
-  const [error, setError] = useState('');
+  const {
+    control, setValue, handleSubmit, formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      CompanyName: '',
+      CompanyAddress: '',
+    },
+    resolver: yupResolver(settingsSchema),
+  });
   const [themeOptions, setThemeOptions] = useState([]);
-  const [selectedTheme, setSelectedTheme] = useState(0); // Use 0 as default
+  const [selectedTheme, setSelectedTheme] = useState(0);
   const [selectedThemeColors, setSelectedThemeColors] = useState({
     primary: '',
     secondary: '',
   });
 
-  // Initialize the timezone with the data from the server
   const [initialTimezone, setInitialTimezone] = useState('');
+  const [data, setData] = useState({});
 
   const fetchData = async () => {
     try {
       const response = await CoreAPIGET('setting');
       const jsonData = response.body.Data;
       setData(jsonData);
-      setInitialTimezone(jsonData.TimeZone); // Set the initial timezone from the server
-      setError(null);
+      setInitialTimezone(jsonData.TimeZone);
+      if (jsonData.CompanyName) {
+        setValue('CompanyName', jsonData.CompanyName);
+      }
+      if (jsonData.CompanyAddress) {
+        setValue('CompanyAddress', jsonData.CompanyAddress);
+      }
     } catch (error) {
-      setError(error.message);
+      console.error(error);
+      console.error('An error occurred');
     }
   };
 
@@ -41,7 +61,8 @@ function SystemSetting() {
       const themeData = response.body.Data;
       setThemeOptions(themeData);
     } catch (error) {
-      setError(error.message);
+      console.error(error);
+      console.error('An error occurred');
     }
   };
 
@@ -76,15 +97,34 @@ function SystemSetting() {
       }
     }
   }, [data.AppthemeID, themeOptions]);
+
   const handleTimezoneChange = (timezone) => {
     setData((prevData) => ({
       ...prevData,
       TimeZone: timezone,
     }));
   };
-  const handleUpdate = async (e) => {
-    e.preventDefault();
+
+  const handleThemeSelection = (theme) => {
+    setSelectedTheme(theme.AppthemeID);
+
+    const colors = JSON.parse(theme.AppthemeValue);
+    setSelectedThemeColors({
+      primary: colors.primary_color || '',
+      secondary: colors.secondary_color || '',
+    });
+  };
+
+  const onSubmit = async () => {
     try {
+      const { error } = settingsSchema.validate(data);
+
+      if (error) {
+        console.error('Validation error:', error.details);
+        return;
+      }
+
+      // Validation passed, proceed with the update
       console.log('Updating data:', data);
 
       const selectedThemeId = parseInt(selectedTheme);
@@ -110,36 +150,6 @@ function SystemSetting() {
     }
   };
 
-  // Custom styled dropdown
-  const [isDropdownOpen, setDropdownOpen] = useState(false);
-
-  useEffect(() => {
-    const handleClickOutsideDropdown = (event) => {
-      if (isDropdownOpen && !event.target.closest('.theme-dropdown')) {
-        setDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutsideDropdown);
-    return () => {
-      document.removeEventListener('click', handleClickOutsideDropdown);
-    };
-  }, [isDropdownOpen]);
-
-  const toggleDropdown = () => {
-    setDropdownOpen((prevState) => !prevState);
-  };
-
-  const handleThemeSelection = (theme) => {
-    setSelectedTheme(theme.AppthemeID);
-
-    const colors = JSON.parse(theme.AppthemeValue);
-    setSelectedThemeColors({
-      primary: colors.primary_color || '',
-      secondary: colors.secondary_color || '',
-    });
-  };
-
   const handleLogoUpload = (base64String) => {
     console.log('Handling logo upload in SystemSetting:', base64String);
     setData({ ...data, CompanyLogo: base64String });
@@ -153,130 +163,83 @@ function SystemSetting() {
           Customize and manage your Company Profile and system settings.
         </p>
         <Separator className="mb-4" />
-        <form>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label className="block font-semibold mb-1">CompanyName</label>
-            <input
-              type="text"
-              value={data.CompanyName || ''}
-              className="border px-2 py-1 w-full"
-              onChange={(e) => setData({ ...data, CompanyName: e.target.value })}
+            <label className="block font-medium mb-1">
+              Company Name
+              <RequiredFieldIndicator />
+            </label>
+            <Controller
+              name="CompanyName"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <input
+                    type="text"
+                    {...field}
+                    className=" text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    placeholder="Company Name Inc."
+                  />
+                  <p className="text-xs mt-1">
+                    Min 2 characters & Max 50 characters. Required.
+                  </p>
+                  {errors.CompanyName && (<ErrorMessage error={errors.CompanyName.message} />)}
+                </>
+              )}
             />
           </div>
-          {/* <div className="mb-4">
-              <ShowLogo maxWidth="100px" maxHeight="100px" />
-            </div> */}
-
           <div className="mb-4">
-            <label className="block font-semibold mb-1">CompanyLogo</label>
+            <label className="block font-medium mb-1">
+              Company Address
+              <RequiredFieldIndicator />
+            </label>
+            <Controller
+              name="CompanyAddress"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <input
+                    type="text"
+                    {...field}
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    placeholder="Bandung, West Java, Indonesia"
+                  />
+                  <p className="text-xs mt-1">
+                    Min 2 characters & Max 50 characters. Required.
+                  </p>
+                  {errors.CompanyAddress && (<ErrorMessage error={errors.CompanyAddress.message} />)}
+                </>
+              )}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-medium mb-1">Logo</label>
             <LogoUpload onUpload={handleLogoUpload} />
           </div>
+
           <div className="mb-4">
-            <label className="block font-semibold mb-1">
-              CompanyAddress
-            </label>
-            <input
-              type="text"
-              value={data.CompanyAddress || ''}
-              className="border px-2 py-1 w-full"
-              onChange={(e) => setData({ ...data, CompanyAddress: e.target.value })}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block font-semibold">Timezone</label>
+            <label className="block font-medium mb-1">Timezone</label>
             <TimezoneDropdown
               selectedTimezone={data.TimeZone || initialTimezone}
               onTimezoneChange={handleTimezoneChange}
             />
+            <p className="text-xs mt-1">
+              Choose your preferred timezone from the list above.
+            </p>
           </div>
-          <div className="mb-4">
-            <label className="block font-semibold mb-1">Theme App</label>
-            <div className="relative inline-block" style={{ minWidth: '200px' }}>
-              <button
-                type="button"
-                onClick={toggleDropdown}
-                className="border bg-white px-3 py-2 w-full text-left rounded"
-              >
-
-                {themeOptions.length > 0
-                      && themeOptions.find((theme) => theme.AppthemeID === selectedTheme)?.AppthemeName || 'Select a theme'}
-              </button>
-              {isDropdownOpen && (
-                <ul className="absolute top-full left-0 w-full z-20 bg-white border rounded shadow mt-2 max-h-40 overflow-y-auto">
-                  {themeOptions.map((theme) => (
-                    <li
-                      key={theme.AppthemeID}
-                      onClick={() => handleThemeSelection(theme)}
-                      className="cursor-pointer px-4 py-2 hover:bg-blue-100 flex items-center"
-                    >
-                      {/* Display primary and secondary color indicators */}
-                      <div
-                        className="w-4 h-4 rounded-full mr-2"
-                        style={{ backgroundColor: theme.primary_color }}
-                      />
-                      <div
-                        className="w-4 h-4 rounded-full mr-2"
-                        style={{ backgroundColor: theme.secondary_color }}
-                      />
-                      {theme.AppthemeName}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          {/* Display the primary and secondary colors */}
-          {selectedThemeColors.primary && (
-            <div className="mb-2">
-              <span>Primary Color: </span>
-              <span
-                style={{
-                  backgroundColor: selectedThemeColors.primary,
-                  width: '20px',
-                  height: '20px',
-                  display: 'inline-block',
-                  verticalAlign: 'middle',
-                  marginLeft: '4px',
-                }}
-              />
-            </div>
-          )}
-          {selectedThemeColors.secondary && (
-            <div className="mb-4">
-              <span>Secondary Color: </span>
-              <span
-                style={{
-                  backgroundColor: selectedThemeColors.secondary,
-                  width: '20px',
-                  height: '20px',
-                  display: 'inline-block',
-                  verticalAlign: 'middle',
-                  marginLeft: '4px',
-                }}
-              />
-            </div>
-          )}
-          <button
-            type="button"
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={handleUpdate}
+          <ThemeApp
+            themeOptions={themeOptions}
+            selectedTheme={selectedTheme}
+            handleThemeSelection={handleThemeSelection}
+            selectedThemeColors={selectedThemeColors}
+          />
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="rounded bg-blue-500 text-white w-full md:w-36"
           >
-            Update
-          </button>
+            Update Settings
+          </Button>
         </form>
         <div className="mb-4" />
         <AddTheme fetchThemes={fetchThemes} />
