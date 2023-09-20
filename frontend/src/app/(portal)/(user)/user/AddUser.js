@@ -82,7 +82,7 @@ function AddUser({ fetchData }) {
         }`}
 
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh] overflow-y-auto max-h-[80vh]" ref={ref}>
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[66vh] overflow-y-auto max-h-[80vh] mx-2" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={handleClose}
@@ -272,7 +272,6 @@ function AddUser({ fetchData }) {
                 )}
               />
             </div>
-
             <div className="mb-4">
               <label className="block font-medium mb-1">Note</label>
               <Controller
@@ -294,20 +293,21 @@ function AddUser({ fetchData }) {
                 )}
               />
             </div>
-            <div className="grid grid-cols-2 gap-2 w-5/6">
+            <div className="grid grid-cols-2 gap-2 w-5/6 mb-4">
               <div>
                 <Controller
                   name="IsSuperAdmin"
                   control={control}
                   render={({ field }) => (
-                    <>
+                    <div className="flex items-center my-2 md:my-0">
                       <input
                         {...field}
                         type="checkbox"
-                        className="mr-2 text-blue-500"
+                        checked={field.value}
+                        className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
                       />
                       <span className="text-sm sm:text-base">Super Admin</span>
-                    </>
+                    </div>
                   )}
                 />
               </div>
@@ -316,30 +316,31 @@ function AddUser({ fetchData }) {
                   name="IsActive"
                   control={control}
                   render={({ field }) => (
-                    <>
+                    <div className="flex items-center my-2 md:my-0">
                       <input
                         {...field}
                         type="checkbox"
-                        className="mr-2 text-blue-500"
+                        checked={field.value}
+                        className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
                       />
                       <span className="text-sm sm:text-base">Active</span>
-                    </>
+                    </div>
                   )}
                 />
               </div>
             </div>
             <div className="place-content-end mt-10 flex">
-              <button
+              <Button
                 type="button"
-                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36"
                 onClick={handleClose}
               >
                 Cancel
-              </button>
+              </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="rounded bg-blue-500 text-white"
+                className="rounded bg-blue-500 text-white w-full md:w-36"
               >
                 Add User
               </Button>

@@ -88,7 +88,7 @@ function AddTheme({ fetchThemes }) {
         }`}
 
       >
-        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[50vh]" ref={ref}>
+        <div className="bg-white rounded-lg p-6 shadow-md relative z-40 w-[50vh] mx-2" ref={ref}>
           <button
             className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={handleClose}
@@ -146,17 +146,17 @@ function AddTheme({ fetchThemes }) {
               </div>
             </div>
             <div className="place-content-end mt-10 flex">
-              <button
+              <Button
                 type="button"
-                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36"
                 onClick={handleClose}
               >
                 Cancel
-              </button>
+              </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="rounded bg-blue-500 text-white"
+                className="rounded bg-blue-500 text-white w-full md:w-36"
               >
                 Add Theme
               </Button>
