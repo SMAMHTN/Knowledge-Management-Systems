@@ -3,6 +3,7 @@ import { KmsAPI } from '@/dep/kms/kmsHandler';
 import {
   useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';
+import { Button } from '@/components/ui/button';
 
 function AddArticle({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
@@ -79,13 +80,13 @@ function AddArticle({ fetchData }) {
 
   return (
     <div>
-      <button
+      <Button
+        type="button"
         onClick={openModal}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        className="rounded bg-blue-500 text-white w-full md:w-36"
       >
         Add New +
-      </button>
-
+      </Button>
       {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${

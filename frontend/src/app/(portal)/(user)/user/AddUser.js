@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
-import { CoreAPI, CoreAPIGET } from '@/dep/core/coreHandler';
 import { userSchema } from '@/constants/schema';
 import { RequiredFieldIndicator, ErrorMessage } from '@/components/FormComponent';
 import { Button } from '@/components/ui/button';
@@ -61,12 +60,13 @@ function AddUser({ fetchData }) {
 
   return (
     <div className="">
-      <button
+      <Button
+        type="button"
         onClick={openModal}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        className="rounded bg-blue-500 text-white w-full md:w-36"
       >
         Add New +
-      </button>
+      </Button>
 
       {/* Overlay */}
       <div
@@ -250,7 +250,7 @@ function AddUser({ fetchData }) {
             </div>
             <div className="mb-4">
               <label className="block font-medium mb-1">
-                AppthemeID
+                App Theme ID
                 <RequiredFieldIndicator />
               </label>
               <Controller

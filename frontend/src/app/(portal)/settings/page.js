@@ -138,11 +138,13 @@ function SystemSetting() {
       };
 
       const response = await CoreAPI('PUT', 'setting', updatedData);
-      console.log('Update response:', response);
-      console.log('Updated theme:', selectedThemeId);
+      // console.log('Update response:', response);
+      // console.log('Updated theme:', selectedThemeId);
       if (response.status === 200) {
         fetchData();
       }
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      alertUpdate(response);
     } catch (error) {
       console.log('Error:', error);
       console.log('An error occurred during update.');

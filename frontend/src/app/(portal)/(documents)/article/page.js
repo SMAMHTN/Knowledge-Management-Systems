@@ -8,6 +8,7 @@ import { DeleteModal, alertDelete } from '@/components/Feature';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 
 function DocTable() {
   const router = useRouter();

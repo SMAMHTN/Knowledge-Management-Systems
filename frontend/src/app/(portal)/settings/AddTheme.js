@@ -70,7 +70,7 @@ function AddTheme({ fetchThemes }) {
       <Button
         type="button"
         onClick={openModal}
-        className="rounded bg-blue-500 text-white"
+        className="rounded bg-blue-500 text-white w-full md:w-36"
       >
         Add Theme
       </Button>

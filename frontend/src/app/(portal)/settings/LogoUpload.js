@@ -40,7 +40,7 @@ function LogoUpload({ onUpload }) {
         onChange={handleFileChange}
       />
       <p className="text-xs mt-1 mb-4">
-        Upload a file from your device. Image should be a .jpg, .jpeg, .png file
+        Upload a file from your device. Image should be a .jpg, .jpeg, .png file. Notes: to successfully change the logo, you must click the upload logo first before click update button.
       </p>
       <Button
         type="button"

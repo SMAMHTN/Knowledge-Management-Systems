@@ -168,7 +168,6 @@ export function DeleteModal({
           >
             Delete
           </button>
-
         </div>
       </div>
     </div>
