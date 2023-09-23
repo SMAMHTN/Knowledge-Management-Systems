@@ -31,8 +31,8 @@ CREATE TABLE `kms_article` (
   `Title` varchar(255) NOT NULL,
   `CategoryID` int(11) DEFAULT 1,
   `Article` longtext DEFAULT NULL,
-  `FileID` longtext DEFAULT "[]",
-  `DocID` longtext DEFAULT "[]",
+  `FileID` longtext DEFAULT "",
+  `DocID` longtext DEFAULT "",
   `IsActive` tinyint(1) DEFAULT 1,
   PRIMARY KEY (`ArticleID`),
   UNIQUE KEY `kms_article_UN` (`Title`),
@@ -144,8 +144,8 @@ CREATE TABLE `kms_permission` (
   `Read` tinyint(1) NOT NULL DEFAULT 0,
   `Update` tinyint(1) NOT NULL DEFAULT 0,
   `Delete` tinyint(1) NOT NULL DEFAULT 0,
-  `FileType` longtext DEFAULT "[]",
-  `DocType` longtext DEFAULT "[]",
+  `FileType` longtext DEFAULT "",
+  `DocType` longtext DEFAULT "",
   PRIMARY KEY (`PermissionID`),
   UNIQUE KEY `kms_permission_UN` (`CategoryID`, `RoleID`),
   KEY `kms_permission_FK` (`CategoryID`),
@@ -159,7 +159,7 @@ CREATE TABLE `kms_permission` (
 
 LOCK TABLES `kms_permission` WRITE;
 /*!40000 ALTER TABLE `kms_permission` DISABLE KEYS */;
-INSERT INTO `kms_permission` VALUES (1, 1, 1, 0, 1, 0, 0, "[]", "[]");
+INSERT INTO `kms_permission` VALUES (1, 1, 1, 0, 1, 0, 0, "", "");
 /*!40000 ALTER TABLE `kms_permission` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
