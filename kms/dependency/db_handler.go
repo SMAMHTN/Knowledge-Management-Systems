@@ -20,14 +20,10 @@ type Info struct {
 }
 
 type LimitType struct {
-	Page int        `query:"page"`
-	Num  int        `query:"num"`
-	Sort []SortType `query:"sort"`
-}
-
-type SortType struct {
-	FieldName string
-	Ascending bool
+	Page int    `query:"page"`
+	Num  int    `query:"num"`
+	Sort string `query:"sort"`
+	Asc  int    `query:"asc"`
 }
 
 func Db_Connect(conf Configuration, dbname string) (database *sql.DB, err error) {
@@ -133,7 +129,7 @@ func LimitMaker(page int, num int) (limit string) {
 }
 
 func (data *LimitType) LimitMaker(totalrow int) (limit string, info Info) {
-
+	limit = ""
 	if data.Num == 0 {
 		data.Num = 10
 	}
@@ -150,17 +146,14 @@ func (data *LimitType) LimitMaker(totalrow int) (limit string, info Info) {
 	} else {
 		info.TotalShow = data.Num
 	}
-	if len(data.Sort) > 0 {
-		limit = limit + "ORDER BY "
-		for _, y := range data.Sort {
-			if y.Ascending {
-				limit = limit + y.FieldName + " ASC "
-			} else {
-				limit = limit + y.FieldName + " DESC"
-			}
+	if data.Sort != "" {
+		if data.Asc == 1 {
+			limit = limit + "SORT BY " + data.Sort + " ASC"
+		} else if data.Asc == 0 {
+			limit = limit + "SORT BY " + data.Sort + " DSC"
 		}
 	}
 	info.UpperLimit = Lowerlimit0 + info.TotalShow
-	limit = "LIMIT " + strconv.Itoa(Lowerlimit0) + "," + strconv.Itoa(data.Num)
+	limit = limit + "LIMIT " + strconv.Itoa(Lowerlimit0) + "," + strconv.Itoa(data.Num)
 	return limit, info
 }

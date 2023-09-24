@@ -40,7 +40,7 @@ func ZapEncodeTimeLayout(t time.Time, layout string, enc zapcore.PrimitiveArrayE
 	enc.AppendString(t.Format(layout))
 }
 
-func InitZapLog(LogFile string, LogFileLow string) (logger *zap.Logger, err error) {
+func InitZapLog(Conf Configuration, LogFile string, LogFileLow string) (logger *zap.Logger, err error) {
 	fmt.Println("---------------------------------------")
 	fmt.Println("Preparing Logger")
 	parent := Get_Parent_Path()
