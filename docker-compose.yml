@@ -42,8 +42,8 @@ services:
       - "5656:5656"
   frontend:
     build: ./frontend
-    # volumes:
-    #   - ./frontend:/frontend:rw
+    volumes:
+      - ./frontend:/frontend:rw
     depends_on:
       - core
       - kms

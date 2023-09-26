@@ -1,6 +1,6 @@
 {
-    "core_link":"http://code.smam.tech:6565",
+    "core_link":"http://core:6565",
     "core_password":"aldim",
-    "kms_link":"http://code.smam.tech:5656",
+    "kms_link":"http://kms:5656",
     "kms_password":"aldim"
 }
