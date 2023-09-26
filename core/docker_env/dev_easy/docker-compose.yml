@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  core-db:
+    image: "mariadb:10.10-jammy"
+    environment:
+      - MARIADB_ROOT_PASSWORD=aldim
+      - MARIADB_DATABASE=core
+  core:
+    build: .
+    depends_on:
+      - core-db
+    volumes:
+      - ./:/core:rw
+    command: /bin/sh -c "while true; do sleep 100000; done"
+    ports:
+      - "6565:6565"

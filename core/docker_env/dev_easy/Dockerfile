@@ -4,4 +4,3 @@ WORKDIR /core
 #Workdir set as core
 COPY . .
 EXPOSE 6565
-CMD go run .

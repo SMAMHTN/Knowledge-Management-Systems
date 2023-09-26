@@ -1,7 +1,7 @@
 FROM golang:1.20rc3-bullseye
 #Using go version 1.20 with debian bullseye as OS
-WORKDIR /core
+WORKDIR /kms
 #Workdir set as core
 COPY . .
-EXPOSE 6565
+EXPOSE 5656
 CMD go run .
