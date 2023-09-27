@@ -65,7 +65,7 @@ func LoginUser(c echo.Context) error {
 	_, now_user, _ := Check_Permission_API(c)
 	res := Response{}
 	res.StatusCode = http.StatusOK
-	res.Data = now_user
+	res.Data = now_user.ToAPI()
 	return c.JSON(http.StatusOK, res)
 }
 

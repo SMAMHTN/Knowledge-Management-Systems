@@ -64,7 +64,7 @@ func Check_Admin_Permission_API(c echo.Context) (bool, map[string]interface{}, e
 	if err != nil {
 		return false, User, err
 	}
-	if IsSuperAdmin {
+	if !IsSuperAdmin {
 		return false, User, nil
 	} else {
 		return true, User, nil
