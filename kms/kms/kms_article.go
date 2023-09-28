@@ -24,17 +24,24 @@ type Article_Table struct {
 }
 
 type Article_API struct {
-	ArticleID      int `json:"ArticleID" query:"ArticleID"`
-	OwnerID        int
-	LastEditedByID int
-	LastEditedTime time.Time
-	Tag            []string
-	Title          string
-	CategoryID     int
-	Article        string
-	FileID         []int
-	DocID          []int
-	IsActive       bool
+	ArticleID            int `json:"ArticleID" query:"ArticleID"`
+	OwnerID              int
+	OwnerUsername        string
+	OwnerName            string
+	LastEditedByID       int
+	LastEditedByUsername string
+	LastEditedByName     string
+	LastEditedTime       time.Time
+	Tag                  []string
+	Title                string
+	CategoryID           int
+	CategoryName         string
+	CategoryParent       string
+	CategoryDescription  string
+	Article              string
+	FileID               []int
+	DocID                []int
+	IsActive             bool
 }
 
 func ListArticle(c echo.Context) error {
@@ -62,7 +69,7 @@ func ListArticle(c echo.Context) error {
 		ArticleList, _ := ReadArticle(query + " " + LimitQuery)
 		var ArticleListAPI []Article_API
 		for _, x := range ArticleList {
-			tmp, err := x.ToAPI()
+			tmp, err := x.ToAPI(c)
 			if err != nil {
 				Logger.Error(err.Error())
 				res.StatusCode = http.StatusInternalServerError
@@ -115,7 +122,6 @@ func ShowArticle(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	_, TrueRead, TrueUpdate, _, err := GetTruePermission(c, u.CategoryID, role_id)
-	// err = permission_kms.Read()
 	if err != nil {
 		Logger.Error(err.Error())
 		res.StatusCode = http.StatusInternalServerError
@@ -124,7 +130,7 @@ func ShowArticle(c echo.Context) error {
 	}
 	permission, _, _ := Check_Admin_Permission_API(c)
 	if TrueRead || TrueUpdate || permission {
-		*u, err = uOri.ToAPI()
+		*u, err = uOri.ToAPI(c)
 		if err != nil {
 			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
@@ -201,7 +207,7 @@ func AddArticle(c echo.Context) error {
 		// 	res.Data = "UPDATE ERROR : " + err.Error()
 		// 	return c.JSON(http.StatusBadRequest, res)
 		// }
-		*u, err = uOri.ToAPI()
+		*u, err = uOri.ToAPI(c)
 		if err != nil {
 			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
@@ -296,7 +302,7 @@ func EditArticle(c echo.Context) error {
 			res.Data = "UPDATE ERROR : " + err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		*u, err = oriu.ToAPI()
+		*u, err = oriu.ToAPI(c)
 		if err != nil {
 			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
@@ -420,7 +426,7 @@ func QueryArticle(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-func (data Article_Table) ToAPI() (res Article_API, err error) {
+func (data Article_Table) ToAPI(c echo.Context) (res Article_API, err error) {
 	res.Article = data.Article
 	res.ArticleID = data.ArticleID
 	res.CategoryID = data.CategoryID
@@ -438,6 +444,23 @@ func (data Article_Table) ToAPI() (res Article_API, err error) {
 	res.OwnerID = data.OwnerID
 	res.Tag = dependency.ConvStringToStringArray(data.Tag)
 	res.Title = data.Title
+	CategoryData := Category{
+		CategoryID:          data.CategoryID,
+		CategoryName:        "",
+		CategoryParentID:    0,
+		CategoryDescription: "",
+	}
+	err = CategoryData.Read()
+	if err != nil {
+		return res, err
+	}
+	res.CategoryName = CategoryData.CategoryName
+	res.CategoryDescription = CategoryData.CategoryDescription
+	res.OwnerName, res.OwnerUsername, err = GetNameUsername(c, data.OwnerID)
+	if err != nil {
+		return res, err
+	}
+	res.LastEditedByName, res.LastEditedByUsername, err = GetNameUsername(c, data.LastEditedByID)
 	return res, err
 }
 

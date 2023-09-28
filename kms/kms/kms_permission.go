@@ -15,7 +15,9 @@ import (
 type Permission_API struct {
 	PermissionID int `json:"PermissionID" query:"PermissionID"`
 	CategoryID   int
+	CategoryName string
 	RoleID       int
+	RoleName     string
 	PCreate      bool `json:"Create"`
 	PRead        bool `json:"Read"`
 	PUpdate      bool `json:"Update"`
@@ -49,7 +51,7 @@ func ListPermission(c echo.Context) error {
 		ListPermission, _ := ReadPermission(query + " " + LimitQuery)
 		var ListPermissionAPI []Permission_API
 		for _, x := range ListPermission {
-			tmp, err := x.ToAPI()
+			tmp, err := x.ToAPI(c)
 			if err != nil {
 				Logger.Error(err.Error())
 				res.StatusCode = http.StatusInternalServerError
@@ -95,7 +97,7 @@ func ShowPermission(c echo.Context) error {
 			res.Data = "KMS PERMISSION NOT FOUND"
 			return c.JSON(http.StatusNotFound, res)
 		}
-		*u, err = uOri.ToAPI()
+		*u, err = uOri.ToAPI(c)
 		if err != nil {
 			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
@@ -152,7 +154,7 @@ func AddPermission(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
-		*u, err = uOri.ToAPI()
+		*u, err = uOri.ToAPI(c)
 		if err != nil {
 			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
@@ -213,7 +215,7 @@ func EditPermission(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
-		*u, err = uOri.ToAPI()
+		*u, err = uOri.ToAPI(c)
 		if err != nil {
 			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
@@ -497,7 +499,7 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 	return CategoryIDList, nil
 }
 
-func (data Permission) ToAPI() (res Permission_API, err error) {
+func (data Permission) ToAPI(c echo.Context) (res Permission_API, err error) {
 	res = Permission_API{
 		PermissionID: data.PermissionID,
 		CategoryID:   data.CategoryID,
@@ -511,6 +513,15 @@ func (data Permission) ToAPI() (res Permission_API, err error) {
 	}
 	res.FileType = dependency.ConvStringToStringArray(data.FileType)
 	res.DocType = dependency.ConvStringToStringArray(data.DocType)
+	PermissionCategory := Category{CategoryID: data.CategoryID}
+	err = PermissionCategory.Read()
+	if err == nil {
+		res.CategoryName = PermissionCategory.CategoryName
+	}
+	Role, err := GetRole(c, data.RoleID)
+	if err == nil {
+		res.RoleName = Role.RoleName
+	}
 	return res, nil
 }
 

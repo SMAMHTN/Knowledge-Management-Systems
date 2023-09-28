@@ -18,7 +18,9 @@ type User_API struct {
 	Address      string `json:"Address"`
 	Phone        string `json:"Phone"`
 	RoleID       int    `json:"RoleID"`
+	RoleName     string `json:"RoleName"`
 	AppthemeID   int    `json:"AppthemeID"`
+	AppthemeName string `json:"AppthemeName"`
 	Note         string `json:"Note"`
 	IsSuperAdmin bool   `json:"IsSuperAdmin"`
 	IsActive     bool   `json:"IsActive"`
@@ -315,6 +317,21 @@ func CheckUserExist(c echo.Context) error {
 }
 
 func (data User) ToAPI() (res User_API) {
+	var err error
+	UserApptheme := Theme{AppthemeID: data.AppthemeID}
+	err = UserApptheme.Read()
+	if err != nil {
+		res.AppthemeName = ""
+	} else {
+		res.AppthemeName = UserApptheme.AppthemeName
+	}
+	UserRole := Role{RoleID: data.RoleID}
+	err = UserRole.Read()
+	if err != nil {
+		res.RoleName = ""
+	} else {
+		res.RoleName = UserRole.RoleName
+	}
 	res.UserID = data.UserID
 	res.UserPhoto = dependency.BytesToBase64(data.UserPhoto)
 	res.Username = data.Username

@@ -8,6 +8,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type CategoryAPI struct {
+	CategoryID          int `json:"CategoryID" query:"CategoryID"`
+	CategoryName        string
+	CategoryParentID    int
+	CategoryParentName  string
+	CategoryDescription string
+}
+
 func ListCategory(c echo.Context) error {
 	query := c.QueryParam("query")
 	permission, _, _ := Check_Admin_Permission_API(c)
@@ -31,8 +39,12 @@ func ListCategory(c echo.Context) error {
 		}
 		LimitQuery, res.Info = limit.LimitMaker(TotalRow)
 		listCategory, _ := ReadCategory(query + " " + LimitQuery)
+		var listCategoryAPI []CategoryAPI
+		for _, x := range listCategory {
+			listCategoryAPI = append(listCategoryAPI, x.ToAPI())
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = listCategory
+		res.Data = listCategoryAPI
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -93,7 +105,7 @@ func ShowCategory(c echo.Context) error {
 	permission, _, _ := Check_Admin_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Category)
+	u := new(CategoryAPI)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -102,7 +114,14 @@ func ShowCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		err = u.Read()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = "DATA INPUT ERROR : " + err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Read()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusNotFound
@@ -110,7 +129,7 @@ func ShowCategory(c echo.Context) error {
 			return c.JSON(http.StatusNotFound, res)
 		}
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = uOri.ToAPI()
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -123,7 +142,7 @@ func AddCategory(c echo.Context) error {
 	permission, _, _ := Check_Admin_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Category)
+	u := new(CategoryAPI)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -132,16 +151,23 @@ func AddCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		_, err = u.Create()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = "DATA INPUT ERROR : " + err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		_, err = uOri.Create()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
 		}
-		u.Read()
+		uOri.Read()
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = uOri.ToAPI()
 		err = RecordHistory(c, "Category", "Added Category : "+u.CategoryName+"("+strconv.Itoa(u.CategoryID)+")")
 		if err != nil {
 			Logger.Error("failed to record category change history " + err.Error())
@@ -158,7 +184,7 @@ func EditCategory(c echo.Context) error {
 	permission, _, _ := Check_Admin_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Category)
+	u := new(CategoryAPI)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -167,16 +193,23 @@ func EditCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		err = u.Update()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = "DATA INPUT ERROR : " + err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Update()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
 		}
-		u.Read()
+		uOri.Read()
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = uOri.ToAPI()
 		err = RecordHistory(c, "Category", "Edited Category : "+u.CategoryName+"("+strconv.Itoa(u.CategoryID)+")")
 		if err != nil {
 			Logger.Error("failed to record category change history " + err.Error())
@@ -193,7 +226,7 @@ func DeleteCategory(c echo.Context) error {
 	permission, _, _ := Check_Admin_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Category)
+	u := new(CategoryAPI)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -207,7 +240,14 @@ func DeleteCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		err = u.Delete()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = "DATA INPUT ERROR : " + err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Delete()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
@@ -226,4 +266,30 @@ func DeleteCategory(c echo.Context) error {
 		res.Data = "ONLY SUPERADMIN HAVE THIS PERMISSION"
 		return c.JSON(http.StatusForbidden, res)
 	}
+}
+
+func (data Category) ToAPI() (res CategoryAPI) {
+	res = CategoryAPI{
+		CategoryID:          data.CategoryID,
+		CategoryName:        data.CategoryName,
+		CategoryParentID:    data.CategoryParentID,
+		CategoryParentName:  "",
+		CategoryDescription: data.CategoryDescription,
+	}
+	CategoryParent := Category{CategoryID: data.CategoryID}
+	err := CategoryParent.Read()
+	if err == nil {
+		res.CategoryParentName = CategoryParent.CategoryName
+	}
+	return res
+}
+
+func (data CategoryAPI) ToTable() (res Category, err error) {
+	res = Category{
+		CategoryID:          data.CategoryID,
+		CategoryName:        data.CategoryName,
+		CategoryParentID:    data.CategoryParentID,
+		CategoryDescription: data.CategoryDescription,
+	}
+	return res, nil
 }
