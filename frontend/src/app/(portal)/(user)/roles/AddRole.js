@@ -58,14 +58,14 @@ function AddRole({ fetchData }) {
       <Button
         type="button"
         onClick={openModal}
-        className="rounded bg-blue-500 text-white w-full md:w-36"
+        className=" bg-gray-100"
       >
-        Add New +
+        +
       </Button>
 
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
+        className={`fixed inset-0  backdrop-blur-sm bg-black bg-opacity-50 ${
           isModalOpen ? 'visible z-20' : 'invisible'
         }`}
       />

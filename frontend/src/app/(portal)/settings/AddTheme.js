@@ -76,7 +76,7 @@ function AddTheme({ fetchThemes }) {
       </Button>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
+        className={`fixed inset-0  backdrop-blur-sm bg-black bg-opacity-50 ${
           isModalOpen ? 'visible z-20' : 'invisible'
         }`}
       />

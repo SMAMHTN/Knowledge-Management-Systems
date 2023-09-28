@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -18,7 +22,8 @@ import {
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
 } from '@radix-ui/react-icons';
-import AddRole from './AddRole';
+import AddCategory from '../../(documents)/category/AddCategory';
+import { KmsAPIGET } from '@/dep/kms/kmsHandler';
 import {
   Select,
   SelectContent,
@@ -47,11 +52,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Separator } from '@/components/ui/separator';
-import { CoreAPIGET } from '@/dep/core/coreHandler';
 
 export const columns = [
   {
-    accessorKey: 'RoleID',
+    accessorKey: 'CategoryID',
     header: ({ column }) => (
       <Button
         className="hover:bg-red-400"
@@ -63,11 +67,11 @@ export const columns = [
       </Button>
     ),
     cell: ({ row }) => (
-      <div>{row.getValue('RoleID')}</div>
+      <div>{row.getValue('CategoryID')}</div>
     ),
   },
   {
-    accessorKey: 'RoleName',
+    accessorKey: 'CategoryName',
     header: ({ column }) => (
       <Button
         className="hover:bg-red-400"
@@ -79,11 +83,11 @@ export const columns = [
       </Button>
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('RoleName')}</div>
+      <div className="capitalize">{row.getValue('CategoryName')}</div>
     ),
   },
   {
-    accessorKey: 'RoleParentID',
+    accessorKey: 'CategoryParentID',
     header: ({ column }) => (
       <Button
         className="hover:bg-red-400"
@@ -94,10 +98,10 @@ export const columns = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div className="lowercase">{row.getValue('RoleParentID')}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue('CategoryParentID')}</div>,
   },
   {
-    accessorKey: 'RoleDescription',
+    accessorKey: 'CategoryDescription',
     header: ({ column }) => (
       <Button
         className="hover:bg-red-400"
@@ -109,7 +113,7 @@ export const columns = [
       </Button>
     ),
     cell: ({ row }) => (
-      <div>{row.getValue('RoleDescription')}</div>
+      <div>{row.getValue('CategoryDescription')}</div>
     ),
   },
   {
@@ -118,9 +122,9 @@ export const columns = [
     cell: ({ row }) => {
       const items = row.original;
       const router = useRouter();
-      const handleNavigate = (RoleID) => {
-        console.log(`handleNavigate is running on ${items.RoleID}`);
-        router.push(`/roles/${RoleID}`);
+      const handleNavigate = (CategoryID) => {
+        console.log(`handleNavigate is running on ${items.CategoryID}`);
+        router.push(`/category/${CategoryID}`);
       };
       return (
         <DropdownMenu>
@@ -132,15 +136,29 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-white">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-gray-200" />
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(items.RoleID)}
+              onClick={() => navigator.clipboard.writeText(items.CategoryID)}
               className="hover:underline"
             >
               Copy ID
             </DropdownMenuItem>
-            <DropdownMenuItem className="hover:underline" onClick={() => handleNavigate(items.RoleID)}>View</DropdownMenuItem>
-            <DropdownMenuItem className="hover:underline">Delete</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="hover:underline" onClick={() => handleNavigate(items.CategoryID)}>View</DropdownMenuItem>
+            <DropdownMenuItem>Delete</DropdownMenuItem>
+            <DropdownMenuItem>
+              {' '}
+              <Link href={`/category/${items.CategoryID}`}>link</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="hover:underline"
+              onClick={() => {
+                handleNavigate();
+              }}
+            >
+              test
+
+            </DropdownMenuItem>
+
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -156,16 +174,21 @@ export default function DataTableDemo() {
   const [rowSelection, setRowSelection] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRows, setTotalRows] = useState(0);
 
   const fetchData = async () => {
     try {
-      const response = await CoreAPIGET(`listrole?page=${currentPage}&num=${itemsPerPage}`);
+      const response = await KmsAPIGET(`listcategory?page=${currentPage}&num=${itemsPerPage}`);
       console.log(response);
       const jsonData = response.body.Data;
-      const pageInfo = response.body.Info;
-      console.log('data fetched in page', currentPage, 'and', itemsPerPage, 'items per page');
-      setPageInfo(pageInfo);
+      // Extract pagination info from the API response
+      const paginationInfo = response.body.Info;
+      const { TotalPage, TotalRow } = paginationInfo;
+
+      // Set the pagination and data state
+      setTotalPages(TotalPage);
+      setTotalRows(TotalRow);
       setData(jsonData);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -173,6 +196,7 @@ export default function DataTableDemo() {
   };
 
   useEffect(() => {
+    // Call the fetchData function when the component mounts.
     fetchData();
   }, [currentPage, itemsPerPage]);
 
@@ -199,22 +223,22 @@ export default function DataTableDemo() {
     <div className="w-full">
       <div className="flex flex-auto w-full md:w-4/5 lg:w-3/4">
         <div className="flex flex-col w-full">
-          <h2 className="text-2xl font-semibold mb-1">List Roles</h2>
+          <h2 className="text-2xl font-semibold mb-1">List Category</h2>
           <p className="text-xs mb-4">
-            view and access list of roles.
+            view and access list of categories.
           </p>
           <Separator className="mb-4" />
         </div>
       </div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter Roles Name..."
-          value={(table.getColumn('RoleName')?.getFilterValue() ?? '')}
-          onChange={(event) => table.getColumn('RoleName')?.setFilterValue(event.target.value)}
+          placeholder="Filter Category Name..."
+          value={(table.getColumn('CategoryName')?.getFilterValue() ?? '')}
+          onChange={(event) => table.getColumn('CategoryName')?.setFilterValue(event.target.value)}
           className="max-w-sm bg-gray-100"
         />
         <div className=" ml-auto item-justify-end inline-flex">
-          <AddRole fetchData={fetchData} />
+          <AddCategory fetchData={fetchData} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className=" ml-2 bg-gray-100">
@@ -293,30 +317,28 @@ export default function DataTableDemo() {
 
       <div className="flex items-center justify-between px-2 py-2">
         <div className="flex-1 text-sm text-muted-foreground">
-          Data show
+          {table.getFilteredSelectedRowModel().rows.length}
           {' '}
-          {pageInfo.LowerLimit}
+          of
           {' '}
-          -
+          {table.getFilteredRowModel().rows.length}
           {' '}
-          {pageInfo.UpperLimit}
+          row(s) selected.
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
             <p className="text-sm font-medium">Rows per page</p>
             <Select
-              value={itemsPerPage.toString()}
+              value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
-                const newItemsPerPage = Number(value); // Convert the value back to a number
-                setItemsPerPage(newItemsPerPage); // Update the state
-                console.log('Button clicked', itemsPerPage);
+                table.setPageSize(Number(value));
               }}
             >
               <SelectTrigger className="h-8 w-[70px] bg-gray-50">
                 <SelectValue placeholder={table.getState().pagination.pageSize} />
               </SelectTrigger>
               <SelectContent side="top">
-                {[5, 10, 20, 30, 40, 50].map((pageSize) => (
+                {[10, 20, 30, 40, 50].map((pageSize) => (
                   <SelectItem key={pageSize} value={`${pageSize}`}>
                     {pageSize}
                   </SelectItem>
@@ -327,20 +349,18 @@ export default function DataTableDemo() {
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
             Page
             {' '}
-            {pageInfo.CurrentPage}
+            {table.getState().pagination.pageIndex + 1}
             {' '}
             of
             {' '}
-            {pageInfo.TotalPage}
+            {table.getPageCount()}
           </div>
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
               className="hidden h-8 w-8 p-0 lg:flex  bg-gray-50"
-              disabled={pageInfo.CurrentPage === 1}
-              onClick={() => {
-                setCurrentPage((prevCurrentPage) => (prevCurrentPage > 0 ? 1 : prevCurrentPage));
-              }}
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
             >
               <span className="sr-only">Go to first page</span>
               <DoubleArrowLeftIcon className="h-4 w-4" />
@@ -348,10 +368,8 @@ export default function DataTableDemo() {
             <Button
               variant="outline"
               className="h-8 w-8 p-0  bg-gray-50"
-              disabled={pageInfo.CurrentPage === 1}
-              onClick={() => {
-                setCurrentPage((prevCurrentPage) => prevCurrentPage - 1);
-              }}
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
             >
               <span className="sr-only">Go to previous page</span>
               <ChevronLeftIcon className="h-4 w-4" />
@@ -359,11 +377,8 @@ export default function DataTableDemo() {
             <Button
               variant="outline"
               className="h-8 w-8 p-0  bg-gray-50"
-              disabled={pageInfo.CurrentPage === pageInfo.TotalPage}
-              onClick={() => {
-                setCurrentPage((prevCurrentPage) => prevCurrentPage + 1);
-                console.log('Button clicked');
-              }}
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
             >
               <span className="sr-only">Go to next page</span>
               <ChevronRightIcon className="h-4 w-4" />
@@ -371,10 +386,8 @@ export default function DataTableDemo() {
             <Button
               variant="outline"
               className="hidden h-8 w-8 p-0 lg:flex  bg-gray-50"
-              disabled={pageInfo.CurrentPage === pageInfo.TotalPage}
-              onClick={() => {
-                setCurrentPage(pageInfo.TotalPage);
-              }}
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
             >
               <span className="sr-only">Go to last page</span>
               <DoubleArrowRightIcon className="h-4 w-4" />

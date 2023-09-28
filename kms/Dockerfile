@@ -4,3 +4,4 @@ WORKDIR /kms
 #Workdir set as core
 COPY . .
 EXPOSE 5656
+CMD go run .

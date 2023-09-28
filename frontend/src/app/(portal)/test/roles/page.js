@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -18,7 +22,7 @@ import {
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
 } from '@radix-ui/react-icons';
-import AddRole from './AddRole';
+import AddRole from '../../(user)/roles/AddRole';
 import {
   Select,
   SelectContent,
