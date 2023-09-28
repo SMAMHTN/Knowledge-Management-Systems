@@ -454,6 +454,19 @@ func GetAllDocTypePermission(c echo.Context, CategoryID int, RoleID int) (DocTyp
 	return DocTypeList, err
 }
 
+func GetCurrentUserReadCategoryList(c echo.Context) (CategoryIDList []int, err error) {
+	_, user, _ := Check_Admin_Permission_API(c)
+	role_id, err := dependency.InterfaceToInt(user["RoleID"])
+	if err != nil {
+		return CategoryIDList, err
+	}
+	CategoryIDList, err = GetReadCategoryList(c, role_id)
+	if err != nil {
+		return CategoryIDList, err
+	}
+	return CategoryIDList, nil
+}
+
 func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err error) {
 	_, userpass, _ := c.Request().BasicAuth()
 	err = nil

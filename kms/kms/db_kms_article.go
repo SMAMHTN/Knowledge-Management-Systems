@@ -8,6 +8,20 @@ import (
 	"time"
 )
 
+type Article_Table struct {
+	ArticleID      int `json:"ArticleID" query:"ArticleID"`
+	OwnerID        int
+	LastEditedByID int
+	LastEditedTime time.Time
+	Tag            string
+	Title          string
+	CategoryID     int
+	Article        string
+	FileID         string
+	DocID          string
+	IsActive       int
+}
+
 type ArticleSolr struct {
 	ArticleID            string
 	OwnerID              int
@@ -36,7 +50,7 @@ func ReadArticle(args string) ([]Article_Table, error) {
 	var err error
 
 	if args != "" {
-		sqlresult, err = Database.Query("SELECT * FROM kms_article" + " " + args)
+		sqlresult, err = Database.Query("SELECT ArticleID, OwnerID, LastEditedByID, LastEditedTime, Tag, Title, CategoryID, FileID, DocID, IsActive FROM kms_article" + " " + args)
 	} else {
 		sqlresult, err = Database.Query("SELECT * FROM kms_article")
 	}
@@ -47,7 +61,7 @@ func ReadArticle(args string) ([]Article_Table, error) {
 	defer sqlresult.Close()
 	for sqlresult.Next() {
 		var result = Article_Table{}
-		var err = sqlresult.Scan(&result.ArticleID, &result.OwnerID, &result.LastEditedByID, &result.LastEditedTime, &result.Tag, &result.Title, &result.CategoryID, &result.Article, &result.FileID, &result.DocID, &result.IsActive)
+		var err = sqlresult.Scan(&result.ArticleID, &result.OwnerID, &result.LastEditedByID, &result.LastEditedTime, &result.Tag, &result.Title, &result.CategoryID, &result.FileID, &result.DocID, &result.IsActive)
 		if err != nil {
 			return results, err
 		}
