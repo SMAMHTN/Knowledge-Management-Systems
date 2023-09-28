@@ -8,6 +8,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type RoleAPI struct {
+	RoleID          int `json:"RoleID" query:"RoleID"`
+	RoleName        string
+	RoleParentID    int
+	RoleParentName  string
+	RoleDescription string
+}
+
 func ListRole(c echo.Context) error {
 	query := c.QueryParam("query")
 	permission, _, _ := Check_Permission_API(c)
@@ -31,8 +39,12 @@ func ListRole(c echo.Context) error {
 		}
 		LimitQuery, res.Info = limit.LimitMaker(TotalRow)
 		listRole, _ := ReadRole(query + " " + LimitQuery)
+		var listRoleApi []RoleAPI
+		for _, y := range listRole {
+			listRoleApi = append(listRoleApi, y.ToAPI())
+		}
 		res.StatusCode = http.StatusOK
-		res.Data = listRole
+		res.Data = listRoleApi
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -45,7 +57,7 @@ func ShowRole(c echo.Context) error {
 	permission, _, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Role)
+	u := new(RoleAPI)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -55,7 +67,14 @@ func ShowRole(c echo.Context) error {
 	}
 	_, now_user, _ := Check_Permission_API(c)
 	if u.RoleID == now_user.RoleID {
-		err = u.Read()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Read()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusNotFound
@@ -63,10 +82,17 @@ func ShowRole(c echo.Context) error {
 			return c.JSON(http.StatusNotFound, res)
 		}
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = uOri.ToAPI()
 		return c.JSON(http.StatusOK, res)
 	} else if permission {
-		err = u.Read()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Read()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusNotFound
@@ -74,7 +100,7 @@ func ShowRole(c echo.Context) error {
 			return c.JSON(http.StatusNotFound, res)
 		}
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = uOri.ToAPI()
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -87,7 +113,7 @@ func AddRole(c echo.Context) error {
 	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Role)
+	u := new(RoleAPI)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -96,16 +122,23 @@ func AddRole(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		_, err = u.Create()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		_, err = uOri.Create()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
 		}
-		u.Read()
+		uOri.Read()
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = uOri.ToAPI()
 		err = RecordHistory(c, "Role", "User "+now_user.Name+"("+now_user.Username+") Added Role : "+u.RoleName+"("+strconv.Itoa(u.RoleID)+")")
 		if err != nil {
 			Logger.Error("failed to record role change history " + err.Error())
@@ -122,7 +155,7 @@ func EditRole(c echo.Context) error {
 	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Role)
+	u := new(RoleAPI)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -131,16 +164,23 @@ func EditRole(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		err = u.Update()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Update()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
 			res.Data = err.Error()
 			return c.JSON(http.StatusConflict, res)
 		}
-		u.Read()
+		uOri.Read()
 		res.StatusCode = http.StatusOK
-		res.Data = u
+		res.Data = uOri.ToAPI()
 		err = RecordHistory(c, "Role", "User "+now_user.Name+"("+now_user.Username+") Edited Role : "+u.RoleName+"("+strconv.Itoa(u.RoleID)+")")
 		if err != nil {
 			Logger.Error(" failed to record role change history " + err.Error())
@@ -157,7 +197,7 @@ func DeleteRole(c echo.Context) error {
 	permission, now_user, _ := Check_Permission_API(c)
 	var err error
 	res := Response{}
-	u := new(Role)
+	u := new(RoleAPI)
 	err = c.Bind(u)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -171,7 +211,14 @@ func DeleteRole(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		err = u.Delete()
+		uOri, err := u.ToTable()
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		err = uOri.Delete()
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusConflict
@@ -253,4 +300,32 @@ func CheckRoleExist(c echo.Context) error {
 	}
 	res.StatusCode = http.StatusOK
 	return c.JSON(http.StatusOK, res)
+}
+
+func (data Role) ToAPI() (res RoleAPI) {
+	res = RoleAPI{
+		RoleID:          data.RoleID,
+		RoleName:        data.RoleName,
+		RoleParentID:    data.RoleParentID,
+		RoleParentName:  "",
+		RoleDescription: data.RoleDescription,
+	}
+	RoleParent := Role{RoleID: data.RoleParentID}
+	err := RoleParent.Read()
+	if err != nil {
+		res.RoleParentName = ""
+	} else {
+		res.RoleParentName = RoleParent.RoleName
+	}
+	return res
+}
+
+func (data RoleAPI) ToTable() (res Role, err error) {
+	res = Role{
+		RoleID:          data.RoleID,
+		RoleName:        data.RoleName,
+		RoleParentID:    data.RoleParentID,
+		RoleDescription: data.RoleDescription,
+	}
+	return res, nil
 }

@@ -15,6 +15,7 @@ type Setting_API struct {
 	CompanyAddress string `json:"CompanyAddress"`
 	TimeZone       string `json:"TimeZone"`
 	AppthemeID     int    `json:"AppthemeID"`
+	AppthemeName   string `json:"AppthemeName"`
 }
 
 func ShowSetting(c echo.Context) error {
@@ -110,5 +111,7 @@ func (data Setting) ToAPI() (res Setting_API) {
 	res.CompanyAddress = data.CompanyAddress
 	res.TimeZone = data.TimeZone
 	res.AppthemeID = data.AppthemeID
+	CompanyApptheme := Theme{AppthemeID: data.AppthemeID}
+	res.AppthemeName = CompanyApptheme.AppthemeName
 	return res
 }

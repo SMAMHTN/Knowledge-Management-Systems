@@ -5,7 +5,18 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"strings"
+
+	"github.com/labstack/echo/v4"
 )
+
+type RoleAPI struct {
+	RoleID          int
+	RoleName        string
+	RoleParentID    int
+	RoleParentName  string
+	RoleDescription string
+}
 
 func CallCoreAPI(method string, dynamicpath string, body interface{}, username string, password string) (result map[string]interface{}, err error) {
 	reqheader := []dependency.ApiHeader{}
@@ -83,4 +94,32 @@ func CallCoreAPINoCred(method string, dynamicpath string, body interface{}) (res
 		return mapbody, errors.New("response is not json")
 	}
 	return mapbody, nil
+}
+
+func GetRole(c echo.Context, RoleID int) (Role RoleAPI, err error) {
+	_, userpass, _ := c.Request().BasicAuth()
+	cred := strings.Split(userpass, "&&")
+
+	RoleGET, err := CallCoreAPI("GET", "role", map[string]int{"RoleID": RoleID}, dependency.GetElementString(cred, 0), dependency.GetElementString(cred, 1))
+	if err != nil {
+		return Role, err
+	}
+	Role.RoleID = RoleID
+	Role.RoleName, err = dependency.InterfaceToString(RoleGET["RoleName"])
+	if err != nil {
+		return Role, err
+	}
+	Role.RoleParentID, err = dependency.InterfaceToInt(RoleGET["RoleParentID"])
+	if err != nil {
+		return Role, err
+	}
+	Role.RoleParentName, err = dependency.InterfaceToString(RoleGET["RoleParentName"])
+	if err != nil {
+		return Role, err
+	}
+	Role.RoleDescription, err = dependency.InterfaceToString(RoleGET["RoleDescription"])
+	if err != nil {
+		return Role, err
+	}
+	return Role, nil
 }
