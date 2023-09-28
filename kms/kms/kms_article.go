@@ -9,20 +9,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Article_Table struct {
-	ArticleID      int `json:"ArticleID" query:"ArticleID"`
-	OwnerID        int
-	LastEditedByID int
-	LastEditedTime time.Time
-	Tag            string
-	Title          string
-	CategoryID     int
-	Article        string
-	FileID         string
-	DocID          string
-	IsActive       int
-}
-
 type Article_API struct {
 	ArticleID            int `json:"ArticleID" query:"ArticleID"`
 	OwnerID              int
@@ -82,9 +68,37 @@ func ListArticle(c echo.Context) error {
 		res.Data = ArticleListAPI
 		return c.JSON(http.StatusOK, res)
 	} else {
-		res.StatusCode = http.StatusForbidden
-		res.Data = "ONLY SUPERADMIN HAVE THIS PERMISSION"
-		return c.JSON(http.StatusForbidden, res)
+		AllowedCategoryList, err := GetCurrentUserReadCategoryList(c)
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		var LimitQuery string
+		TotalRow, err := CountRows("kms_article")
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		LimitQuery, res.Info = limit.LimitMaker(TotalRow)
+		ArticleList, _ := ReadArticle("WHERE " + dependency.SQLArrayInt(AllowedCategoryList) + " " + LimitQuery)
+		var ArticleListAPI []Article_API
+		for _, x := range ArticleList {
+			tmp, err := x.ToAPI(c)
+			if err != nil {
+				Logger.Error(err.Error())
+				res.StatusCode = http.StatusInternalServerError
+				res.Data = err
+				return c.JSON(http.StatusInternalServerError, res)
+			}
+			ArticleListAPI = append(ArticleListAPI, tmp)
+		}
+		res.StatusCode = http.StatusOK
+		res.Data = ArticleListAPI
+		return c.JSON(http.StatusOK, res)
 	}
 }
 
