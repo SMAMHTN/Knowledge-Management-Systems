@@ -5,7 +5,7 @@ import "fmt"
 func SQLArrayString(values []string) (res string) {
 	res = "("
 	for i, value := range values {
-		res += fmt.Sprintf("%s", value)
+		res += value
 		if i < len(values)-1 {
 			res += ","
 		}

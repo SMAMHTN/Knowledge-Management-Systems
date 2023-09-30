@@ -47,7 +47,13 @@ func ListPermission(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
-		LimitQuery, res.Info = limit.LimitMaker(TotalRow)
+		LimitQuery, res.Info, err = limit.LimitMaker(TotalRow)
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
 		ListPermission, _ := ReadPermission(query + " " + LimitQuery)
 		var ListPermissionAPI []Permission_API
 		for _, x := range ListPermission {

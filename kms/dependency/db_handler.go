@@ -2,10 +2,14 @@ package dependency
 
 import (
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -20,10 +24,24 @@ type Info struct {
 }
 
 type LimitType struct {
-	Page int    `query:"page"`
-	Num  int    `query:"num"`
-	Sort string `query:"sort"`
-	Asc  int    `query:"asc"`
+	Page  int    `query:"page"`
+	Num   int    `query:"num"`
+	Sort  string `query:"sort"`
+	Query string `query:"query"`
+}
+
+type SortType struct {
+	Field     string `json:"field" query:"field"`
+	Ascending bool   `json:"asc" query:"asc"`
+}
+
+type QueryType struct {
+	Field   string  `json:"field" query:"field"`
+	String  string  `json:"string" query:"string"`
+	Integer int     `json:"int" query:"int"`
+	Float   float64 `json:"float" query:"float"`
+	Date    string  `json:"date" query:"date"`
+	DateGo  time.Time
 }
 
 func Db_Connect(conf Configuration, dbname string) (database *sql.DB, err error) {
@@ -128,8 +146,23 @@ func LimitMaker(page int, num int) (limit string) {
 	return limit
 }
 
-func (data *LimitType) LimitMaker(totalrow int) (limit string, info Info) {
-	limit = ""
+func (data *LimitType) LimitMaker(totalrow int) (limit string, info Info, err error) {
+	var sortquery []SortType
+	var queryquery []QueryType
+	if data.Sort != "" {
+		err = json.Unmarshal([]byte(data.Sort), &sortquery)
+		if err != nil {
+			err = errors.New("sort field json read error : " + err.Error())
+			return limit, info, err
+		}
+	}
+	if data.Query != "" {
+		err = json.Unmarshal([]byte(data.Query), &queryquery)
+		if err != nil {
+			err = errors.New("query field json read error : " + err.Error())
+			return limit, info, err
+		}
+	}
 	if data.Num == 0 {
 		data.Num = 10
 	}
@@ -146,14 +179,38 @@ func (data *LimitType) LimitMaker(totalrow int) (limit string, info Info) {
 	} else {
 		info.TotalShow = data.Num
 	}
-	if data.Sort != "" {
-		if data.Asc == 1 {
-			limit = limit + "SORT BY " + data.Sort + " ASC"
-		} else if data.Asc == 0 {
-			limit = limit + "SORT BY " + data.Sort + " DSC"
+	if len(queryquery) > 0 {
+		var queryList []string
+		for _, y := range queryquery {
+			if y.Integer != 0 {
+				queryList = append(queryList, y.Field+"="+strconv.Itoa(y.Integer))
+			} else if y.Float != 0.0 {
+				queryList = append(queryList, strconv.FormatFloat(y.Float, 'f', -1, 64))
+			} else if y.String != "" {
+				queryList = append(queryList, "LOWER("+y.Field+") LIKE LOWER("+y.String+")")
+			} else if y.Date != "" {
+				y.DateGo, err = time.Parse(time.RFC3339, y.Date)
+				if err != nil {
+					err = errors.New("query field date format error (RFC3339) : " + err.Error())
+					return limit, info, err
+				}
+			}
 		}
+		limit += "WHERE (" + strings.Join(queryList, " OR ") + ") "
+	}
+	if len(sortquery) > 0 {
+		var sortList []string
+		for _, y := range sortquery {
+			if y.Ascending {
+				sortList = append(sortList, y.Field+" ASC")
+			} else {
+				sortList = append(sortList, y.Field+" DESC")
+			}
+		}
+		limit = limit + "ORDER BY " + strings.Join(sortList, ", ") + " "
 	}
 	info.UpperLimit = Lowerlimit0 + info.TotalShow
 	limit = limit + "LIMIT " + strconv.Itoa(Lowerlimit0) + "," + strconv.Itoa(data.Num)
-	return limit, info
+	fmt.Println(limit)
+	return limit, info, nil
 }
