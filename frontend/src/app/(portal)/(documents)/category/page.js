@@ -1,7 +1,7 @@
 import DataTable from './DataTable';
 import { Separator } from '@/components/SmComponent';
 
-function listrole() {
+function listcategory() {
   return (
     <div className="w-full">
       <div className="flex flex-auto w-full md:w-4/5 lg:w-3/4">
@@ -18,4 +18,4 @@ function listrole() {
   );
 }
 
-export default listrole;
+export default listcategory;

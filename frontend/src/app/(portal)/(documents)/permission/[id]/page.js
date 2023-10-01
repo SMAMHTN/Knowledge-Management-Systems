@@ -34,7 +34,7 @@ function PermissionDetail({ params }) {
       try {
         const response = await KmsAPIGET(`permission?PermissionID=${params.id}`);
         setData(response.body.Data);
-
+        console.log(response);
         Object.keys(response.body.Data).forEach((key) => {
           if (key !== 'PermissionID') {
             // Ensure FileType is an array

@@ -59,7 +59,7 @@ function AddCategory({ fetchData }) {
       <Button
         type="button"
         onClick={openModal}
-        className=" bg-gray-100"
+        className=" bg-gray-100 ml-2"
       >
         +
       </Button>
