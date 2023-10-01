@@ -7,9 +7,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import { alertUpdate } from '@/components/Feature';
 import { permSchema } from '@/constants/schema';
-import { ErrorMessage, RequiredFieldIndicator } from '@/components/FormComponent';
+import { ErrorMessage, RequiredFieldIndicator, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 
 function PermissionDetail({ params }) {
   const {
@@ -35,7 +34,7 @@ function PermissionDetail({ params }) {
       try {
         const response = await KmsAPIGET(`permission?PermissionID=${params.id}`);
         setData(response.body.Data);
-
+        console.log(response);
         Object.keys(response.body.Data).forEach((key) => {
           if (key !== 'PermissionID') {
             // Ensure FileType is an array

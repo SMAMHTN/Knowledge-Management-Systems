@@ -5,7 +5,7 @@ import { CoreAPI, CoreAPIGET, getUserData } from '@/dep/core/coreHandler';
 import { alertUpdate } from '@/components/Feature';
 import LogoUpload from '@/app/(portal)/settings/LogoUpload';
 import ProfileImage from '@/components/Navbar/ShowUserPhoto';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/components/SmComponent';
 
 function UserSettings() {
   const [data, setData] = useState({});

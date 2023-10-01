@@ -17,7 +17,11 @@ services:
         condition: service_healthy
     volumes:
       - ./core:/core:rw
-    command: /bin/sh -c "while true; do sleep 100000; done"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6565/checkserverrun"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     ports:
       - "6565:6565"
   kms-db:
@@ -33,22 +37,30 @@ services:
   kms:
     build: ./kms
     depends_on:
-      - kms-db
-      - core
+      kms-db:
+        condition: service_healthy
+      core:
+        condition: service_healthy
     volumes:
       - ./kms:/kms:rw
-    command: /bin/sh -c "while true; do sleep 100000; done"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5656/checkserverrun"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     ports:
       - "5656:5656"
-  frontend:
-    build: ./frontend
-    volumes:
-      - ./frontend:/frontend:rw
-    depends_on:
-      - core
-      - kms
-    ports:
-      - "3000:3000"
+  # frontend:
+  #   build: ./frontend
+  #   depends_on:
+  #     kms-db:
+  #       condition: service_healthy
+  #     core:
+  #       condition: service_healthy
+  #     kms:
+  #       condition: service_healthy
+  #   ports:
+  # #     - "3000:3000"
   # solr:
   #   image: "solr:9.2.0"
   #   ulimits:

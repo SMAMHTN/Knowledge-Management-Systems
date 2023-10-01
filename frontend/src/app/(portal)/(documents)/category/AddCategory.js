@@ -4,9 +4,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { KmsAPI } from '@/dep/kms/kmsHandler';
 
 import { catSchema } from '@/constants/schema';
-import { RequiredFieldIndicator, ErrorMessage } from '@/components/FormComponent';
+import { RequiredFieldIndicator, ErrorMessage, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+
 import {
   useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';
@@ -59,21 +59,21 @@ function AddCategory({ fetchData }) {
       <Button
         type="button"
         onClick={openModal}
-        className="rounded bg-blue-500 text-white w-full md:w-36"
+        className=" bg-gray-100 ml-2"
       >
-        Add New +
+        +
       </Button>
 
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
+        className={`fixed inset-0  backdrop-blur-sm bg-black bg-opacity-50 ${
           isModalOpen ? 'visible z-20' : 'invisible'
         }`}
       />
 
       {/* Modal */}
       <div
-        className={`fixed inset-0 flex justify-center items-center ${
+        className={`fixed inset-0 flex  justify-center items-center ${
           isModalOpen ? 'visible z-30' : 'invisible'
         }`}
 

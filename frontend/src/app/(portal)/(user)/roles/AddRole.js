@@ -4,9 +4,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { CoreAPI } from '@/dep/core/coreHandler';
 
 import { roleSchema } from '@/constants/schema';
-import { RequiredFieldIndicator, ErrorMessage } from '@/components/FormComponent';
+import { RequiredFieldIndicator, ErrorMessage, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+
 import {
   useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';
@@ -58,14 +58,14 @@ function AddRole({ fetchData }) {
       <Button
         type="button"
         onClick={openModal}
-        className="rounded bg-blue-500 text-white w-full md:w-36"
+        className=" bg-gray-100 ml-2"
       >
-        Add New +
+        +
       </Button>
 
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
+        className={`fixed inset-0  backdrop-blur-sm bg-black bg-opacity-50 ${
           isModalOpen ? 'visible z-20' : 'invisible'
         }`}
       />
@@ -182,125 +182,3 @@ function AddRole({ fetchData }) {
 }
 
 export default AddRole;
-
-// "use client";
-// import React, { useState } from "react";
-// import { useState, useEffect } from "react";
-// import { useRouter } from "next/navigation";
-// import { KmsAPI } from "@/dep/kms/kmsHandler";
-
-// function AddProduct() {
-//   const [formData, setFormData] = useState({
-//     CategoryName: "",
-//     CategoryParentID: "",
-//     CategoryDescription: "",
-//   });
-//   const [modal, setModal] = useState(false);
-//   const [isMutating, setIsMutating] = useState(false);
-
-//   const router = useRouter();
-
-//   function handleSubmit(e) {
-//     e.preventDefault();
-
-//     setIsMutating(true);
-
-// // Use useEffect to fetch data
-// useEffect(() => {
-//   const fetchData = async () => {
-//     try {
-//       await KmsAPI("POST", "category", data);
-//       setIsMutating(false);
-//       router.refresh();
-//       setModal(false);
-//     } catch (error) {
-//       console.log("Error occurred:", error);
-//       setIsMutating(false);
-//       // Handle error, show a message, etc.
-//     }
-//   };
-
-//   fetchData();
-// }, [data, router]); // Add data and router as dependencies for useEffect
-//   }
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prevData) => ({
-//       ...prevData,
-//       [name]: value,
-//     }));
-//   };
-
-//   function handleChange() {
-//     setModal(!modal);
-//   }
-
-//   return (
-//     <div>
-//       <button  onClick={handleChange} className="bg-blue-500 text-white rounded px-2 py-1">
-//         Add New +
-//       </button>
-//       <input
-//         type="checkbox"
-//         checked={modal}
-//         onChange={handleChange}
-//         className="modal-toggle"
-//       />
-
-//       <div className="modal">
-//         <div className="modal-box">
-//           <h3 className="font-bold text-lg">Add New Product</h3>
-//           <form onSubmit={handleSubmit}>
-//             <div className="form-control">
-//               <label className="label font-bold">CategoryName</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryName}
-//           onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Product Name"
-//               />
-//             </div>
-//             <div className="form-control">
-//               <label className="label font-bold">Price</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryParentID}
-//           onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Price"
-//               />
-//             </div>
-//             <div className="form-control">
-//               <label className="label font-bold">Price</label>
-//               <input
-//                 type="text"
-//                 value={formData.CategoryDescription}
-//                 onChange={handleInputChange}
-//                 className="input w-full input-bordered"
-//                 placeholder="Price"
-//               />
-//             </div>
-//             <div className="modal-action">
-//               <button type="button" className="btn" onClick={handleChange}>
-//                 Close
-//               </button>
-//               {!isMutating ? (
-//                 <button type="submit" className="btn btn-primary">
-//                   Save
-//                 </button>
-//               ) : (
-//                 <button type="button" className="btn loading">
-//                   Saving...
-//                 </button>
-//               )}
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default AddProduct;

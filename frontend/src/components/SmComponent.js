@@ -13,3 +13,7 @@ export function ErrorMessage({ error }) {
     <p className="text-red-600 text-xs absolute">{error}</p>
   );
 }
+
+export function Separator() {
+  return <hr className="w-full border-t border-gray-300 mb-4" />;
+}

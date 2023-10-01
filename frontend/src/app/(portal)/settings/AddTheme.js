@@ -4,9 +4,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { CoreAPI } from '@/dep/core/coreHandler';
 
 import { themeSchema } from '@/constants/schema';
-import { ErrorMessage, RequiredFieldIndicator } from '@/components/FormComponent';
+import { ErrorMessage, RequiredFieldIndicator, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+
 import { useOutsideClick, useModal, alertAdd } from '@/components/Feature';
 import { closeIcon } from '@/constants/icon';
 
@@ -76,7 +76,7 @@ function AddTheme({ fetchThemes }) {
       </Button>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
+        className={`fixed inset-0  backdrop-blur-sm bg-black bg-opacity-50 ${
           isModalOpen ? 'visible z-20' : 'invisible'
         }`}
       />
