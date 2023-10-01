@@ -17,13 +17,13 @@ type Permission struct {
 	DocType      string //json
 }
 
-func ReadPermission(args string) ([]Permission, error) {
+func ReadPermission(args string, values []interface{}) ([]Permission, error) {
 	var results []Permission
 	var sqlresult *sql.Rows
 	var err error
 
 	if args != "" {
-		sqlresult, err = Database.Query("SELECT * FROM kms_permission" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM kms_permission"+" "+args, values...)
 	} else {
 		sqlresult, err = Database.Query("SELECT * FROM kms_permission")
 	}

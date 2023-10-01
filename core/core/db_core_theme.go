@@ -11,13 +11,13 @@ type Theme struct {
 	AppthemeValue string //json
 }
 
-func ReadTheme(args string) ([]Theme, error) {
+func ReadTheme(args string, values []interface{}) ([]Theme, error) {
 	var results []Theme
 	var sqlresult *sql.Rows
 	var err error
 
 	if args != "" {
-		sqlresult, err = Database.Query("SELECT * FROM core_theme" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM core_theme"+" "+args, values...)
 	} else {
 		sqlresult, err = Database.Query("SELECT * FROM core_theme")
 	}

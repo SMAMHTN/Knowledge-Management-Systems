@@ -19,7 +19,7 @@ func CheckStringArrayBracket(data string) bool {
 
 func ConvStringToStringArrayBracket(data string) (result []string, err error) {
 	if !CheckStringArrayBracket(data) {
-		return nil, errors.New("this isnt an array")
+		return nil, errors.New(data + " : this isnt an array")
 	}
 	splitStr := strings.Split(data[1:len(data)-1], ",")
 	for count, x := range splitStr {

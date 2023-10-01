@@ -12,13 +12,13 @@ type Doc struct {
 	DocType    string
 }
 
-func ReadDoc(args string) ([]Doc, error) {
+func ReadDoc(args string, values []interface{}) ([]Doc, error) {
 	var results []Doc
 	var sqlresult *sql.Rows
 	var err error
 
 	if args != "" {
-		sqlresult, err = Database.Query("SELECT * FROM kms_doc" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM kms_doc"+" "+args, values...)
 	} else {
 		sqlresult, err = Database.Query("SELECT * FROM kms_doc")
 	}
