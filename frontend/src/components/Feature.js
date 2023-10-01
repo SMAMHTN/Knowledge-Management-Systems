@@ -3,6 +3,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { Button } from './ui/button';
+import { closeIcon } from '@/constants/icon';
+import { Separator } from './SmComponent';
 
 export const useOutsideClick = (ref, closeModal) => {
   useEffect(() => {
@@ -155,38 +157,35 @@ export function DeleteModal({
 
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-50">
-      <div ref={modalRef} className="bg-white rounded p-6 shadow-md w-96">
-        <h2 className="text-xl font-semibold mb-4">Confirm Deletion</h2>
-        <p className="mb-4">{message}</p>
-        {/* <div className="flex justify-end">
+      <div className="fixed inset-0 flex justify-center items-center">
+        <div ref={modalRef} className="bg-white rounded-lg p-6 shadow-md w-96 relative">
+          {/* Close button inside the modal */}
           <button
-            className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36"
+            className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
             onClick={onClose}
           >
-            Cancel
+            {closeIcon}
           </button>
-          <button
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded w-full md:w-36"
-            onClick={onDelete}
-          >
-            Delete
-          </button>
-        </div> */}
-        <div className="place-content-end mt-10 flex">
-          <Button
-            type="button"
-            className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36"
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            onClick={onDelete}
-            className="rounded bg-red-500 hover:bg-red-600 text-white w-full md:w-36"
-          >
-            Delete
-          </Button>
+
+          <h2 className="text-xl font-semibold mb-2">Confirm Deletion</h2>
+          <Separator className="mb-4" />
+          <p className="mb-4">{message}</p>
+          <div className="place-content-end mt-10 flex">
+            <Button
+              type="button"
+              className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36"
+              onClick={onClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              onClick={onDelete}
+              className="rounded bg-red-500 hover:bg-red-600 text-white w-full md:w-36"
+            >
+              Delete
+            </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { getUserData, Logout } from '@/dep/core/coreHandler';
 import { searchIcon, dashboardIcon } from '@/constants/icon';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/components/SmComponent';
 
 function Home() {
   const [error, setError] = useState('');

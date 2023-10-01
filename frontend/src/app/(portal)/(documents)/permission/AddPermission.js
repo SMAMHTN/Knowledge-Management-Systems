@@ -3,9 +3,9 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { permSchema } from '@/constants/schema';
-import { RequiredFieldIndicator, ErrorMessage } from '@/components/FormComponent';
+import { RequiredFieldIndicator, ErrorMessage, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+
 import {
   useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';
@@ -69,14 +69,9 @@ function AddPermission({ fetchData }) {
 
   return (
     <div>
-      <Button
-        type="button"
-        onClick={openModal}
-        className="rounded bg-blue-500 text-white w-full md:w-36"
-      >
-        Add New +
+      <Button type="button" onClick={openModal} className=" bg-gray-100 ml-2">
+        +
       </Button>
-
       {/* Overlay */}
       <div
         className={`fixed inset-0  backdrop-blur-sm bg-black bg-opacity-50 ${

@@ -100,15 +100,6 @@ function UserProfile({ maxWidth, maxHeight }) {
               {userSetting.title}
             </Link>
           </DropdownMenuItem>
-          {/* <DropdownMenuItem>
-            Billing
-
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Settings
-
-          </DropdownMenuItem>
-          <DropdownMenuItem>New Team</DropdownMenuItem> */}
         </DropdownMenuGroup>
         <DropdownMenuSeparator className="mx-1 bg-neutral-200" />
         <DropdownMenuItem className="hover:underline cursor-pointer" onClick={handleLogout}>

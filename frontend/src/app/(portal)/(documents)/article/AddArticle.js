@@ -83,9 +83,9 @@ function AddArticle({ fetchData }) {
       <Button
         type="button"
         onClick={openModal}
-        className="rounded bg-blue-500 text-white w-full md:w-36"
+        className=" bg-gray-100 ml-2"
       >
-        Add New +
+        +
       </Button>
       {/* Overlay */}
       <div

@@ -4,9 +4,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { KmsAPI } from '@/dep/kms/kmsHandler';
 
 import { catSchema } from '@/constants/schema';
-import { RequiredFieldIndicator, ErrorMessage } from '@/components/FormComponent';
+import { RequiredFieldIndicator, ErrorMessage, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+
 import {
   useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';

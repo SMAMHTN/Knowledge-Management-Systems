@@ -4,9 +4,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { CoreAPI } from '@/dep/core/coreHandler';
 
 import { themeSchema } from '@/constants/schema';
-import { ErrorMessage, RequiredFieldIndicator } from '@/components/FormComponent';
+import { ErrorMessage, RequiredFieldIndicator, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+
 import { useOutsideClick, useModal, alertAdd } from '@/components/Feature';
 import { closeIcon } from '@/constants/icon';
 

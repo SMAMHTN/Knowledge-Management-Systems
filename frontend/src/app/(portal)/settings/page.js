@@ -12,8 +12,8 @@ import ThemeApp from '@/components/AppThemeDropdown';
 import AddTheme from './AddTheme';
 import LogoUpload from './LogoUpload';
 import TimezoneDropdown from '@/components/TimezoneDropdown';
-import { Separator } from '@/components/ui/separator';
-import { ErrorMessage, RequiredFieldIndicator } from '@/components/FormComponent';
+import { Separator, ErrorMessage, RequiredFieldIndicator } from '@/components/SmComponent';
+
 import { Button } from '@/components/ui/button';
 
 function SystemSetting() {

@@ -7,7 +7,7 @@ import AddArticle from './AddArticle';
 import { DeleteModal, alertDelete } from '@/components/Feature';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
 
 function DocTable() {

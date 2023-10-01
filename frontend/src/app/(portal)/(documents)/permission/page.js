@@ -7,7 +7,7 @@ import { CoreAPIGET } from '@/dep/core/coreHandler';
 import AddPermission from './AddPermission';
 import { DeleteModal, alertDelete } from '@/components/Feature';
 import { ItmsPerPageComp, PaginationComp } from '@/components/PaginationControls';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/components/SmComponent';
 
 function PermTable() {
   const router = useRouter();

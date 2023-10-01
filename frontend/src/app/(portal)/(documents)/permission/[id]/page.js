@@ -7,9 +7,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import { alertUpdate } from '@/components/Feature';
 import { permSchema } from '@/constants/schema';
-import { ErrorMessage, RequiredFieldIndicator } from '@/components/FormComponent';
+import { ErrorMessage, RequiredFieldIndicator, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 
 function PermissionDetail({ params }) {
   const {

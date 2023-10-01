@@ -3,11 +3,12 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { userSchema } from '@/constants/schema';
-import { RequiredFieldIndicator, ErrorMessage } from '@/components/FormComponent';
+import { RequiredFieldIndicator, ErrorMessage, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+
 import { useOutsideClick, useModal, alertAdd } from '@/components/Feature';
 import { closeIcon } from '@/constants/icon';
+import { CoreAPI } from '@/dep/core/coreHandler';
 
 function AddUser({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
@@ -47,7 +48,7 @@ function AddUser({ fetchData }) {
         return;
       }
 
-      const response = await KmsAPI('POST', 'user', formData);
+      const response = await CoreAPI('POST', 'user', formData);
       await new Promise((resolve) => setTimeout(resolve, 300));
       fetchData();
       alertAdd(response);
@@ -59,13 +60,13 @@ function AddUser({ fetchData }) {
   };
 
   return (
-    <div className="">
+    <div>
       <Button
         type="button"
         onClick={openModal}
-        className="rounded bg-blue-500 text-white w-full md:w-36"
+        className=" bg-gray-100 ml-2"
       >
-        Add New +
+        +
       </Button>
 
       {/* Overlay */}

@@ -2,28 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  DoubleArrowLeftIcon,
-  DoubleArrowRightIcon,
-} from '@radix-ui/react-icons';
-import AddCategory from '../../(documents)/category/AddCategory';
-import { KmsAPIGET } from '@/dep/kms/kmsHandler';
 import {
   Select,
   SelectContent,
@@ -32,7 +18,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -51,11 +36,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Separator } from '@/components/SmComponent';
+import { CoreAPI, CoreAPIGET } from '@/dep/core/coreHandler';
+import PaginationCtrl from '@/components/Table/PaginationCtrl';
 
-export const columns = [
+const columns = [
   {
-    accessorKey: 'CategoryID',
+    accessorKey: 'HistoryID',
     header: ({ column }) => (
       <Button
         className="hover:bg-red-400"
@@ -67,53 +53,69 @@ export const columns = [
       </Button>
     ),
     cell: ({ row }) => (
-      <div>{row.getValue('CategoryID')}</div>
+      <div>{row.getValue('HistoryID')}</div>
     ),
   },
   {
-    accessorKey: 'CategoryName',
+    accessorKey: 'ActivityType',
     header: ({ column }) => (
       <Button
         className="hover:bg-red-400"
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        Name
+        Type
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('CategoryName')}</div>
+      <div className="capitalize">{row.getValue('ActivityType')}</div>
     ),
   },
   {
-    accessorKey: 'CategoryParentID',
+    accessorKey: 'Changes',
     header: ({ column }) => (
       <Button
         className="hover:bg-red-400"
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        Parent
+        Changes
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div className="lowercase">{row.getValue('CategoryParentID')}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue('Changes')}</div>,
   },
   {
-    accessorKey: 'CategoryDescription',
+    accessorKey: 'UserID',
     header: ({ column }) => (
       <Button
         className="hover:bg-red-400"
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        Description
+        UserID
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ row }) => (
-      <div>{row.getValue('CategoryDescription')}</div>
+      <div>{row.getValue('UserID')}</div>
+    ),
+  },
+  {
+    accessorKey: 'Time',
+    header: ({ column }) => (
+      <Button
+        className="hover:bg-red-400"
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Time
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <div>{row.getValue('Time')}</div>
     ),
   },
   {
@@ -121,82 +123,54 @@ export const columns = [
     enableHiding: false,
     cell: ({ row }) => {
       const items = row.original;
-      const router = useRouter();
-      const handleNavigate = (CategoryID) => {
-        console.log(`handleNavigate is running on ${items.CategoryID}`);
-        router.push(`/category/${CategoryID}`);
-      };
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-white">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(items.CategoryID)}
-              className="hover:underline"
-            >
-              Copy ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="hover:underline" onClick={() => handleNavigate(items.CategoryID)}>View</DropdownMenuItem>
-            <DropdownMenuItem>Delete</DropdownMenuItem>
-            <DropdownMenuItem>
-              {' '}
-              <Link href={`/category/${items.CategoryID}`}>link</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="hover:underline"
-              onClick={() => {
-                handleNavigate();
-              }}
-            >
-              test
-
-            </DropdownMenuItem>
-
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          {' '}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-white">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-gray-200" />
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(items.UserID)}
+                className="hover:underline  hover:cursor-pointer"
+              >
+                Copy User ID
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </>
       );
     },
   },
 ];
 
-export default function DataTableDemo() {
+export default function DataTable() {
   const [data, setData] = useState([]);
-  const [sorting, setSorting] = useState([]); // Define sorting state
+  const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalRows, setTotalRows] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
 
   const fetchData = async () => {
     try {
-      const response = await KmsAPIGET(`listcategory?page=${currentPage}&num=${itemsPerPage}`);
-      console.log(response);
-      const jsonData = response.body.Data;
-      // Extract pagination info from the API response
-      const paginationInfo = response.body.Info;
-      const { TotalPage, TotalRow } = paginationInfo;
-
-      // Set the pagination and data state
-      setTotalPages(TotalPage);
-      setTotalRows(TotalRow);
-      setData(jsonData);
+      const response = await CoreAPIGET(`listhistory?page=${currentPage}&num=${itemsPerPage}`);
+      setPageInfo(response.body.Info);
+      setData(response.body.Data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
   useEffect(() => {
-    // Call the fetchData function when the component mounts.
     fetchData();
   }, [currentPage, itemsPerPage]);
 
@@ -206,7 +180,6 @@ export default function DataTableDemo() {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -219,26 +192,19 @@ export default function DataTableDemo() {
     },
   });
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
   return (
     <div className="w-full">
-      <div className="flex flex-auto w-full md:w-4/5 lg:w-3/4">
-        <div className="flex flex-col w-full">
-          <h2 className="text-2xl font-semibold mb-1">List Category</h2>
-          <p className="text-xs mb-4">
-            view and access list of categories.
-          </p>
-          <Separator className="mb-4" />
-        </div>
-      </div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter Category Name..."
-          value={(table.getColumn('CategoryName')?.getFilterValue() ?? '')}
-          onChange={(event) => table.getColumn('CategoryName')?.setFilterValue(event.target.value)}
+          placeholder="Filter User Name..."
+          value={(table.getColumn('UserID')?.getFilterValue() ?? '')}
+          onChange={(event) => table.getColumn('UserID')?.setFilterValue(event.target.value)}
           className="max-w-sm bg-gray-100"
         />
         <div className=" ml-auto item-justify-end inline-flex">
-          <AddCategory fetchData={fetchData} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className=" ml-2 bg-gray-100">
@@ -314,31 +280,37 @@ export default function DataTableDemo() {
           </TableBody>
         </Table>
       </div>
-
       <div className="flex items-center justify-between px-2 py-2">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length}
-          {' '}
-          of
-          {' '}
-          {table.getFilteredRowModel().rows.length}
-          {' '}
-          row(s) selected.
+        <div className="flex-1 text-sm font-medium text-muted-foreground">
+          <div className="hidden lg:flex">
+            Data show
+            {' '}
+            {pageInfo.LowerLimit}
+            {' '}
+            -
+            {' '}
+            {pageInfo.UpperLimit}
+            {' '}
+            of
+            {' '}
+            {pageInfo.TotalRow}
+          </div>
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Rows per page</p>
+            <p className="hidden lg:flex text-sm font-medium">Rows per page</p>
             <Select
-              value={`${table.getState().pagination.pageSize}`}
+              value={itemsPerPage.toString()}
               onValueChange={(value) => {
-                table.setPageSize(Number(value));
+                const newItemsPerPage = Number(value);
+                setItemsPerPage(newItemsPerPage);
               }}
             >
               <SelectTrigger className="h-8 w-[70px] bg-gray-50">
-                <SelectValue placeholder={table.getState().pagination.pageSize} />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent side="top">
-                {[10, 20, 30, 40, 50].map((pageSize) => (
+                {[5, 10, 20, 30, 40, 50].map((pageSize) => (
                   <SelectItem key={pageSize} value={`${pageSize}`}>
                     {pageSize}
                   </SelectItem>
@@ -346,53 +318,11 @@ export default function DataTableDemo() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page
-            {' '}
-            {table.getState().pagination.pageIndex + 1}
-            {' '}
-            of
-            {' '}
-            {table.getPageCount()}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex  bg-gray-50"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <span className="sr-only">Go to first page</span>
-              <DoubleArrowLeftIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0  bg-gray-50"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <span className="sr-only">Go to previous page</span>
-              <ChevronLeftIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0  bg-gray-50"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <span className="sr-only">Go to next page</span>
-              <ChevronRightIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex  bg-gray-50"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-            >
-              <span className="sr-only">Go to last page</span>
-              <DoubleArrowRightIcon className="h-4 w-4" />
-            </Button>
-          </div>
+          <PaginationCtrl
+            currentPage={currentPage}
+            totalPage={pageInfo.TotalPage}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
     </div>
