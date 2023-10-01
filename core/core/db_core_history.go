@@ -19,13 +19,13 @@ func EmptyHistory() History {
 	return History{HistoryID: 0, ActivityType: "Test", Time: GetTime(), UserID: 1, Changes: "Test", IPAddress: "21120119120026"}
 }
 
-func ReadHistory(args string) ([]History, error) {
+func ReadHistory(args string, values []interface{}) ([]History, error) {
 	var results []History
 	var sqlresult *sql.Rows
 	var err error
 
 	if args != "" {
-		sqlresult, err = Database.Query("SELECT * FROM core_history" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM core_history"+" "+args, values...)
 	} else {
 		sqlresult, err = Database.Query("SELECT * FROM core_history")
 	}

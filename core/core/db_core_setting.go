@@ -31,13 +31,13 @@ func GetTimeZone() string {
 	return TimeZone
 }
 
-func ReadSetting(args string) ([]Setting, error) {
+func ReadSetting(args string, values []interface{}) ([]Setting, error) {
 	var results []Setting
 	var sqlresult *sql.Rows
 	var err error
 
 	if args != "" {
-		sqlresult, err = Database.Query("SELECT * FROM core_setting" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM core_setting"+" "+args, values...)
 	} else {
 		sqlresult, err = Database.Query("SELECT * FROM core_setting")
 	}

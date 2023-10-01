@@ -27,10 +27,10 @@ type Permission_API struct {
 }
 
 func ListPermission(c echo.Context) error {
-	query := c.QueryParam("query")
+
 	permission, _, _ := Check_Admin_Permission_API(c)
 	res := ResponseList{}
-	limit := new(dependency.LimitType)
+	limit := new(dependency.QueryType)
 	err := c.Bind(limit)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -40,6 +40,7 @@ func ListPermission(c echo.Context) error {
 	}
 	if permission {
 		var LimitQuery string
+		var ValuesQuery []interface{}
 		TotalRow, err := CountRows("kms_permission")
 		if err != nil {
 			Logger.Error(err.Error())
@@ -47,14 +48,14 @@ func ListPermission(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
-		LimitQuery, res.Info, err = limit.LimitMaker(TotalRow)
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(TotalRow)
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
 			res.Data = err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		ListPermission, _ := ReadPermission(query + " " + LimitQuery)
+		ListPermission, _ := ReadPermission(LimitQuery, ValuesQuery)
 		var ListPermissionAPI []Permission_API
 		for _, x := range ListPermission {
 			tmp, err := x.ToAPI(c)
@@ -334,7 +335,7 @@ func GetTruePermission(c echo.Context, CategoryID int, RoleID int) (Create bool,
 		categoryIDListString += fmt.Sprintf(", %d", CategoryIDList[i])
 	}
 	FinalQuery := fmt.Sprintf("WHERE RoleID IN (%s) AND CategoryID IN (%s)", roleIDListString, categoryIDListString)
-	PermissionList, err := ReadPermission(FinalQuery)
+	PermissionList, err := ReadPermission(FinalQuery, nil)
 	for _, val := range PermissionList {
 		if !Create {
 			if val.PCreate != 0 {
@@ -399,7 +400,7 @@ func GetAllFileTypePermission(c echo.Context, CategoryID int, RoleID int) (FileT
 		categoryIDListString += fmt.Sprintf(", %d", CategoryIDList[i])
 	}
 	FinalQuery := fmt.Sprintf("WHERE RoleID IN (%s) AND CategoryID IN (%s)", roleIDListString, categoryIDListString)
-	PermissionList, err := ReadPermission(FinalQuery)
+	PermissionList, err := ReadPermission(FinalQuery, nil)
 	for _, val := range PermissionList {
 		TmpFileTypeList := dependency.ConvStringToStringArray(val.FileType)
 		if err != nil {
@@ -449,7 +450,7 @@ func GetAllDocTypePermission(c echo.Context, CategoryID int, RoleID int) (DocTyp
 		categoryIDListString += fmt.Sprintf(", %d", CategoryIDList[i])
 	}
 	FinalQuery := fmt.Sprintf("WHERE RoleID IN (%s) AND CategoryID IN (%s)", roleIDListString, categoryIDListString)
-	PermissionList, err := ReadPermission(FinalQuery)
+	PermissionList, err := ReadPermission(FinalQuery, nil)
 	for _, val := range PermissionList {
 		TmpDocTypeList := dependency.ConvStringToStringArray(val.DocType)
 		if err != nil {
@@ -499,7 +500,7 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 	}
 
 	FinalQuery := fmt.Sprintf("WHERE RoleID IN (%s)", roleIDListString)
-	PermissionList, err := ReadPermission(FinalQuery)
+	PermissionList, err := ReadPermission(FinalQuery, nil)
 	if err != nil {
 		return CategoryIDList, err
 	}

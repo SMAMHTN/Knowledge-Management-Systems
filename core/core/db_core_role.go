@@ -12,13 +12,13 @@ type Role struct {
 	RoleDescription string
 }
 
-func ReadRole(args string) ([]Role, error) {
+func ReadRole(args string, values []interface{}) ([]Role, error) {
 	var results []Role
 	var sqlresult *sql.Rows
 	var err error
 
 	if args != "" {
-		sqlresult, err = Database.Query("SELECT * FROM core_role" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM core_role"+" "+args, values...)
 	} else {
 		sqlresult, err = Database.Query("SELECT * FROM core_role")
 	}

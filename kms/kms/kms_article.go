@@ -2,6 +2,8 @@ package kms
 
 import (
 	"dependency"
+	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -31,10 +33,12 @@ type Article_API struct {
 }
 
 func ListArticle(c echo.Context) error {
-	query := c.QueryParam("query")
+	var LimitQuery string
+	var ValuesQuery []interface{}
+
 	permission, _, _ := Check_Admin_Permission_API(c)
 	res := ResponseList{}
-	limit := new(dependency.LimitType)
+	limit := new(dependency.QueryType)
 	err := c.Bind(limit)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -43,7 +47,6 @@ func ListArticle(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		var LimitQuery string
 		TotalRow, err := CountRows("kms_article")
 		if err != nil {
 			Logger.Error(err.Error())
@@ -51,14 +54,14 @@ func ListArticle(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
-		LimitQuery, res.Info, err = limit.LimitMaker(TotalRow)
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(TotalRow)
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
 			res.Data = err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		ArticleList, _ := ReadArticle(query + " " + LimitQuery)
+		ArticleList, _ := ReadArticle(LimitQuery, ValuesQuery)
 		var ArticleListAPI []Article_API
 		for _, x := range ArticleList {
 			tmp, err := x.ToAPI(c)
@@ -81,7 +84,6 @@ func ListArticle(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
-		var LimitQuery string
 		TotalRow, err := CountRows("kms_article")
 		if err != nil {
 			Logger.Error(err.Error())
@@ -89,14 +91,44 @@ func ListArticle(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
-		LimitQuery, res.Info, err = limit.LimitMaker(TotalRow)
+		var wherequery []dependency.WhereType
+		if limit.Query != "" {
+			err = json.Unmarshal([]byte(limit.Query), &wherequery)
+			if err != nil {
+				err = errors.New("query field json read error : " + err.Error())
+				Logger.Error(err.Error())
+				res.StatusCode = http.StatusInternalServerError
+				res.Data = err
+				return c.JSON(http.StatusInternalServerError, res)
+			}
+		}
+		var convertedAllowedCategoryList []interface{}
+		for _, v := range AllowedCategoryList {
+			convertedAllowedCategoryList = append(convertedAllowedCategoryList, v)
+		}
+		singlewherequery := dependency.WhereType{
+			Field:    "CategoryID",
+			Operator: "IN",
+			Logic:    "AND",
+			Values:   convertedAllowedCategoryList,
+		}
+		wherequery = append(wherequery, singlewherequery)
+		a, err := json.Marshal(wherequery)
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		limit.Query = string(a)
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(TotalRow)
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
 			res.Data = err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		ArticleList, _ := ReadArticle("WHERE " + dependency.SQLArrayInt(AllowedCategoryList) + " " + LimitQuery)
+		ArticleList, _ := ReadArticle(LimitQuery, ValuesQuery)
 		var ArticleListAPI []Article_API
 		for _, x := range ArticleList {
 			tmp, err := x.ToAPI(c)
@@ -422,11 +454,12 @@ func DeleteArticle(c echo.Context) error {
 func QueryArticle(c echo.Context) error {
 	var err error
 	var res Response
+	query := c.QueryParam("query")
 	_, user, _ := Check_Admin_Permission_API(c)
 	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	q := c.QueryParam("q")
 	search := c.QueryParam("search")
-	query := c.QueryParam("query")
+
 	if err != nil {
 		Logger.Error(err.Error())
 		res.StatusCode = http.StatusInternalServerError
