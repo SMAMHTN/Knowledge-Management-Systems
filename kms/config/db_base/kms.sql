@@ -27,7 +27,7 @@ CREATE TABLE `kms_article` (
   `OwnerID` int(11) NOT NULL,
   `LastEditedByID` int(11) NOT NULL,
   `LastEditedTime` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `Tag` longtext DEFAULT "[]",
+  `Tag` longtext DEFAULT "",
   `Title` varchar(255) NOT NULL,
   `CategoryID` int(11) DEFAULT 1,
   `Article` longtext DEFAULT NULL,
@@ -47,6 +47,7 @@ CREATE TABLE `kms_article` (
 
 LOCK TABLES `kms_article` WRITE;
 /*!40000 ALTER TABLE `kms_article` DISABLE KEYS */;
+INSERT INTO `kms_article` VALUES (1, 1, 1, '2001-09-20 10:10:10',"Default,Public,Example","Example Article",1,"This is example article","","",1);
 /*!40000 ALTER TABLE `kms_article` ENABLE KEYS */;
 UNLOCK TABLES;
 
