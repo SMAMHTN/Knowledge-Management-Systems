@@ -49,7 +49,6 @@ function CategoryDetail({ params }) {
         console.error('Validation error:', error.details);
         return;
       }
-
       const response = await KmsAPI('PUT', 'category', formData);
       await new Promise((resolve) => setTimeout(resolve, 300));
       alertUpdate(response);

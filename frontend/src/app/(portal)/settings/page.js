@@ -41,15 +41,12 @@ function SystemSetting() {
     try {
       const response = await CoreAPIGET('setting');
       const jsonData = response.body.Data;
-      console.log(response);
       setData(jsonData);
+      const { Data } = response.body;
       setInitialTimezone(jsonData.TimeZone);
-      if (jsonData.CompanyName) {
-        setValue('CompanyName', jsonData.CompanyName);
-      }
-      if (jsonData.CompanyAddress) {
-        setValue('CompanyAddress', jsonData.CompanyAddress);
-      }
+      Object.keys(Data).forEach((key) => {
+        setValue(key, Data[key]);
+      });
     } catch (error) {
       console.error(error);
       console.error('An error occurred');
@@ -116,7 +113,7 @@ function SystemSetting() {
     });
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (data) => {
     try {
       const { error } = settingsSchema.validate(data);
 
@@ -124,9 +121,6 @@ function SystemSetting() {
         console.error('Validation error:', error.details);
         return;
       }
-
-      // Validation passed, proceed with the update
-      console.log('Updating data:', data);
 
       const selectedThemeId = parseInt(selectedTheme);
 
@@ -137,10 +131,7 @@ function SystemSetting() {
         TimeZone: data.TimeZone,
         AppthemeID: selectedThemeId,
       };
-
       const response = await CoreAPI('PUT', 'setting', updatedData);
-      // console.log('Update response:', response);
-      // console.log('Updated theme:', selectedThemeId);
       if (response.status === 200) {
         fetchData();
       }

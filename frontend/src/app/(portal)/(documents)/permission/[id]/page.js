@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import { alertUpdate } from '@/components/Feature';
 import { permSchema } from '@/constants/schema';
@@ -15,6 +14,7 @@ function PermissionDetail({ params }) {
     handleSubmit, control, setValue, formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
+      PermissionID: '',
       CategoryID: '',
       RoleID: '',
       Create: false,
@@ -36,14 +36,7 @@ function PermissionDetail({ params }) {
         setData(response.body.Data);
         console.log(response);
         Object.keys(response.body.Data).forEach((key) => {
-          if (key !== 'PermissionID') {
-            // Ensure FileType is an array
-            if (key === 'FileType' && typeof response.body.Data[key] === 'string') {
-              setValue(key, response.body.Data[key].split(',').map((item) => item.trim()));
-            } else {
-              setValue(key, response.body.Data[key]);
-            }
-          }
+          setValue(key, response.body.Data[key]);
         });
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -92,12 +85,21 @@ function PermissionDetail({ params }) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label className="block font-medium mb-1">Permission ID</label>
-            <input
-              type="text"
-              value={data.PermissionID || ''}
-              className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-              placeholder="Permission ID"
+            <Controller
+              name="PermissionID"
+              control={control}
               readOnly
+              render={({ field }) => (
+                <>
+                  <input
+                    type="text"
+                    {...field}
+                    className=" text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    placeholder="Permission ID"
+                  />
+                  {errors.CategoryID && (<ErrorMessage error={errors.CategoryID.message} />)}
+                </>
+              )}
             />
           </div>
           <div className="mb-4">

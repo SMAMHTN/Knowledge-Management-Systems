@@ -104,7 +104,7 @@ export default function DataTable() {
         <div>File Type</div>
       ),
       cell: ({ row }) => (
-        <div>{row.getValue('FileType')}</div>
+        <div>{((fileTypeArray) => fileTypeArray.join(', '))(row.getValue('FileType'))}</div>
       ),
     },
     {
@@ -113,7 +113,7 @@ export default function DataTable() {
         <div>Doc Type</div>
       ),
       cell: ({ row }) => (
-        <div>{row.getValue('DocType')}</div>
+        <div>{((docTypeArray) => docTypeArray.join(', '))(row.getValue('DocType'))}</div>
       ),
     },
     {
