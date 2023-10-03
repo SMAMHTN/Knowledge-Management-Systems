@@ -9,7 +9,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -23,7 +22,7 @@ type Info struct {
 	TotalShow   int
 }
 
-type LimitType struct {
+type QueryType struct {
 	Page  int    `query:"page"`
 	Num   int    `query:"num"`
 	Sort  string `query:"sort"`
@@ -35,14 +34,19 @@ type SortType struct {
 	Ascending bool   `json:"asc" query:"asc"`
 }
 
-type QueryType struct {
-	Field   string  `json:"field" query:"field"`
-	String  string  `json:"string" query:"string"`
-	Integer int     `json:"int" query:"int"`
-	Float   float64 `json:"float" query:"float"`
-	Date    string  `json:"date" query:"date"`
-	DateGo  time.Time
+type WhereType struct {
+	Field    string        `json:"field" query:"field"`
+	Operator string        `json:"operator" query:"operator"`
+	Logic    string        `json:"logic" query:"logic"`
+	Values   []interface{} `json:"values" query:"values"`
 }
+
+var (
+	AllowedOperator        = [...]string{"=", "!=", "<=>", ">", "<", ">=", "<=", "LIKE"}
+	SpecialAllowedOperator = [...]string{"BETWEEN", "GREATEST", "IN", "LEAST", "NOT BETWEEN", "NOT IN", "!", "LowerLIKE"}
+	AllowedLogic           = [...]string{"AND", "OR", "XOR"}
+	SpecialAllowedLogic    = [...]string{}
+)
 
 func Db_Connect(conf Configuration, dbname string) (database *sql.DB, err error) {
 	if dbname == "" {
@@ -146,21 +150,21 @@ func LimitMaker(page int, num int) (limit string) {
 	return limit
 }
 
-func (data *LimitType) LimitMaker(totalrow int) (limit string, info Info, err error) {
+func (data *QueryType) QueryMaker(totalrow int) (query string, values []interface{}, info Info, err error) {
 	var sortquery []SortType
-	var queryquery []QueryType
+	var wherequery []WhereType
 	if data.Sort != "" {
 		err = json.Unmarshal([]byte(data.Sort), &sortquery)
 		if err != nil {
 			err = errors.New("sort field json read error : " + err.Error())
-			return limit, info, err
+			return query, values, info, err
 		}
 	}
 	if data.Query != "" {
-		err = json.Unmarshal([]byte(data.Query), &queryquery)
+		err = json.Unmarshal([]byte(data.Query), &wherequery)
 		if err != nil {
-			err = errors.New("query field json read error : " + err.Error())
-			return limit, info, err
+			err = errors.New("query query json read error : " + err.Error())
+			return query, values, info, err
 		}
 	}
 	if data.Num == 0 {
@@ -179,24 +183,41 @@ func (data *LimitType) LimitMaker(totalrow int) (limit string, info Info, err er
 	} else {
 		info.TotalShow = data.Num
 	}
-	if len(queryquery) > 0 {
-		var queryList []string
-		for _, y := range queryquery {
-			if y.Integer != 0 {
-				queryList = append(queryList, y.Field+"="+strconv.Itoa(y.Integer))
-			} else if y.Float != 0.0 {
-				queryList = append(queryList, strconv.FormatFloat(y.Float, 'f', -1, 64))
-			} else if y.String != "" {
-				queryList = append(queryList, "LOWER("+y.Field+") LIKE LOWER("+y.String+")")
-			} else if y.Date != "" {
-				y.DateGo, err = time.Parse(time.RFC3339, y.Date)
-				if err != nil {
-					err = errors.New("query field date format error (RFC3339) : " + err.Error())
-					return limit, info, err
+	//WHERE QUERY CREATOR
+	if len(wherequery) > 0 {
+		query += "WHERE ("
+		for i, condition := range wherequery {
+			if i > 0 {
+				switch condition.Logic {
+				case "AND", "OR", "XOR":
+					query += " " + condition.Logic + " "
+				default:
+					err = errors.New("use only these allowed logic : " + strings.Join(AllowedLogic[:], ", ") + "," + strings.Join(SpecialAllowedLogic[:], ", ") + " but got " + condition.Logic)
+					return query, values, info, err
 				}
 			}
+			//CONDITION CHECKER
+			switch condition.Operator {
+			case "=", "!=", "<=>", ">", "<", ">=", "<=", "LIKE":
+				query += fmt.Sprintf("%s %s ?", condition.Field, condition.Operator)
+				values = append(values, condition.Values[0])
+			case "IN", "NOT IN":
+				query += fmt.Sprintf("%s %s (?%s)", condition.Field, condition.Operator, strings.Repeat(", ?", len(condition.Values)-1))
+				values = append(values, condition.Values...)
+			case "BETWEEN", "NOT BETWEEN":
+				query += fmt.Sprintf("%s %s ? AND ?", condition.Field, condition.Operator)
+				values = append(values, condition.Values[0], condition.Values[1])
+			case "GREATEST", "LEAST":
+				query += fmt.Sprintf("%s (%s)", condition.Operator, condition.Field)
+			case "LowerLIKE":
+				query += fmt.Sprintf("LOWER(%s) LIKE LOWER(?)", condition.Field)
+				values = append(values, condition.Values[0])
+			default:
+				err = errors.New("use only these allowed operator : " + strings.Join(AllowedOperator[:], ", ") + "," + strings.Join(SpecialAllowedOperator[:], ", ") + " but got " + condition.Operator)
+				return query, values, info, err
+			}
 		}
-		limit += "WHERE (" + strings.Join(queryList, " OR ") + ") "
+		query += ") "
 	}
 	if len(sortquery) > 0 {
 		var sortList []string
@@ -207,10 +228,11 @@ func (data *LimitType) LimitMaker(totalrow int) (limit string, info Info, err er
 				sortList = append(sortList, y.Field+" DESC")
 			}
 		}
-		limit = limit + "ORDER BY " + strings.Join(sortList, ", ") + " "
+		query = query + "ORDER BY " + strings.Join(sortList, ", ") + " "
 	}
 	info.UpperLimit = Lowerlimit0 + info.TotalShow
-	limit = limit + "LIMIT " + strconv.Itoa(Lowerlimit0) + "," + strconv.Itoa(data.Num)
-	fmt.Println(limit)
-	return limit, info, nil
+	query = query + "LIMIT " + strconv.Itoa(Lowerlimit0) + "," + strconv.Itoa(data.Num)
+	fmt.Println(query)
+	fmt.Println(values)
+	return query, values, info, nil
 }

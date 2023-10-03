@@ -76,7 +76,7 @@ func init() {
 
 		fmt.Printf("%s: %v\n", fieldName, fieldValue)
 	}
-	Logger, err = dependency.InitZapLog(Conf.Error_Log_location, Conf.Log_location)
+	Logger, err = dependency.InitZapLog(Conf, Conf.Error_Log_location, Conf.Log_location)
 	if err != nil {
 		panic(err)
 	}

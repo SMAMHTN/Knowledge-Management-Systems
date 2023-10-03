@@ -56,7 +56,7 @@ func AddHistory(c echo.Context) error {
 func ListHistory(c echo.Context) error {
 	query := c.QueryParam("query")
 	res := ResponseList{}
-	limit := new(dependency.LimitType)
+	limit := new(dependency.QueryType)
 	err := c.Bind(limit)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -67,6 +67,7 @@ func ListHistory(c echo.Context) error {
 	permission, _, _ := Check_Permission_API(c)
 	if permission {
 		var LimitQuery string
+		var ValuesQuery []interface{}
 		TotalRow, err := CountRows("core_history")
 		if err != nil {
 			Logger.Error(err.Error())
@@ -74,8 +75,14 @@ func ListHistory(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
-		LimitQuery, res.Info = limit.LimitMaker(TotalRow)
-		Histories, _ := ReadHistory(query + " " + LimitQuery)
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(TotalRow)
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		Histories, _ := ReadHistory(query+" "+LimitQuery, ValuesQuery)
 		HistoriesAPI := []HistoryAPI{}
 		for _, y := range Histories {
 			HistoriesAPI = append(HistoriesAPI, y.ToAPI())

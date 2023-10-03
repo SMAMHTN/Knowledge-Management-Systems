@@ -48,13 +48,13 @@ func ReadUser(args string) ([]User, error) {
 	return results, nil
 }
 
-func ReadUserWithoutPhoto(args string) ([]User, error) {
+func ReadUserWithoutPhoto(args string, values []interface{}) ([]User, error) {
 	var results []User
 	var sqlresult *sql.Rows
 	var err error
 
 	if args != "" {
-		sqlresult, err = Database.Query("SELECT UserID, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive FROM core_user" + " " + args)
+		sqlresult, err = Database.Query("SELECT UserID, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive FROM core_user"+" "+args, values...)
 	} else {
 		sqlresult, err = Database.Query("SELECT UserID, Username, Password, Name, Email, Address, Phone, RoleID, AppthemeID, Note, IsSuperAdmin, IsActive FROM core_user")
 	}

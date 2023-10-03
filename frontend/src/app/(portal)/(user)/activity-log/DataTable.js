@@ -8,8 +8,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useRouter } from 'next/navigation';
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react';
+import {
+  ArrowUpDown, ChevronDown, MoreHorizontal,
+} from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -36,31 +37,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { CoreAPI, CoreAPIGET } from '@/dep/core/coreHandler';
+import { CoreAPIGET } from '@/dep/core/coreHandler';
 import PaginationCtrl from '@/components/Table/PaginationCtrl';
 
 const columns = [
   {
-    accessorKey: 'HistoryID',
-    header: ({ column }) => (
-      <Button
-        className="hover:bg-red-400"
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        ID
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <div>{row.getValue('HistoryID')}</div>
-    ),
-  },
-  {
     accessorKey: 'ActivityType',
     header: ({ column }) => (
       <Button
-        className="hover:bg-red-400"
+        className="hover:bg-gray-300"
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
@@ -75,38 +60,31 @@ const columns = [
   {
     accessorKey: 'Changes',
     header: ({ column }) => (
-      <Button
-        className="hover:bg-red-400"
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Changes
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
+      <div>Changes</div>
     ),
-    cell: ({ row }) => <div className="lowercase">{row.getValue('Changes')}</div>,
+    cell: ({ row }) => <div>{row.getValue('Changes')}</div>,
   },
   {
-    accessorKey: 'UserID',
+    accessorKey: 'UserUserName',
     header: ({ column }) => (
       <Button
-        className="hover:bg-red-400"
+        className="hover:bg-gray-300"
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        UserID
+        Name
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ row }) => (
-      <div>{row.getValue('UserID')}</div>
+      <div>{row.getValue('UserUserName')}</div>
     ),
   },
   {
     accessorKey: 'Time',
     header: ({ column }) => (
       <Button
-        className="hover:bg-red-400"
+        className="hover:bg-gray-300"
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
@@ -128,14 +106,14 @@ const columns = [
           {' '}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button variant="ghost" className="h-8 w-8 p-0 hover:border-gray-400 hover:border hover:rounded-md">
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-white">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-gray-200" />
+              <DropdownMenuSeparator className="bg-gray-300" />
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(items.UserID)}
                 className="hover:underline  hover:cursor-pointer"
@@ -200,14 +178,14 @@ export default function DataTable() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter User Name..."
-          value={(table.getColumn('UserID')?.getFilterValue() ?? '')}
-          onChange={(event) => table.getColumn('UserID')?.setFilterValue(event.target.value)}
+          value={(table.getColumn('UserUserName')?.getFilterValue() ?? '')}
+          onChange={(event) => table.getColumn('UserUserName')?.setFilterValue(event.target.value)}
           className="max-w-sm bg-gray-100"
         />
         <div className=" ml-auto item-justify-end inline-flex">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className=" ml-2 bg-gray-100">
+              <Button variant="outline" className=" ml-2 bg-gray-100  hover:bg-gray-300">
                 Columns
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
@@ -230,7 +208,7 @@ export default function DataTable() {
           </DropdownMenu>
         </div>
       </div>
-      <div className="rounded-md border bg-gray-100">
+      <div className="rounded-md border bg-gray-100 py-2">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -256,6 +234,7 @@ export default function DataTable() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  className="hover:bg-gray-300 rounded"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

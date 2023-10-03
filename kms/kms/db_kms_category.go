@@ -12,13 +12,13 @@ type Category struct {
 	CategoryDescription string
 }
 
-func ReadCategory(args string) ([]Category, error) {
+func ReadCategory(args string, values []interface{}) ([]Category, error) {
 	var results []Category
 	var sqlresult *sql.Rows
 	var err error
 
 	if args != "" {
-		sqlresult, err = Database.Query("SELECT * FROM kms_category" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM kms_category"+" "+args, values...)
 	} else {
 		sqlresult, err = Database.Query("SELECT * FROM kms_category")
 	}

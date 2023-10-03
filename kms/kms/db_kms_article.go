@@ -44,15 +44,15 @@ type ArticleSolr struct {
 	DocContent           string
 }
 
-func ReadArticle(args string) ([]Article_Table, error) {
+func ReadArticle(args string, values []interface{}) ([]Article_Table, error) {
 	var results []Article_Table
 	var sqlresult *sql.Rows
 	var err error
 
 	if args != "" {
-		sqlresult, err = Database.Query("SELECT ArticleID, OwnerID, LastEditedByID, LastEditedTime, Tag, Title, CategoryID, FileID, DocID, IsActive FROM kms_article" + " " + args)
+		sqlresult, err = Database.Query("SELECT ArticleID, OwnerID, LastEditedByID, LastEditedTime, Tag, Title, CategoryID, FileID, DocID, IsActive FROM kms_article"+" "+args, values...)
 	} else {
-		sqlresult, err = Database.Query("SELECT * FROM kms_article")
+		sqlresult, err = Database.Query("SELECT ArticleID, OwnerID, LastEditedByID, LastEditedTime, Tag, Title, CategoryID, FileID, DocID, IsActive FROM kms_article")
 	}
 
 	if err != nil {

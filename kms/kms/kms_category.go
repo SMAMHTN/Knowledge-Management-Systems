@@ -17,10 +17,10 @@ type CategoryAPI struct {
 }
 
 func ListCategory(c echo.Context) error {
-	query := c.QueryParam("query")
+
 	permission, _, _ := Check_Admin_Permission_API(c)
 	res := ResponseList{}
-	limit := new(dependency.LimitType)
+	limit := new(dependency.QueryType)
 	err := c.Bind(limit)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -30,6 +30,7 @@ func ListCategory(c echo.Context) error {
 	}
 	if permission {
 		var LimitQuery string
+		var ValuesQuery []interface{}
 		TotalRow, err := CountRows("kms_category")
 		if err != nil {
 			Logger.Error(err.Error())
@@ -37,14 +38,14 @@ func ListCategory(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
-		LimitQuery, res.Info, err = limit.LimitMaker(TotalRow)
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(TotalRow)
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
 			res.Data = err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		listCategory, _ := ReadCategory(query + " " + LimitQuery)
+		listCategory, _ := ReadCategory(LimitQuery, ValuesQuery)
 		var listCategoryAPI []CategoryAPI
 		for _, x := range listCategory {
 			listCategoryAPI = append(listCategoryAPI, x.ToAPI())

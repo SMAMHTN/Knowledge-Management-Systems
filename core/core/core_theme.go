@@ -11,7 +11,7 @@ import (
 func ListTheme(c echo.Context) error {
 	query := c.QueryParam("query")
 	res := ResponseList{}
-	limit := new(dependency.LimitType)
+	limit := new(dependency.QueryType)
 	err := c.Bind(limit)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -20,6 +20,7 @@ func ListTheme(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	var LimitQuery string
+	var ValuesQuery []interface{}
 	TotalRow, err := CountRows("core_theme")
 	if err != nil {
 		Logger.Error(err.Error())
@@ -27,8 +28,14 @@ func ListTheme(c echo.Context) error {
 		res.Data = err
 		return c.JSON(http.StatusInternalServerError, res)
 	}
-	LimitQuery, res.Info = limit.LimitMaker(TotalRow)
-	listtheme, _ := ReadTheme(query + " " + LimitQuery)
+	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(TotalRow)
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	listtheme, _ := ReadTheme(query+" "+LimitQuery, ValuesQuery)
 	res.StatusCode = http.StatusOK
 	res.Data = listtheme
 	return c.JSON(http.StatusOK, res)

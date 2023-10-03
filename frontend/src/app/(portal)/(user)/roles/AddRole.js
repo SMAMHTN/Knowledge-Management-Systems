@@ -58,7 +58,7 @@ function AddRole({ fetchData }) {
       <Button
         type="button"
         onClick={openModal}
-        className=" bg-gray-100 ml-2"
+        className=" bg-gray-100 ml-2 hover:bg-gray-300 border-white border "
       >
         +
       </Button>

@@ -12,13 +12,13 @@ type File struct {
 	FileType   string
 }
 
-func ReadFile(args string) ([]File, error) {
+func ReadFile(args string, values []interface{}) ([]File, error) {
 	var results []File
 	var sqlresult *sql.Rows
 	var err error
 
 	if args != "" {
-		sqlresult, err = Database.Query("SELECT * FROM kms_file" + " " + args)
+		sqlresult, err = Database.Query("SELECT * FROM kms_file"+" "+args, values...)
 	} else {
 		sqlresult, err = Database.Query("SELECT * FROM kms_file")
 	}
