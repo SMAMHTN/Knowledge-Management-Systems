@@ -56,11 +56,11 @@ export default function DataTable() {
       accessorKey: 'PermissionID',
       header: ({ column }) => (
         <Button
-          className="hover:bg-red-400"
+          className="hover:bg-gray-300"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          ID
+          Perm ID
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -69,46 +69,39 @@ export default function DataTable() {
       ),
     },
     {
-      accessorKey: 'CategoryID',
+      accessorKey: 'CategoryName',
       header: ({ column }) => (
         <Button
-          className="hover:bg-red-400"
+          className="hover:bg-gray-300"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Cat ID
+          Cat
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue('CategoryID')}</div>
+        <div>{row.getValue('CategoryName')}</div>
       ),
     },
     {
-      accessorKey: 'RoleID',
+      accessorKey: 'RoleName',
       header: ({ column }) => (
         <Button
-          className="hover:bg-red-400"
+          className="hover:bg-gray-300"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Role ID
+          Role
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <div className="lowercase">{row.getValue('RoleID')}</div>,
+      cell: ({ row }) => <div>{row.getValue('RoleName')}</div>,
     },
     {
       accessorKey: 'FileType',
       header: ({ column }) => (
-        <Button
-          className="hover:bg-red-400"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          FileType
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div>File Type</div>
       ),
       cell: ({ row }) => (
         <div>{row.getValue('FileType')}</div>
@@ -117,14 +110,7 @@ export default function DataTable() {
     {
       accessorKey: 'DocType',
       header: ({ column }) => (
-        <Button
-          className="hover:bg-red-400"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          DocType
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div>Doc Type</div>
       ),
       cell: ({ row }) => (
         <div>{row.getValue('DocType')}</div>
@@ -158,14 +144,14 @@ export default function DataTable() {
             {' '}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
+                <Button variant="ghost" className="h-8 w-8 p-0 hover:border-gray-400 hover:border hover:rounded-md">
                   <span className="sr-only">Open menu</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-gray-200" />
+                <DropdownMenuSeparator className="bg-gray-300" />
                 <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(items.PermissionID)}
                   className="hover:underline  hover:cursor-pointer"
@@ -260,7 +246,7 @@ export default function DataTable() {
           <AddPermission fetchData={fetchData} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className=" ml-2 bg-gray-100">
+              <Button variant="outline" className=" ml-2 bg-gray-100 hover:bg-gray-300">
                 Columns
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
@@ -283,7 +269,7 @@ export default function DataTable() {
           </DropdownMenu>
         </div>
       </div>
-      <div className="rounded-md border bg-gray-100">
+      <div className="rounded-md border bg-gray-100 py-2">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -309,6 +295,7 @@ export default function DataTable() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  className="hover:bg-gray-300 rounded"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

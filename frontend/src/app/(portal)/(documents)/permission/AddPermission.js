@@ -69,7 +69,7 @@ function AddPermission({ fetchData }) {
 
   return (
     <div>
-      <Button type="button" onClick={openModal} className=" bg-gray-100 ml-2">
+      <Button type="button" onClick={openModal} className=" bg-gray-100 ml-2 hover:bg-gray-300 border border-white">
         +
       </Button>
       {/* Overlay */}

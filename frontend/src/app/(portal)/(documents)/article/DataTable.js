@@ -52,26 +52,10 @@ export default function DataTable() {
   const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
   const columns = [
     {
-      accessorKey: 'ArticleID',
-      header: ({ column }) => (
-        <Button
-          className="hover:bg-red-400"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          ID
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <div>{row.getValue('ArticleID')}</div>
-      ),
-    },
-    {
       accessorKey: 'LastEditedTime',
       header: ({ column }) => (
         <Button
-          className="hover:bg-red-400"
+          className="hover:bg-gray-300"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
@@ -87,7 +71,7 @@ export default function DataTable() {
       accessorKey: 'Tag',
       header: ({ column }) => (
         <Button
-          className="hover:bg-red-400"
+          className="hover:bg-gray-300"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
@@ -101,7 +85,7 @@ export default function DataTable() {
       accessorKey: 'Title',
       header: ({ column }) => (
         <Button
-          className="hover:bg-red-400"
+          className="hover:bg-gray-300"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
@@ -115,7 +99,7 @@ export default function DataTable() {
       accessorKey: 'CategoryID',
       header: ({ column }) => (
         <Button
-          className="hover:bg-red-400"
+          className="hover:bg-gray-300"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
@@ -131,7 +115,7 @@ export default function DataTable() {
       accessorKey: 'IsActive',
       header: ({ column }) => (
         <Button
-          className="hover:bg-red-400"
+          className="hover:bg-gray-300"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
@@ -171,14 +155,14 @@ export default function DataTable() {
             {' '}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
+                <Button variant="ghost" className="h-8 w-8 p-0 hover:border-gray-400 hover:border hover:rounded-md">
                   <span className="sr-only">Open menu</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-gray-200" />
+                <DropdownMenuSeparator className="bg-gray-300" />
                 <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(items.ArticleID)}
                   className="hover:underline  hover:cursor-pointer"
@@ -284,7 +268,7 @@ export default function DataTable() {
           </DropdownMenu>
         </div>
       </div>
-      <div className="rounded-md border bg-gray-100">
+      <div className="rounded-md border bg-gray-100 py-2">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -310,6 +294,7 @@ export default function DataTable() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  className="hover:bg-gray-300 rounded"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
