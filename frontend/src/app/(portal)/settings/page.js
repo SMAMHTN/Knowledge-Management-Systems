@@ -94,13 +94,14 @@ function SystemSetting() {
         });
       }
     }
-  }, [data.AppthemeID, themeOptions]);
+  }, [data.AppthemeID, themeOptions, data.TimeZone]);
 
   const handleTimezoneChange = (timezone) => {
     setData((prevData) => ({
       ...prevData,
       TimeZone: timezone,
     }));
+    setInitialTimezone(timezone);
   };
 
   const handleThemeSelection = (theme) => {
@@ -128,7 +129,7 @@ function SystemSetting() {
         CompanyName: data.CompanyName,
         CompanyLogo: data.CompanyLogo,
         CompanyAddress: data.CompanyAddress,
-        TimeZone: data.TimeZone,
+        TimeZone: initialTimezone,
         AppthemeID: selectedThemeId,
       };
       const response = await CoreAPI('PUT', 'setting', updatedData);
@@ -145,7 +146,7 @@ function SystemSetting() {
   };
 
   const handleLogoUpload = (base64String) => {
-    console.log('Handling logo upload in SystemSetting:', base64String);
+    // console.log('Handling logo upload in SystemSetting:', base64String);
     setData({ ...data, CompanyLogo: base64String });
   };
 

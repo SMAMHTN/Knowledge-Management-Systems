@@ -4,14 +4,13 @@ import { ChevronDown } from 'lucide-react';
 
 function TimezoneDropdown({ selectedTimezone, onTimezoneChange }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null); // Create a ref for the dropdown button
-
+  const dropdownRef = useRef(null);
   const handleTimezoneSelection = (timezone) => {
     onTimezoneChange(timezone);
   };
   const toggleDropdown = (e) => {
-    e.preventDefault(); // Prevent any default behavior
-    e.stopPropagation(); // Stop event propagation
+    e.preventDefault();
+    e.stopPropagation();
 
     setDropdownOpen((prevOpen) => !prevOpen);
   };
@@ -22,7 +21,6 @@ function TimezoneDropdown({ selectedTimezone, onTimezoneChange }) {
     }
   };
 
-  // Attach and detach event listeners when the dropdown is opened/closed
   React.useEffect(() => {
     if (dropdownOpen) {
       document.addEventListener('click', handleClickOutsideDropdown);
@@ -45,11 +43,14 @@ function TimezoneDropdown({ selectedTimezone, onTimezoneChange }) {
           {selectedTimezone || 'Select a timezone'}
         </button>
         {dropdownOpen && (
-          <ul className="absolute top-full left-0 w-full z-20 bg-white border rounded shadow mt-2 max-h-40 overflow-y-auto">
+          <ul className="absolute top-full left-0 w-full z-20 bg-white border rounded shadow mt-2 max-h-40 lg:max-h-80 overflow-y-auto">
             {timezones.map((timezone, index) => (
               <li
                 key={index}
-                onClick={() => handleTimezoneSelection(timezone.tzCode)}
+                onClick={() => {
+                  handleTimezoneSelection(timezone.tzCode);
+                  setDropdownOpen(false);
+                }}
                 className="cursor-pointer px-4 py-2 hover:bg-blue-100"
               >
                 {timezone.label}
