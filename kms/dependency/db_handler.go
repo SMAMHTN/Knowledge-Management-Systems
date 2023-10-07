@@ -232,7 +232,5 @@ func (data *QueryType) QueryMaker(totalrow int) (query string, values []interfac
 	}
 	info.UpperLimit = Lowerlimit0 + info.TotalShow
 	query = query + "LIMIT " + strconv.Itoa(Lowerlimit0) + "," + strconv.Itoa(data.Num)
-	fmt.Println(query)
-	fmt.Println(values)
 	return query, values, info, nil
 }

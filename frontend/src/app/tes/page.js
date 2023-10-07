@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import ArticleEditor from "@/dep/grapesjs/ArticleEditor";
+import ArticleEditor from '@/dep/grapesjs/ArticleEditor';
 
 function tes() {
   return <ArticleEditor />;

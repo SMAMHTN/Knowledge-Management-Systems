@@ -35,17 +35,21 @@ func ConvIntArrayToStringUnique(arr []int) (string, error) {
 
 func ConvStringToIntArray(str string) ([]int, error) {
 	// Split the string by the delimiter and convert it back to an integer array
-	strValues := strings.Split(str, ",")
-	var intArray []int
-	for _, strVal := range strValues {
-		num := 0
-		num, err := strconv.Atoi(strVal)
-		if err != nil {
-			return nil, err
+	if str == "" {
+		return []int{}, nil
+	} else {
+		strValues := strings.Split(str, ",")
+		var intArray []int
+		for _, strVal := range strValues {
+			num := 0
+			num, err := strconv.Atoi(strVal)
+			if err != nil {
+				return nil, err
+			}
+			intArray = append(intArray, num)
 		}
-		intArray = append(intArray, num)
+		return intArray, nil
 	}
-	return intArray, nil
 }
 
 func ConvStringArrayToString(arr []string) (string, error) {
@@ -59,7 +63,11 @@ func ConvStringArrayToString(arr []string) (string, error) {
 
 // stringToStringArray converts a single string back to an array of strings using a delimiter.
 func ConvStringToStringArray(str string) []string {
-	return strings.Split(str, ",")
+	if str == "" {
+		return []string{}
+	} else {
+		return strings.Split(str, ",")
+	}
 }
 
 func ConvStringArrayToStringUnique(arr []string) (string, error) {

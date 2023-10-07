@@ -7,6 +7,31 @@ import { generateKmsCred } from '../others/generateCred';
 
 const LoginDynamicpath = '/';
 
+export async function CookiesGenerateKMSCred() {
+  const conf = readConf('frontend_conf.json');
+  const cookieStore = cookies();
+  let un; let
+    pwd;
+  try {
+    un = cookieStore.get('username')?.value;
+    pwd = cookieStore.get('password')?.value;
+
+    if (un == undefined || pwd == undefined) {
+      un = '';
+      pwd = '';
+    }
+  } catch (error) {
+    throw error;
+  }
+  const credentials = Buffer.from(
+    `${conf.kms_password}:${un}&&${pwd}`,
+  ).toString('base64');
+  return {
+    cred: credentials,
+    link: conf.kms_link,
+  };
+}
+
 export async function KmsAPI(method, path, data) {
   const conf = readConf('frontend_conf.json');
   const cookieStore = cookies();
@@ -79,7 +104,6 @@ export async function KmsAPIGET(path) {
       redirect(LoginDynamicpath);
     }
     const responseBody = await response.json();
-
     return {
       head: response.headers,
       body: responseBody,

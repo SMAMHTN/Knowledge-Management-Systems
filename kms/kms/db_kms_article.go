@@ -135,6 +135,19 @@ func (data *Article_Table) ReadShort() error {
 	return nil
 }
 
+func (data *Article_Table) ReadArticleOnly() error {
+	var err error
+	if data.ArticleID != 0 {
+		err = Database.QueryRow("SELECT ArticleID,Article FROM kms_article WHERE ArticleID = ?", data.ArticleID).Scan(&data.ArticleID, &data.Article)
+	} else {
+		return errors.New("please insert articleid")
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (data Article_Table) Update() error {
 	var err error
 	DocIDList, err := dependency.ConvStringToIntArray(data.DocID)
@@ -166,6 +179,20 @@ func (data Article_Table) Update() error {
 	}
 	defer upd.Close()
 	_, err = upd.Exec(data.OwnerID, data.LastEditedByID, data.LastEditedTime, data.Tag, data.Title, data.CategoryID, data.Article, data.FileID, data.DocID, data.IsActive, data.ArticleID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (data Article_Table) UpdateArticleOnly() error {
+	var err error
+	upd, err := Database.Prepare("UPDATE kms.kms_article SET Article=? WHERE ArticleID=?;")
+	if err != nil {
+		return err
+	}
+	defer upd.Close()
+	_, err = upd.Exec(data.Article, data.ArticleID)
 	if err != nil {
 		return err
 	}
