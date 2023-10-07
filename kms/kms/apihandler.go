@@ -75,10 +75,11 @@ func GetNameUsername(c echo.Context, UserID int) (Name string, Username string, 
 	_, userpass, _ := c.Request().BasicAuth()
 	cred := strings.Split(userpass, "&&")
 
-	User, err := CallCoreAPI("GET", "checkuserexist", map[string]int{"UserID": UserID}, dependency.GetElementString(cred, 0), dependency.GetElementString(cred, 1))
+	User, err := CallCoreAPI("GET", "loginuser", map[string]int{"UserID": UserID}, dependency.GetElementString(cred, 0), dependency.GetElementString(cred, 1))
 	if err != nil {
 		return "", "", err
 	}
+	fmt.Println(User)
 	Name, err = dependency.InterfaceToString(User["Name"])
 	if err != nil {
 		return "", "", err
@@ -215,6 +216,8 @@ func Test_api() {
 	e.DELETE("/file", DeleteFile, basicAuthMiddleware)
 	e.GET("/listarticle", ListArticle, basicAuthMiddleware)
 	e.GET("/queryarticle", QueryArticle, basicAuthMiddleware)
+	e.GET("/articlegrapesjs", ReadArticleGrapesjs, basicAuthMiddleware)
+	e.PUT("/articlegrapesjs", UpdateArticleGrapesjs, basicAuthMiddleware)
 	e.GET("/article", ShowArticle, basicAuthMiddleware)
 	e.POST("/article", AddArticle, basicAuthMiddleware)
 	e.PUT("/article", EditArticle, basicAuthMiddleware)

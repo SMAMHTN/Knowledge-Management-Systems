@@ -28,6 +28,7 @@
     "clsx": "^2.0.0",
     "eslint-config-next": "13.4.7",
     "grapesjs": "^0.21.7",
+    "grapesjs-blocks-basic": "^1.0.2",
     "grapesjs-preset-webpage": "^1.0.3",
     "i": "^0.3.7",
     "lucide-react": "^0.277.0",
