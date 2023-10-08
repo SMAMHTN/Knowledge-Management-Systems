@@ -3,7 +3,7 @@
 import ArticleEditor from '@/dep/grapesjs/ArticleEditor';
 
 function tes() {
-  return <ArticleEditor />;
+  return (<ArticleEditor />);
 }
 
 export default tes;

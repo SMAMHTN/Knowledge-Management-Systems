@@ -6,36 +6,29 @@ import 'grapesjs/dist/css/grapes.min.css';
 import './grapejs.css';
 import plugin from 'grapesjs-blocks-basic';
 // import { useState } from 'react';
-import { CookiesGenerateKMSCred, KmsAPI, KmsAPIGET } from '../kms/kmsHandler';
+import { KmsAPI, KmsAPIGET } from '../kms/kmsHandler';
 
 function ArticleEditor() {
-  let credential;
-  let kmsLink;
-  CookiesGenerateKMSCred().then((result) => {
-    credential = result.cred;
-    kmsLink = result.link;
-    console.log(projectEndpoint);
-  });
   const projectID = 1;
-  const projectEndpoint = `http://localhost:5656/articlegrapesjs?id=${projectID}`;
-  console.log(projectEndpoint);
   const onEditor = (editor) => {
     console.log('Editor loaded', { editor });
-    // console.log('passed here');
-    // KmsAPIGET(`articlegrapesjs?id=${projectID}`).then((res) => {
-    //   // if (res.body.StatusCode == 200) {
-    //   // }
-    //   console.log(res);
-    //   console.log('before this');
-    //   console.log(res.body);
-    //   console.log('before this 2');
-    //   console.log(res.body.data);
-    //   console.log('before this 3');
-    //   const body = res.body.StatusCode;
-    // });
-    // console.log('before this 4');
-    // console.log(body);
-    // console.log('before this 5');
+    const storageManager = editor.Storage;
+    storageManager.add('kms_remote', {
+      async load(storageOptions) {
+        console.log('storageOptions');
+        console.log(storageOptions);
+        const res = await KmsAPIGET(`articlegrapesjs?id=${projectID}`);
+        const datares = res.body.data;
+        return JSON.parse(datares);
+      },
+      async store(data, storageOptions) {
+        console.log('storing data');
+        // console.log("data");
+        // console.log(data);
+        // console.log("storageOptions");
+        // console.log(storageOptions);
+      },
+    });
   };
 
   return (
@@ -50,11 +43,10 @@ function ArticleEditor() {
       plugins={[plugin]}
       options={{
         height: '100vh',
+        width: 'auto',
         log: 'debug',
         storageManager: {
-          type: 'remote',
-          urlLoad: projectEndpoint,
-          urlStore: projectEndpoint,
+          type: 'kms_remote',
           stepsBeforeSave: 1,
           autosave: true,
           autoload: true,
@@ -70,32 +62,7 @@ function ArticleEditor() {
             });
             KmsAPI('PUT', 'articlegrapesjs', { id: projectID, dump: { data, pagesHtml } }).then();
           },
-          onLoad: (result) => console.log(result),
-          // onLoad: async () => {
-          //   const [res, setRes] = useState({
-          //     body: {
-          //       data: "",
-          //     },
-          //   });
-          // let body;
-          // KmsAPIGET(`articlegrapesjs?id=${projectID}`).then((res) => {
-          //   // if (res.body.StatusCode == 200) {
-          //   // }
-          //   body = res.body.data;
-          //   return body;
-          // });
-          //   setRes(await KmsAPIGET(`articlegrapesjs?id=${projectID}`));
-          //   return JSON.stringify(res.body.data);
-          // },
-          headers: {
-            Authorization: `Basic ${credential}`,
-            Accept: '*/*',
-            Connection: 'keep-alive',
-            'Content-Type': 'application/json',
-          },
-          credentials: {
-            Authorization: `Basic ${credential}`,
-          },
+          onLoad: (result) => result.data,
         },
         pluginsOpts: {
           [plugin]: {
