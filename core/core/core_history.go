@@ -54,7 +54,6 @@ func AddHistory(c echo.Context) error {
 }
 
 func ListHistory(c echo.Context) error {
-	query := c.QueryParam("query")
 	res := ResponseList{}
 	limit := new(dependency.QueryType)
 	err := c.Bind(limit)
@@ -82,7 +81,7 @@ func ListHistory(c echo.Context) error {
 			res.Data = err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		Histories, _ := ReadHistory(query+" "+LimitQuery, ValuesQuery)
+		Histories, _ := ReadHistory(LimitQuery, ValuesQuery)
 		HistoriesAPI := []HistoryAPI{}
 		for _, y := range Histories {
 			HistoriesAPI = append(HistoriesAPI, y.ToAPI())

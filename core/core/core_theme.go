@@ -9,7 +9,6 @@ import (
 )
 
 func ListTheme(c echo.Context) error {
-	query := c.QueryParam("query")
 	res := ResponseList{}
 	limit := new(dependency.QueryType)
 	err := c.Bind(limit)
@@ -35,7 +34,7 @@ func ListTheme(c echo.Context) error {
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	listtheme, _ := ReadTheme(query+" "+LimitQuery, ValuesQuery)
+	listtheme, _ := ReadTheme(LimitQuery, ValuesQuery)
 	res.StatusCode = http.StatusOK
 	res.Data = listtheme
 	return c.JSON(http.StatusOK, res)

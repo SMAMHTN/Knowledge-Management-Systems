@@ -17,7 +17,6 @@ type RoleAPI struct {
 }
 
 func ListRole(c echo.Context) error {
-	query := c.QueryParam("query")
 	permission, _, _ := Check_Permission_API(c)
 	res := ResponseList{}
 	limit := new(dependency.QueryType)
@@ -45,7 +44,7 @@ func ListRole(c echo.Context) error {
 			res.Data = err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		listRole, _ := ReadRole(query+" "+LimitQuery, ValuesQuery)
+		listRole, _ := ReadRole(LimitQuery, ValuesQuery)
 		var listRoleApi []RoleAPI
 		for _, y := range listRole {
 			listRoleApi = append(listRoleApi, y.ToAPI())

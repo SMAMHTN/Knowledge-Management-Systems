@@ -27,7 +27,6 @@ type User_API struct {
 }
 
 func ListUser(c echo.Context) error {
-	query := c.QueryParam("query")
 	permission, _, _ := Check_Permission_API(c)
 	res := ResponseList{}
 	limit := new(dependency.QueryType)
@@ -55,7 +54,7 @@ func ListUser(c echo.Context) error {
 			res.Data = err.Error()
 			return c.JSON(http.StatusBadRequest, res)
 		}
-		listUser, _ := ReadUserWithoutPhoto(query+" "+LimitQuery, ValuesQuery)
+		listUser, _ := ReadUserWithoutPhoto(LimitQuery, ValuesQuery)
 		var listUserAPI []User_API
 		for _, y := range listUser {
 			listUserAPI = append(listUserAPI, y.ToAPI())
