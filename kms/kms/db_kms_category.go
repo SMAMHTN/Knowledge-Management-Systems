@@ -69,16 +69,18 @@ func (data *Category) Read() error {
 }
 
 func (data Category) Update() error {
-	var err error
-
-	upd, err := Database.Prepare("UPDATE kms.kms_category SET CategoryName=?, CategoryParentID=?, CategoryDescription=? WHERE CategoryID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.CategoryName, data.CategoryParentID, data.CategoryDescription, data.CategoryID)
-	if err != nil {
-		return err
+	if data.CategoryID != 0 {
+		upd, err := Database.Prepare("UPDATE kms.kms_category SET CategoryName=?, CategoryParentID=?, CategoryDescription=? WHERE CategoryID=?;")
+		if err != nil {
+			return err
+		}
+		defer upd.Close()
+		_, err = upd.Exec(data.CategoryName, data.CategoryParentID, data.CategoryDescription, data.CategoryID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("please insert categoryid")
 	}
 	return nil
 }

@@ -71,16 +71,18 @@ func (data *File) Read() error {
 }
 
 func (data File) Update() error {
-	var err error
-
-	upd, err := Database.Prepare("UPDATE kms.kms_file SET FileLoc=?, CategoryID=?, FileType=? WHERE FileID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.FileLoc, data.CategoryID, data.FileType, data.FileID)
-	if err != nil {
-		return err
+	if data.FileID != 0 {
+		upd, err := Database.Prepare("UPDATE kms.kms_file SET FileLoc=?, CategoryID=?, FileType=? WHERE FileID=?;")
+		if err != nil {
+			return err
+		}
+		defer upd.Close()
+		_, err = upd.Exec(data.FileLoc, data.CategoryID, data.FileType, data.FileID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("please insert fileid")
 	}
 	return nil
 }
