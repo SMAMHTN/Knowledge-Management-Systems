@@ -76,16 +76,18 @@ func (data *History) Read() error {
 }
 
 func (data History) Update() error {
-	var err error
-
-	upd, err := Database.Prepare("UPDATE core.core_history SET ActivityType=?, `Time`=?, UserID=?, Changes=?, IPAddress=? WHERE HistoryID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.ActivityType, data.Time, data.UserID, data.Changes, data.IPAddress, data.HistoryID)
-	if err != nil {
-		return err
+	if data.HistoryID != 0 {
+		upd, err := Database.Prepare("UPDATE core.core_history SET ActivityType=?, `Time`=?, UserID=?, Changes=?, IPAddress=? WHERE HistoryID=?;")
+		if err != nil {
+			return err
+		}
+		defer upd.Close()
+		_, err = upd.Exec(data.ActivityType, data.Time, data.UserID, data.Changes, data.IPAddress, data.HistoryID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("please insert historyid")
 	}
 	return nil
 }

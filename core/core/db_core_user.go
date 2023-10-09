@@ -170,21 +170,20 @@ func (data *User) ReadLogin() error {
 }
 
 func (data User) Update() error {
-	var err error
-	if err != nil {
-		return err
-	}
-
-	upd, err := Database.Prepare("UPDATE core.core_user SET UserPhoto=?, Username=?, Password=?, Name=?, Email=?, Address=?, Phone=?, RoleID=?, AppthemeID=?, Note=?, IsSuperAdmin=?, IsActive=? WHERE UserID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.UserPhoto, data.Username,
-		data.Password, data.Name, data.Email, data.Address, data.Phone, data.RoleID,
-		data.AppthemeID, data.Note, data.IsSuperAdmin, data.IsActive, data.UserID)
-	if err != nil {
-		return err
+	if data.UserID != 0 {
+		upd, err := Database.Prepare("UPDATE core.core_user SET UserPhoto=?, Username=?, Password=?, Name=?, Email=?, Address=?, Phone=?, RoleID=?, AppthemeID=?, Note=?, IsSuperAdmin=?, IsActive=? WHERE UserID=?;")
+		if err != nil {
+			return err
+		}
+		defer upd.Close()
+		_, err = upd.Exec(data.UserPhoto, data.Username,
+			data.Password, data.Name, data.Email, data.Address, data.Phone, data.RoleID,
+			data.AppthemeID, data.Note, data.IsSuperAdmin, data.IsActive, data.UserID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("please insert UserID or Username")
 	}
 	return nil
 }

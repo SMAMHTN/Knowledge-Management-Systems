@@ -172,29 +172,35 @@ func (data Article_Table) Update() error {
 			return errors.New("Article FileID Error " + strconv.Itoa(SingleFileID) + " : " + err.Error())
 		}
 	}
-
-	upd, err := Database.Prepare("UPDATE kms.kms_article SET OwnerID=?, LastEditedByID=?, LastEditedTime=?, Tag=?, Title=?, CategoryID=?, Article=?, FileID=?, DocID=?, IsActive=? WHERE ArticleID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.OwnerID, data.LastEditedByID, data.LastEditedTime, data.Tag, data.Title, data.CategoryID, data.Article, data.FileID, data.DocID, data.IsActive, data.ArticleID)
-	if err != nil {
-		return err
+	if data.ArticleID != 0 {
+		upd, err := Database.Prepare("UPDATE kms.kms_article SET OwnerID=?, LastEditedByID=?, LastEditedTime=?, Tag=?, Title=?, CategoryID=?, Article=?, FileID=?, DocID=?, IsActive=? WHERE ArticleID=?;")
+		if err != nil {
+			return err
+		}
+		defer upd.Close()
+		_, err = upd.Exec(data.OwnerID, data.LastEditedByID, data.LastEditedTime, data.Tag, data.Title, data.CategoryID, data.Article, data.FileID, data.DocID, data.IsActive, data.ArticleID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("please insert articleid")
 	}
 	return nil
 }
 
 func (data Article_Table) UpdateArticleOnly() error {
-	var err error
-	upd, err := Database.Prepare("UPDATE kms.kms_article SET Article=? WHERE ArticleID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.Article, data.ArticleID)
-	if err != nil {
-		return err
+	if data.ArticleID != 0 {
+		upd, err := Database.Prepare("UPDATE kms.kms_article SET Article=? WHERE ArticleID=?;")
+		if err != nil {
+			return err
+		}
+		defer upd.Close()
+		_, err = upd.Exec(data.Article, data.ArticleID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("please insert articleid")
 	}
 	return nil
 }

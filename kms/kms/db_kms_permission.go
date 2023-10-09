@@ -67,7 +67,7 @@ func (data *Permission) Read() error {
 	} else if data.CategoryID != 0 && data.RoleID != 0 {
 		err = Database.QueryRow("SELECT * FROM kms_permission WHERE CategoryID = ? AND RoleID = ?", data.CategoryID, data.RoleID).Scan(&data.PermissionID, &data.CategoryID, &data.RoleID, &data.PCreate, &data.PRead, &data.PUpdate, &data.PDelete, &data.FileType, &data.DocType)
 	} else {
-		return errors.New("please insert permissionid")
+		return errors.New("please insert permissionid or categoryid+roleid")
 	}
 	if err != nil {
 		return err
@@ -76,16 +76,18 @@ func (data *Permission) Read() error {
 }
 
 func (data Permission) Update() error {
-	var err error
-
-	upd, err := Database.Prepare("UPDATE kms.kms_permission SET CategoryID=?, RoleID=?, `Create`=?, `Read`=?, `Update`=?, `Delete`=?, `FileType`=?, `DocType`=? WHERE PermissionID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.CategoryID, data.RoleID, data.PCreate, data.PRead, data.PUpdate, data.PDelete, data.FileType, data.DocType, data.PermissionID)
-	if err != nil {
-		return err
+	if data.PermissionID != 0 {
+		upd, err := Database.Prepare("UPDATE kms.kms_permission SET CategoryID=?, RoleID=?, `Create`=?, `Read`=?, `Update`=?, `Delete`=?, `FileType`=?, `DocType`=? WHERE PermissionID=?;")
+		if err != nil {
+			return err
+		}
+		defer upd.Close()
+		_, err = upd.Exec(data.CategoryID, data.RoleID, data.PCreate, data.PRead, data.PUpdate, data.PDelete, data.FileType, data.DocType, data.PermissionID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("please insert permissionid")
 	}
 	return nil
 }

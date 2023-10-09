@@ -87,19 +87,22 @@ func (data *Setting) Read() error {
 
 func (data Setting) Update() error {
 	var err error
-	_, err = dependency.GetTime(data.TimeZone)
-	if err != nil {
-		return err
-	}
-
-	upd, err := Database.Prepare("UPDATE core.core_setting SET CompanyName=?, CompanyLogo=?, CompanyAddress=?, Timezone=?, AppthemeID=? WHERE CompanyID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.CompanyName, data.CompanyLogo, data.CompanyAddress, data.TimeZone, data.AppthemeID, data.CompanyID)
-	if err != nil {
-		return err
+	if data.CompanyID != 0 {
+		_, err = dependency.GetTime(data.TimeZone)
+		if err != nil {
+			return err
+		}
+		upd, err := Database.Prepare("UPDATE core.core_setting SET CompanyName=?, CompanyLogo=?, CompanyAddress=?, Timezone=?, AppthemeID=? WHERE CompanyID=?;")
+		if err != nil {
+			return err
+		}
+		defer upd.Close()
+		_, err = upd.Exec(data.CompanyName, data.CompanyLogo, data.CompanyAddress, data.TimeZone, data.AppthemeID, data.CompanyID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("please insert companyid")
 	}
 	return nil
 }
