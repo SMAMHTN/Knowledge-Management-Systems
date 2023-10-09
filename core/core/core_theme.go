@@ -20,14 +20,7 @@ func ListTheme(c echo.Context) error {
 	}
 	var LimitQuery string
 	var ValuesQuery []interface{}
-	TotalRow, err := CountRows("core_theme")
-	if err != nil {
-		Logger.Error(err.Error())
-		res.StatusCode = http.StatusInternalServerError
-		res.Data = err
-		return c.JSON(http.StatusInternalServerError, res)
-	}
-	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(TotalRow)
+	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "core_theme")
 	if err != nil {
 		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest

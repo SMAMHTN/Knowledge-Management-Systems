@@ -60,14 +60,7 @@ func ListArticle(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		TotalRow, err := CountRows("kms_article")
-		if err != nil {
-			Logger.Error(err.Error())
-			res.StatusCode = http.StatusInternalServerError
-			res.Data = err
-			return c.JSON(http.StatusInternalServerError, res)
-		}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(TotalRow)
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_article")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -91,13 +84,6 @@ func ListArticle(c echo.Context) error {
 		return c.JSON(http.StatusOK, res)
 	} else {
 		AllowedCategoryList, err := GetCurrentUserReadCategoryList(c)
-		if err != nil {
-			Logger.Error(err.Error())
-			res.StatusCode = http.StatusInternalServerError
-			res.Data = err
-			return c.JSON(http.StatusInternalServerError, res)
-		}
-		TotalRow, err := CountRows("kms_article")
 		if err != nil {
 			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
@@ -134,7 +120,7 @@ func ListArticle(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, res)
 		}
 		limit.Query = string(a)
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(TotalRow)
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_article")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
