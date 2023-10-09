@@ -31,14 +31,7 @@ func ListCategory(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		TotalRow, err := CountRows("kms_category")
-		if err != nil {
-			Logger.Error(err.Error())
-			res.StatusCode = http.StatusInternalServerError
-			res.Data = err
-			return c.JSON(http.StatusInternalServerError, res)
-		}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(TotalRow)
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_category")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest

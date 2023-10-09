@@ -57,6 +57,7 @@ func GetTimeZone() (timezone string, err error) {
 	return responsedata, nil
 }
 
+// UNUSED
 func CountRows(tableName string) (int, error) {
 	var count int
 	query := "SELECT COUNT(*) FROM " + tableName

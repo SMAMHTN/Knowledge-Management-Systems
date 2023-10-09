@@ -150,9 +150,17 @@ func LimitMaker(page int, num int) (limit string) {
 	return limit
 }
 
-func (data *QueryType) QueryMaker(totalrow int) (query string, values []interface{}, info Info, err error) {
+func (data *QueryType) QueryMaker(Database *sql.DB, tableName string) (query string, values []interface{}, info Info, err error) {
 	var sortquery []SortType
 	var wherequery []WhereType
+	//DEFAULT VALUE
+	if data.Num == 0 {
+		data.Num = 10
+	}
+	if data.Page == 0 {
+		data.Page = 1
+	}
+	//JSON CHECKER
 	if data.Sort != "" {
 		err = json.Unmarshal([]byte(data.Sort), &sortquery)
 		if err != nil {
@@ -166,22 +174,6 @@ func (data *QueryType) QueryMaker(totalrow int) (query string, values []interfac
 			err = errors.New("query query json read error : " + err.Error())
 			return query, values, info, err
 		}
-	}
-	if data.Num == 0 {
-		data.Num = 10
-	}
-	if data.Page == 0 {
-		data.Page = 1
-	}
-	info.TotalPage = int(math.Ceil(float64(totalrow) / float64(data.Num)))
-	info.CurrentPage = data.Page
-	info.TotalRow = totalrow
-	Lowerlimit0 := (data.Page - 1) * data.Num
-	info.LowerLimit = Lowerlimit0 + 1
-	if info.TotalPage == info.CurrentPage {
-		info.TotalShow = totalrow % data.Num
-	} else {
-		info.TotalShow = data.Num
 	}
 	//WHERE QUERY CREATOR
 	if len(wherequery) > 0 {
@@ -230,7 +222,35 @@ func (data *QueryType) QueryMaker(totalrow int) (query string, values []interfac
 		}
 		query = query + "ORDER BY " + strings.Join(sortList, ", ") + " "
 	}
-	info.UpperLimit = Lowerlimit0 + info.TotalShow
+	//COUNT TOTAL
+	var count int
+	querycountrow := "SELECT COUNT(*) FROM " + tableName + " " + query
+
+	err = Database.QueryRow(querycountrow, values...).Scan(&count)
+	if err != nil {
+		return query, values, info, err
+	}
+	//Set some info
+	info.TotalRow = count
+	info.TotalPage = int(math.Ceil(float64(count) / float64(data.Num)))
+	info.CurrentPage = data.Page
+	Lowerlimit0 := (data.Page - 1) * data.Num
+	if info.TotalPage == info.CurrentPage {
+		info.TotalShow = count % data.Num
+		info.UpperLimit = Lowerlimit0 + info.TotalShow
+		info.LowerLimit = Lowerlimit0 + 1
+		fmt.Println("CHECK 1")
+	} else if info.TotalPage < info.CurrentPage {
+		info.TotalShow = 0
+		info.UpperLimit = Lowerlimit0 + 1
+		info.LowerLimit = Lowerlimit0 + 1
+		fmt.Println("CHECK 2")
+	} else {
+		info.TotalShow = data.Num
+		info.UpperLimit = Lowerlimit0 + info.TotalShow
+		info.LowerLimit = Lowerlimit0 + 1
+		fmt.Println("CHECK 3")
+	}
 	query = query + "LIMIT " + strconv.Itoa(Lowerlimit0) + "," + strconv.Itoa(data.Num)
 	return query, values, info, nil
 }
