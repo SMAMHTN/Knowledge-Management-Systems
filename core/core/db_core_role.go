@@ -82,16 +82,18 @@ func (data Role) CheckExist() error {
 }
 
 func (data Role) Update() error {
-	var err error
-
-	upd, err := Database.Prepare("UPDATE core.core_role SET RoleName=?, RoleParentID=?, RoleDescription=? WHERE RoleID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.RoleName, data.RoleParentID, data.RoleDescription, data.RoleID)
-	if err != nil {
-		return err
+	if data.RoleID != 0 {
+		upd, err := Database.Prepare("UPDATE core.core_role SET RoleName=?, RoleParentID=?, RoleDescription=? WHERE RoleID=?;")
+		if err != nil {
+			return err
+		}
+		defer upd.Close()
+		_, err = upd.Exec(data.RoleName, data.RoleParentID, data.RoleDescription, data.RoleID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("please insert roleid")
 	}
 	return nil
 }

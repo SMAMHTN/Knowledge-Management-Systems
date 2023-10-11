@@ -71,16 +71,18 @@ func (data *Doc) Read() error {
 }
 
 func (data Doc) Update() error {
-	var err error
-
-	upd, err := Database.Prepare("UPDATE kms.kms_doc SET DocLoc=?, CategoryID=?, DocType=? WHERE DocID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.DocLoc, data.CategoryID, data.DocType, data.DocID)
-	if err != nil {
-		return err
+	if data.DocID != 0 {
+		upd, err := Database.Prepare("UPDATE kms.kms_doc SET DocLoc=?, CategoryID=?, DocType=? WHERE DocID=?;")
+		if err != nil {
+			return err
+		}
+		defer upd.Close()
+		_, err = upd.Exec(data.DocLoc, data.CategoryID, data.DocType, data.DocID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("please insert docid")
 	}
 	return nil
 }

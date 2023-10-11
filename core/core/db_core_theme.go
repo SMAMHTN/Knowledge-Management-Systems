@@ -68,16 +68,18 @@ func (data *Theme) Read() error {
 }
 
 func (data Theme) Update() error {
-	var err error
-
-	upd, err := Database.Prepare("UPDATE core.core_theme SET AppthemeName=?, AppthemeValue=? WHERE AppthemeID=?;")
-	if err != nil {
-		return err
-	}
-	defer upd.Close()
-	_, err = upd.Exec(data.AppthemeName, data.AppthemeValue, data.AppthemeID)
-	if err != nil {
-		return err
+	if data.AppthemeID != 0 {
+		upd, err := Database.Prepare("UPDATE core.core_theme SET AppthemeName=?, AppthemeValue=? WHERE AppthemeID=?;")
+		if err != nil {
+			return err
+		}
+		defer upd.Close()
+		_, err = upd.Exec(data.AppthemeName, data.AppthemeValue, data.AppthemeID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("please insert appthemeid")
 	}
 	return nil
 }
