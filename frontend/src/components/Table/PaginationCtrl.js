@@ -8,6 +8,8 @@ import {
 import { Button } from '@/components/ui/button';
 
 function Pagination({ currentPage, totalPage, onPageChange }) {
+  const correctedTotalPage = totalPage === 0 ? 1 : totalPage;
+
   const handlePrevClick = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
@@ -36,7 +38,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
         {' '}
         of
         {' '}
-        {totalPage}
+        {correctedTotalPage}
       </div>
       <div className="flex items-center space-x-2">
         <Button
@@ -60,7 +62,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
         <Button
           variant="outline"
           className="hidden h-8 w-8 p-0 md:flex  bg-gray-50"
-          disabled={currentPage === totalPage}
+          disabled={currentPage === correctedTotalPage}
           onClick={handleNextClick}
         >
           <span className="sr-only">Go to next page</span>
@@ -69,7 +71,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
         <Button
           variant="outline"
           className="hidden h-8 w-8 p-0 md:flex  bg-gray-50"
-          disabled={currentPage === totalPage}
+          disabled={currentPage === correctedTotalPage}
           onClick={handleLastPageClick}
         >
           <span className="sr-only">Go to last page</span>
@@ -98,7 +100,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
         <Button
           variant="outline"
           className=" h-8 w-8 p-0  bg-gray-50"
-          disabled={currentPage === totalPage}
+          disabled={currentPage === correctedTotalPage}
           onClick={handleNextClick}
         >
           <span className="sr-only">Go to next page</span>
@@ -107,7 +109,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
         <Button
           variant="outline"
           className=" h-8 w-8 p-0 bg-gray-50"
-          disabled={currentPage === totalPage}
+          disabled={currentPage === correctedTotalPage}
           onClick={handleLastPageClick}
         >
           <span className="sr-only">Go to last page</span>
