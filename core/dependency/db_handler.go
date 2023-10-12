@@ -162,6 +162,7 @@ func (data *QueryType) QueryMaker(Database *sql.DB, tableName string) (query str
 	}
 	//JSON CHECKER
 	if data.Sort != "" {
+		fmt.Println(data.Sort)
 		err = json.Unmarshal([]byte(data.Sort), &sortquery)
 		if err != nil {
 			err = errors.New("sort field json read error : " + err.Error())

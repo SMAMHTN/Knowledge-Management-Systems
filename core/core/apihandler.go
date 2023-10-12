@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"go.uber.org/zap"
 )
 
 type Response struct {
@@ -72,6 +73,7 @@ var ValidatorLogin = func(username, password string, c echo.Context) (bool, erro
 func Test_api() {
 	e := echo.New()
 
+	//Auth Middleware
 	basicAuthMiddleware := middleware.BasicAuth(Validator)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
@@ -79,33 +81,89 @@ func Test_api() {
 	e.Use(middleware.BodyLimit("8M"))
 	e.IPExtractor = echo.ExtractIPFromXFFHeader()
 
+	//Logger Middleware
+	// var FieldList []string
+	// FieldList = append(FieldList, dependency.GetFieldNames(dependency.QueryType{})...)
+	// FieldList = append(FieldList, dependency.GetFieldNames(User_API{})...)
+	// FieldList = append(FieldList, dependency.GetFieldNames(HistoryAPI{})...)
+	// FieldList = append(FieldList, dependency.GetFieldNames(RoleAPI{})...)
+	// FieldList = append(FieldList, dependency.GetFieldNames(Theme{})...)
+	// FieldList = append(FieldList, dependency.GetFieldNames(Setting_API{})...)
+	// fmt.Println(FieldList)
+	// SugaredLogger := Logger.Sugar()
+	LogMiddleware := middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			Logger.Info("request",
+				zap.Int("status", v.Status),
+				zap.String("Method", v.Method),
+				zap.String("URI", v.URI),
+				zap.Duration("Duration", v.Latency),
+				zap.String("Client IP", v.RemoteIP),
+				zap.String("Host IP", v.Host),
+				zap.String("Protocol", v.Protocol),
+			)
+			// SugaredLogger.Info("request",
+			// 	"URI", v.URI,
+			// 	"Time", v.StartTime,
+			// 	"Duration", v.Latency,
+			// 	"Protocol", v.Protocol,
+			// 	"Client IP", v.RemoteIP,
+			// 	"Host IP", v.Host,
+			// 	"Method", v.Method,
+			// 	"status", v.Status,
+			// 	"Request Body", v.FormValues,
+			// )
+			// fmt.Println(v.FormValues)
+			return nil
+		},
+		// HandleError:      false,
+		LogLatency:  true,
+		LogProtocol: true,
+		LogRemoteIP: true,
+		LogHost:     true,
+		LogMethod:   true,
+		LogURI:      true,
+		// LogURIPath:       false,
+		// LogRoutePath:     false,
+		// LogRequestID:     false,
+		// LogReferer:       false,
+		// LogUserAgent:     false,
+		LogStatus: true,
+		// LogError:         false,
+		// LogContentLength: false,
+		// LogResponseSize:  false,
+		// LogHeaders:       []string{},
+		// LogQueryParams:   []string{},
+		// LogFormValues: FieldList,
+	})
+
 	// Define a protected route that requires Basic Authentication
-	e.GET("/login", Login, basicAuthMiddleware)
-	e.GET("/checkuserexist", CheckUserExist, basicAuthMiddleware)
-	e.GET("/loginuser", LoginUser, basicAuthMiddleware)
-	e.GET("/listuser", ListUser, basicAuthMiddleware)
-	e.GET("/user", ShowUser, basicAuthMiddleware)
-	e.POST("/user", AddUser, basicAuthMiddleware)
-	e.PUT("/user", EditUser, basicAuthMiddleware)
-	e.DELETE("/user", DeleteUser, basicAuthMiddleware)
-	e.GET("/listrole", ListRole, basicAuthMiddleware)
-	e.GET("/checkroleexist", CheckRoleExist, basicAuthMiddleware)
-	e.GET("/listrolechild", ListRoleChild, basicAuthMiddleware)
-	e.GET("/role", ShowRole, basicAuthMiddleware)
-	e.POST("/role", AddRole, basicAuthMiddleware)
-	e.PUT("/role", EditRole, basicAuthMiddleware)
-	e.DELETE("/role", DeleteRole, basicAuthMiddleware)
-	e.GET("/listhistory", ListHistory, basicAuthMiddleware)
-	e.POST("/history", AddHistory, basicAuthMiddleware)
-	e.GET("/listtheme", ListTheme, basicAuthMiddleware)
-	e.GET("/theme", ShowTheme, basicAuthMiddleware)
-	e.POST("/theme", AddTheme, basicAuthMiddleware)
-	e.PUT("/theme", EditTheme, basicAuthMiddleware)
-	e.DELETE("/theme", DeleteTheme, basicAuthMiddleware)
-	e.GET("/setting", ShowSetting)
-	e.PUT("/setting", EditSetting, basicAuthMiddleware)
-	e.GET("/checkserverrun", CheckServerRun)
-	e.GET("/tz", ExtractTimeZoneAPI)
+	e.GET("/login", Login, basicAuthMiddleware, LogMiddleware)
+	e.GET("/checkuserexist", CheckUserExist, basicAuthMiddleware, LogMiddleware)
+	e.GET("/loginuser", LoginUser, basicAuthMiddleware, LogMiddleware)
+	e.GET("/listuser", ListUser, basicAuthMiddleware, LogMiddleware)
+	e.GET("/user", ShowUser, basicAuthMiddleware, LogMiddleware)
+	e.POST("/user", AddUser, basicAuthMiddleware, LogMiddleware)
+	e.PUT("/user", EditUser, basicAuthMiddleware, LogMiddleware)
+	e.DELETE("/user", DeleteUser, basicAuthMiddleware, LogMiddleware)
+	e.GET("/listrole", ListRole, basicAuthMiddleware, LogMiddleware)
+	e.GET("/checkroleexist", CheckRoleExist, basicAuthMiddleware, LogMiddleware)
+	e.GET("/listrolechild", ListRoleChild, basicAuthMiddleware, LogMiddleware)
+	e.GET("/role", ShowRole, basicAuthMiddleware, LogMiddleware)
+	e.POST("/role", AddRole, basicAuthMiddleware, LogMiddleware)
+	e.PUT("/role", EditRole, basicAuthMiddleware, LogMiddleware)
+	e.DELETE("/role", DeleteRole, basicAuthMiddleware, LogMiddleware)
+	e.GET("/listhistory", ListHistory, basicAuthMiddleware, LogMiddleware)
+	e.POST("/history", AddHistory, basicAuthMiddleware, LogMiddleware)
+	e.GET("/listtheme", ListTheme, basicAuthMiddleware, LogMiddleware)
+	e.GET("/theme", ShowTheme, basicAuthMiddleware, LogMiddleware)
+	e.POST("/theme", AddTheme, basicAuthMiddleware, LogMiddleware)
+	e.PUT("/theme", EditTheme, basicAuthMiddleware, LogMiddleware)
+	e.DELETE("/theme", DeleteTheme, basicAuthMiddleware, LogMiddleware)
+	e.GET("/setting", ShowSetting, LogMiddleware)
+	e.PUT("/setting", EditSetting, basicAuthMiddleware, LogMiddleware)
+	e.GET("/checkserverrun", CheckServerRun, LogMiddleware)
+	e.GET("/tz", ExtractTimeZoneAPI, LogMiddleware)
 
 	// Start the server
 	e.Logger.Fatal(e.Start(Port_conf))

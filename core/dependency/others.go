@@ -1,5 +1,7 @@
 package dependency
 
+import "reflect"
+
 func GetElementString(slice []string, index int) string {
 	if index < len(slice) {
 		return slice[index]
@@ -22,4 +24,15 @@ func BooltoInt(data bool) (res int) {
 	} else {
 		return 0
 	}
+}
+
+func GetFieldNames(v interface{}) []string {
+	var fieldNames []string
+	val := reflect.ValueOf(v)
+
+	for i := 0; i < val.NumField(); i++ {
+		fieldNames = append(fieldNames, val.Type().Field(i).Name)
+	}
+
+	return fieldNames
 }

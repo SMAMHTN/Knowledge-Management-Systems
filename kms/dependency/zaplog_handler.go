@@ -40,66 +40,100 @@ func ZapEncodeTimeLayout(t time.Time, layout string, enc zapcore.PrimitiveArrayE
 	enc.AppendString(t.Format(layout))
 }
 
-func InitZapLog(Conf Configuration, LogFile string, LogFileLow string) (logger *zap.Logger, err error) {
+func InitZapLog(Conf Configuration, LogFile string, LogFileWarn string, LogFileInfo string) (logger *zap.Logger, err error) {
 	fmt.Println("---------------------------------------")
 	fmt.Println("Preparing Logger")
 	parent := Get_Parent_Path()
-	// Check if the log file exists at the provided path
+
+	//ERROR LOG
 	_, err = os.Stat(LogFile)
 	if os.IsNotExist(err) {
-		// If not found, try appending the LogFile to the parent path
 		LogFile = filepath.Join(parent, "log", "Error.log")
 	}
 	if err := os.MkdirAll(filepath.Dir(LogFile), 0711); err != nil {
 		return logger, err
 	}
 
-	// Open the log file for writing
-	file, err := os.OpenFile(LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0761)
+	fileError, err := os.OpenFile(LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0761)
 	if err != nil {
 		return logger, errors.New("failed to open log file: " + err.Error())
 	}
 
-	_, err = os.Stat(LogFileLow)
+	//WARN LOG
+	_, err = os.Stat(LogFileWarn)
 	if os.IsNotExist(err) {
-		// If not found, try appending the LogFile to the parent path
-		LogFileLow = filepath.Join(parent, "log", "Info.log")
+		LogFileWarn = filepath.Join(parent, "log", "Warn.log")
 	}
-	if err := os.MkdirAll(filepath.Dir(LogFileLow), 0711); err != nil {
+	if err := os.MkdirAll(filepath.Dir(LogFileWarn), 0711); err != nil {
 		return logger, err
 	}
-
-	// Open the log file for writing
-	fileLow, err := os.OpenFile(LogFileLow, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0761)
+	fileWarn, err := os.OpenFile(LogFileWarn, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0761)
 	if err != nil {
 		return logger, errors.New("failed to open log file: " + err.Error())
 	}
 
+	//INFO LOG
+	_, err = os.Stat(LogFileInfo)
+	if os.IsNotExist(err) {
+		LogFileInfo = filepath.Join(parent, "log", "Info.log")
+	}
+	if err := os.MkdirAll(filepath.Dir(LogFileInfo), 0711); err != nil {
+		return logger, err
+	}
+	fileInfo, err := os.OpenFile(LogFileInfo, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0761)
+	if err != nil {
+		return logger, errors.New("failed to open log file: " + err.Error())
+	}
+
+	//ENCODER
 	config := zap.NewProductionEncoderConfig()
 	config.EncodeTime = UniversalTimeEncoder
 	config2 := zap.NewProductionEncoderConfig()
 	config2.EncodeTime = CasualTimeEncoder
 	UniversalEncoder := zapcore.NewJSONEncoder(config)
 	CasualEncoder := zapcore.NewConsoleEncoder(config2)
+
+	//PRIORITY
 	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.ErrorLevel
 	})
 	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl < zapcore.ErrorLevel
+		return lvl == zapcore.WarnLevel
+	})
+	InfoPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl == zapcore.InfoLevel
 	})
 	mediumPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.WarnLevel
 	})
-	core := zapcore.NewTee(
-		zapcore.NewCore(CasualEncoder, zapcore.AddSync(os.Stdout), highPriority),
-		zapcore.NewCore(CasualEncoder, zapcore.AddSync(os.Stdout), lowPriority),
-		zapcore.NewCore(UniversalEncoder, zapcore.AddSync(file), highPriority),
-		zapcore.NewCore(UniversalEncoder, zapcore.AddSync(fileLow), lowPriority),
-	)
-	logger = zap.New(core, zap.AddStacktrace(mediumPriority), zap.AddCaller())
 
-	fmt.Println("Error Logger at " + LogFile)
-	fmt.Println("Info Logger at " + LogFileLow)
+	//CORE ACTIVATION OR WHICH LOGGING ACTIVATED
+	var CoreList []zapcore.Core
+	if Conf.Activate_Info_Log {
+		fmt.Println("INFO LOG ACTIVATED")
+		fmt.Println("Info Logger at " + LogFileInfo)
+		CoreList = append(CoreList, zapcore.NewCore(UniversalEncoder, zapcore.AddSync(fileInfo), InfoPriority))
+	}
+	if Conf.Activate_Warn_Log {
+		fmt.Println("WARN LOG ACTIVATED")
+		fmt.Println("Warn Logger at " + LogFileWarn)
+		CoreList = append(CoreList, zapcore.NewCore(UniversalEncoder, zapcore.AddSync(fileWarn), lowPriority))
+	}
+	if !Conf.Disable_Error_Log {
+		fmt.Println("ERRROR LOG ACTIVATED")
+		fmt.Println("Error Logger at " + LogFile)
+		CoreList = append(CoreList, zapcore.NewCore(UniversalEncoder, zapcore.AddSync(fileError), highPriority))
+	}
+	if Conf.Activate_terminal_log {
+		CoreList = append(CoreList,
+			zapcore.NewCore(CasualEncoder, zapcore.AddSync(os.Stdout), highPriority),
+			zapcore.NewCore(CasualEncoder, zapcore.AddSync(os.Stdout), lowPriority),
+			zapcore.NewCore(CasualEncoder, zapcore.AddSync(os.Stdout), InfoPriority),
+		)
+	}
+
+	core := zapcore.NewTee(CoreList...)
+	logger = zap.New(core, zap.AddStacktrace(mediumPriority), zap.AddCaller())
 	fmt.Println("---------------------------------------")
 	return logger, nil
 }

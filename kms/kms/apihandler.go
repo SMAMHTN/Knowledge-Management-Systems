@@ -12,6 +12,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"go.uber.org/zap"
 )
 
 type Response struct {
@@ -193,36 +194,72 @@ func Test_api() {
 	}))
 	e.Use(middleware.BodyLimit(Conf.Max_upload))
 	e.IPExtractor = echo.ExtractIPFromXFFHeader()
+
+	//Logger Middleware
+	LogMiddleware := middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			Logger.Info("request",
+				zap.Int("status", v.Status),
+				zap.String("Method", v.Method),
+				zap.String("URI", v.URI),
+				zap.Duration("Duration", v.Latency),
+				zap.String("Client IP", v.RemoteIP),
+				zap.String("Host IP", v.Host),
+				zap.String("Protocol", v.Protocol),
+			)
+			return nil
+		},
+		// HandleError:      false,
+		LogLatency:  true,
+		LogProtocol: true,
+		LogRemoteIP: true,
+		LogHost:     true,
+		LogMethod:   true,
+		LogURI:      true,
+		// LogURIPath:       false,
+		// LogRoutePath:     false,
+		// LogRequestID:     false,
+		// LogReferer:       false,
+		// LogUserAgent:     false,
+		LogStatus: true,
+		// LogError:         false,
+		// LogContentLength: false,
+		// LogResponseSize:  false,
+		// LogHeaders:       []string{},
+		// LogQueryParams:   []string{},
+		// LogFormValues: FieldList,
+	})
+
 	// Define a protected route that requires Basic Authentication
-	e.GET("/listcategory", ListCategory, basicAuthMiddleware)
-	e.GET("/listcategoryparent", ListCategoryParent, basicAuthMiddleware)
-	e.GET("/listcategorychild", ListCategoryChild, basicAuthMiddleware)
-	e.GET("/category", ShowCategory, basicAuthMiddleware)
-	e.POST("/category", AddCategory, basicAuthMiddleware)
-	e.PUT("/category", EditCategory, basicAuthMiddleware)
-	e.DELETE("/category", DeleteCategory, basicAuthMiddleware)
-	e.GET("/listpermission", ListPermission, basicAuthMiddleware)
-	e.GET("/permission", ShowPermission, basicAuthMiddleware)
-	e.POST("/permission", AddPermission, basicAuthMiddleware)
-	e.PUT("/permission", EditPermission, basicAuthMiddleware)
-	e.DELETE("/permission", DeletePermission, basicAuthMiddleware)
-	e.GET("/listdoc", ListDoc, basicAuthMiddleware)
-	e.GET("/doc", ShowDoc, basicAuthMiddleware)
-	e.POST("/doc", AddDoc, basicAuthMiddleware)
-	e.DELETE("/doc", DeleteDoc, basicAuthMiddleware)
-	e.GET("/listfile", ListFile, basicAuthMiddleware)
-	e.GET("/file", ShowFile, basicAuthMiddleware)
-	e.POST("/file", AddFile, basicAuthMiddleware)
-	e.DELETE("/file", DeleteFile, basicAuthMiddleware)
-	e.GET("/listarticle", ListArticle, basicAuthMiddleware)
-	e.GET("/queryarticle", QueryArticle, basicAuthMiddleware)
-	e.GET("/articlegrapesjs", ReadArticleGrapesjs, basicAuthMiddleware)
-	e.PUT("/articlegrapesjs", UpdateArticleGrapesjs, basicAuthMiddleware)
-	e.GET("/article", ShowArticle, basicAuthMiddleware)
-	e.POST("/article", AddArticle, basicAuthMiddleware)
-	e.PUT("/article", EditArticle, basicAuthMiddleware)
-	e.DELETE("/article", DeleteArticle, basicAuthMiddleware)
-	e.GET("/checkserverrun", CheckServerRun)
+	e.GET("/listcategory", ListCategory, basicAuthMiddleware, LogMiddleware)
+	e.GET("/listcategoryparent", ListCategoryParent, basicAuthMiddleware, LogMiddleware)
+	e.GET("/listcategorychild", ListCategoryChild, basicAuthMiddleware, LogMiddleware)
+	e.GET("/category", ShowCategory, basicAuthMiddleware, LogMiddleware)
+	e.POST("/category", AddCategory, basicAuthMiddleware, LogMiddleware)
+	e.PUT("/category", EditCategory, basicAuthMiddleware, LogMiddleware)
+	e.DELETE("/category", DeleteCategory, basicAuthMiddleware, LogMiddleware)
+	e.GET("/listpermission", ListPermission, basicAuthMiddleware, LogMiddleware)
+	e.GET("/permission", ShowPermission, basicAuthMiddleware, LogMiddleware)
+	e.POST("/permission", AddPermission, basicAuthMiddleware, LogMiddleware)
+	e.PUT("/permission", EditPermission, basicAuthMiddleware, LogMiddleware)
+	e.DELETE("/permission", DeletePermission, basicAuthMiddleware, LogMiddleware)
+	e.GET("/listdoc", ListDoc, basicAuthMiddleware, LogMiddleware)
+	e.GET("/doc", ShowDoc, basicAuthMiddleware, LogMiddleware)
+	e.POST("/doc", AddDoc, basicAuthMiddleware, LogMiddleware)
+	e.DELETE("/doc", DeleteDoc, basicAuthMiddleware, LogMiddleware)
+	e.GET("/listfile", ListFile, basicAuthMiddleware, LogMiddleware)
+	e.GET("/file", ShowFile, basicAuthMiddleware, LogMiddleware)
+	e.POST("/file", AddFile, basicAuthMiddleware, LogMiddleware)
+	e.DELETE("/file", DeleteFile, basicAuthMiddleware, LogMiddleware)
+	e.GET("/listarticle", ListArticle, basicAuthMiddleware, LogMiddleware)
+	e.GET("/queryarticle", QueryArticle, basicAuthMiddleware, LogMiddleware)
+	e.GET("/articlegrapesjs", ReadArticleGrapesjs, basicAuthMiddleware, LogMiddleware)
+	e.PUT("/articlegrapesjs", UpdateArticleGrapesjs, basicAuthMiddleware, LogMiddleware)
+	e.GET("/article", ShowArticle, basicAuthMiddleware, LogMiddleware)
+	e.POST("/article", AddArticle, basicAuthMiddleware, LogMiddleware)
+	e.PUT("/article", EditArticle, basicAuthMiddleware, LogMiddleware)
+	e.DELETE("/article", DeleteArticle, basicAuthMiddleware, LogMiddleware)
+	e.GET("/checkserverrun", CheckServerRun, LogMiddleware)
 
 	// Start the server
 	e.Logger.Fatal(e.Start(Port_conf))

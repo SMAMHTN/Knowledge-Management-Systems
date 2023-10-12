@@ -12,5 +12,9 @@
   "solr_password": "SMAM",
   "tika_link": "http://tika:9998",
   "filestore": "/kms/filestore/",
-  "max_upload": "10G"
+  "max_upload": "10G",
+  "disable_error_log": false,
+  "activate_warn_log": true,
+  "activate_info_log": true,
+  "activate_terminal_log": true
 }

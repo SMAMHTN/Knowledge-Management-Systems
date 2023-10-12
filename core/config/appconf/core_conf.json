@@ -4,5 +4,9 @@
     "app_password": "aldim",
     "db_link": "core-db",
     "db_username": "root",
-    "db_password": "aldim"
+    "db_password": "aldim",
+    "disable_error_log": false,
+    "activate_warn_log": true,
+    "activate_info_log": true,
+    "activate_terminal_log": true
 }
