@@ -43,6 +43,7 @@ import {
 import { CoreAPI, CoreAPIGET } from '@/dep/core/coreHandler';
 import PaginationCtrl from '@/components/Table/PaginationCtrl';
 import { DeleteModal, alertDelete } from '@/components/Feature';
+import { URLParamsBuilder, HandleQueryParams, HandleSortParams } from '@/dep/others/HandleParams';
 
 export default function DataTable() {
   const [data, setData] = useState([]);
@@ -52,12 +53,66 @@ export default function DataTable() {
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
   const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
+  const [sortField, setSortField] = useState(null);
+  const [sortAsc, setSortAsc] = useState(false);
+  const [sortParams, setSortParams] = useState(null);
   const filterRef = useRef();
   const searchParams = useSearchParams();
   let currentPage = searchParams.get('page') || 1;
   let itemsPerPage = searchParams.get('num') || 5;
   const q = searchParams.get('query');
+  const SortPass = searchParams.get('sort');
   const [queries, setQueries] = useState('');
+  const fetchData = async (page = searchParams.get('page'), num = searchParams.get('num'), search = searchParams.get('query'), sortPass = searchParams.get('sort')) => {
+    let response;
+    try {
+      let queriesencoded = null;
+      let sortencoded = null;
+
+      if (search !== null) {
+        queriesencoded = encodeURIComponent(search);
+      }
+
+      if (sortPass !== null) {
+        sortencoded = encodeURIComponent(sortPass);
+      }
+      response = await CoreAPIGET(URLParamsBuilder('listrole', page, num, queriesencoded, sortencoded));
+      setPageInfo(response.body.Info);
+      console.log(pageInfo);
+      setData(response.body.Data);
+      console.log(response);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+  function SingleSortToggle(FieldName) {
+    let newSortField; let
+      newSortAsc;
+
+    if (sortField === FieldName) {
+      newSortField = FieldName;
+      newSortAsc = !sortAsc;
+    } else {
+      newSortField = FieldName;
+      newSortAsc = false;
+    }
+
+    setSortField(newSortField);
+    setSortAsc(newSortAsc);
+
+    // Update other logic based on the sorting field and direction
+    const newSortParams = HandleSortParams(newSortField, newSortAsc);
+
+    // Update the sorting parameters in the state
+    setSortParams(newSortParams);
+
+    // Fetch data with the updated sorting parameters
+    fetchData(currentPage, itemsPerPage, q, newSortParams);
+
+    // Update the URL with the new sorting parameters
+    const queriesencoded = q !== null ? encodeURIComponent(q) : null;
+    router.push(URLParamsBuilder('', currentPage, itemsPerPage, queriesencoded, newSortParams));
+  }
   const columns = [
     {
       accessorKey: 'RoleName',
@@ -65,7 +120,7 @@ export default function DataTable() {
         <Button
           className="hover:bg-gray-300"
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          onClick={() => SingleSortToggle('RoleName')}
         >
           Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -81,7 +136,7 @@ export default function DataTable() {
         <Button
           className="hover:bg-gray-300"
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          onClick={() => SingleSortToggle('RoleParentName')}
         >
           Parent
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -166,45 +221,39 @@ export default function DataTable() {
       },
     },
   ];
-  const fetchData = async (page = searchParams.get('page'), num = searchParams.get('num'), search = searchParams.get('query')) => {
-    let response;
-    try {
-      if (search !== null) {
-        console.log('--------------------');
-        console.log(search);
-        const searchEncoded = encodeURIComponent(search);
-        response = await CoreAPIGET(`listrole?page=${page}&num=${num}&query=${searchEncoded}`);
-        console.log('run with search');
-      } else {
-        response = await CoreAPIGET(`listrole?page=${page}&num=${num}`);
-        console.log('run without search');
-      }
-      setPageInfo(response.body.Info);
-      console.log(pageInfo);
-      setData(response.body.Data);
-      console.log(response);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
 
   useEffect(() => {
-    fetchData(currentPage, itemsPerPage, q);
+    fetchData(currentPage, itemsPerPage, q, SortPass);
+    let queriesencoded = null; // Declare queriesencoded outside the if block
+    let sortencoded = null;
+
     if (q !== null) {
-      const queriesencoded = encodeURIComponent(q);
-      router.push(
-        `?page=${currentPage}&num=${itemsPerPage}&query=${queriesencoded}`,
-        { scroll: false },
-      );
-      console.log('run with q');
-    } else {
-      router.push(
-        `?page=${currentPage}&num=${itemsPerPage}`,
-        { scroll: false },
-      );
-      console.log('run without q');
+      queriesencoded = encodeURIComponent(q);
     }
-  }, [currentPage, itemsPerPage, q]);
+
+    if (SortPass !== null) {
+      sortencoded = encodeURIComponent(SortPass);
+    }
+
+    router.push(
+      URLParamsBuilder('', currentPage, itemsPerPage, queriesencoded, sortencoded),
+      { scroll: false },
+    );
+  }, [currentPage, itemsPerPage, q, SortPass]);
+
+  useEffect(() => {
+    fetchData(currentPage, itemsPerPage, q, sortParams);
+    let queriesencoded = null; // Declare queriesencoded outside the if block
+
+    if (q !== null) {
+      queriesencoded = encodeURIComponent(q);
+    }
+
+    router.push(
+      URLParamsBuilder('', currentPage, itemsPerPage, queriesencoded, sortParams),
+      { scroll: false },
+    );
+  }, [sortParams]);
 
   const table = useReactTable({
     data,
@@ -226,7 +275,17 @@ export default function DataTable() {
 
   const handlePageChange = (newPage) => {
     currentPage = newPage;
-    router.push(`?page=${newPage}&num=${itemsPerPage}&query=${q}`);
+    let queriesencoded = null; // Declare queriesencoded outside the if block
+    let sortencoded = null;
+
+    if (q !== null) {
+      queriesencoded = encodeURIComponent(q);
+    }
+
+    if (SortPass !== null) {
+      sortencoded = encodeURIComponent(SortPass);
+    }
+    router.push(URLParamsBuilder('', newPage, itemsPerPage, queriesencoded, sortencoded));
   };
 
   const handleFilterChange = () => {
@@ -251,7 +310,7 @@ export default function DataTable() {
           className="max-w-sm bg-gray-100"
         />
         <Button variant="outline" className=" px-2 ml-2 bg-gray-100  hover:bg-gray-300">
-          <Link href={`/roles?page=${currentPage}&num=${itemsPerPage}&query=${queries}`}>
+          <Link href={URLParamsBuilder('/roles', currentPage, itemsPerPage, queries, sortParams)}>
             <Search className="hidden lg:flex" size={24} />
             <Search className="flex lg:hidden" size={20} />
           </Link>
@@ -370,7 +429,7 @@ export default function DataTable() {
               onValueChange={(value) => {
                 const newItemsPerPage = Number(value);
                 itemsPerPage = newItemsPerPage;
-                router.push(`?page=${currentPage}&num=${itemsPerPage}&query=${q}`);
+                router.push(URLParamsBuilder('', currentPage, itemsPerPage, queries, sortParams));
               }}
             >
               <SelectTrigger className="h-8 w-[70px] bg-gray-50">
