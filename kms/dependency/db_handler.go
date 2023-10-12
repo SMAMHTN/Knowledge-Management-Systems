@@ -240,6 +240,11 @@ func (data *QueryType) QueryMaker(Database *sql.DB, tableName string) (query str
 		info.TotalShow = count % data.Num
 		info.UpperLimit = Lowerlimit0 + info.TotalShow
 		info.LowerLimit = Lowerlimit0 + 1
+		if data.Num == 1 {
+			info.TotalShow = data.Num
+			info.UpperLimit = 1
+			info.LowerLimit = 1
+		}
 	} else if count < 1 {
 		info.TotalShow = 0
 		info.UpperLimit = 0
