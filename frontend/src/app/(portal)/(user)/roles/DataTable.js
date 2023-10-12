@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import {
   flexRender,
   getCoreRowModel,
@@ -8,9 +9,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  ArrowUpDown, ChevronDown, MoreHorizontal,
+  ArrowUpDown, ChevronDown, MoreHorizontal, Search,
 } from 'lucide-react';
 import AddRole from './AddRole';
 import {
@@ -46,14 +47,18 @@ import { DeleteModal, alertDelete } from '@/components/Feature';
 export default function DataTable() {
   const [data, setData] = useState([]);
   const [sorting, setSorting] = useState([]);
+  const router = useRouter();
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
+  const filterRef = useRef();
+  const searchParams = useSearchParams();
+  let currentPage = searchParams.get('page') || 1;
+  let itemsPerPage = searchParams.get('num') || 5;
+  const q = searchParams.get('query');
+  const [queries, setQueries] = useState('');
   const columns = [
-
     {
       accessorKey: 'RoleName',
       header: ({ column }) => (
@@ -101,7 +106,6 @@ export default function DataTable() {
         const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
         const [deletingRoleID, setDeletingRoleID] = useState(null);
         const [deleteMessage, setDeleteMessage] = useState('');
-        const router = useRouter();
         const handleNavigate = (RoleID) => {
           router.push(`/roles/${RoleID}`);
         };
@@ -162,19 +166,45 @@ export default function DataTable() {
       },
     },
   ];
-  const fetchData = async () => {
+  const fetchData = async (page = searchParams.get('page'), num = searchParams.get('num'), search = searchParams.get('query')) => {
+    let response;
     try {
-      const response = await CoreAPIGET(`listrole?page=${currentPage}&num=${itemsPerPage}`);
+      if (search !== null) {
+        console.log('--------------------');
+        console.log(search);
+        const searchEncoded = encodeURIComponent(search);
+        response = await CoreAPIGET(`listrole?page=${page}&num=${num}&query=${searchEncoded}`);
+        console.log('run with search');
+      } else {
+        response = await CoreAPIGET(`listrole?page=${page}&num=${num}`);
+        console.log('run without search');
+      }
       setPageInfo(response.body.Info);
+      console.log(pageInfo);
       setData(response.body.Data);
+      console.log(response);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, [currentPage, itemsPerPage]);
+    fetchData(currentPage, itemsPerPage, q);
+    if (q !== null) {
+      const queriesencoded = encodeURIComponent(q);
+      router.push(
+        `?page=${currentPage}&num=${itemsPerPage}&query=${queriesencoded}`,
+        { scroll: false },
+      );
+      console.log('run with q');
+    } else {
+      router.push(
+        `?page=${currentPage}&num=${itemsPerPage}`,
+        { scroll: false },
+      );
+      console.log('run without q');
+    }
+  }, [currentPage, itemsPerPage, q]);
 
   const table = useReactTable({
     data,
@@ -195,23 +225,43 @@ export default function DataTable() {
   });
 
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+    currentPage = newPage;
+    router.push(`?page=${newPage}&num=${itemsPerPage}&query=${q}`);
   };
+
+  const handleFilterChange = () => {
+    const userInput = filterRef.current.value;
+    console.log(userInput);
+    const newQ = encodeURIComponent(JSON.stringify([{
+      field: 'RoleName',
+      operator: 'LowerLIKE',
+      logic: 'AND',
+      values: [`%${userInput}%`],
+    }]));
+    setQueries(newQ);
+  };
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter Roles Name..."
-          value={(table.getColumn('RoleName')?.getFilterValue() ?? '')}
-          onChange={(event) => table.getColumn('RoleName')?.setFilterValue(event.target.value)}
+          onChange={handleFilterChange}
+          ref={filterRef}
           className="max-w-sm bg-gray-100"
         />
+        <Button variant="outline" className=" px-2 ml-2 bg-gray-100  hover:bg-gray-300">
+          <Link href={`/roles?page=${currentPage}&num=${itemsPerPage}&query=${queries}`}>
+            <Search className="hidden lg:flex" size={24} />
+            <Search className="flex lg:hidden" size={20} />
+          </Link>
+        </Button>
         <div className=" ml-auto item-justify-end inline-flex">
           <AddRole fetchData={fetchData} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className=" ml-2 bg-gray-100  hover:bg-gray-300">
-                Columns
+                Show
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -252,7 +302,7 @@ export default function DataTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {data !== null ? (table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((
                 row,
               ) => (
@@ -280,24 +330,36 @@ export default function DataTable() {
                   No results.
                 </TableCell>
               </TableRow>
+            )) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
             )}
+
           </TableBody>
         </Table>
       </div>
       <div className="flex items-center justify-between px-2 py-2">
         <div className="flex-1 text-sm font-medium text-muted-foreground">
           <div className="hidden lg:flex">
-            Data show
-            {' '}
-            {pageInfo.LowerLimit}
-            {' '}
-            -
-            {' '}
-            {pageInfo.UpperLimit}
-            {' '}
-            of
-            {' '}
-            {pageInfo.TotalRow}
+            {pageInfo.LowerLimit !== undefined && pageInfo.UpperLimit !== undefined && (
+            <span>
+              Data show
+              {' '}
+              {pageInfo.LowerLimit === 0 && pageInfo.UpperLimit === 0
+                ? '0'
+                : `${pageInfo.LowerLimit} - ${pageInfo.UpperLimit}`}
+                {' '}
+              of
+              {' '}
+              {pageInfo.TotalRow}
+            </span>
+            )}
           </div>
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
@@ -307,8 +369,8 @@ export default function DataTable() {
               value={itemsPerPage.toString()}
               onValueChange={(value) => {
                 const newItemsPerPage = Number(value);
-                setItemsPerPage(newItemsPerPage);
-                setCurrentPage(1);
+                itemsPerPage = newItemsPerPage;
+                router.push(`?page=${currentPage}&num=${itemsPerPage}&query=${q}`);
               }}
             >
               <SelectTrigger className="h-8 w-[70px] bg-gray-50">
@@ -324,7 +386,7 @@ export default function DataTable() {
             </Select>
           </div>
           <PaginationCtrl
-            currentPage={currentPage}
+            currentPage={Number(currentPage)}
             totalPage={pageInfo.TotalPage}
             onPageChange={handlePageChange}
           />

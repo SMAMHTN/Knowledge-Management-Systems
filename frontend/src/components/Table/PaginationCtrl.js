@@ -27,7 +27,6 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
   const handleLastPageClick = () => {
     onPageChange(totalPage);
   };
-
   return (
     <div className="flex">
       <div className="flex w-[100px] items-center mr-4 justify-center text-sm font-medium">

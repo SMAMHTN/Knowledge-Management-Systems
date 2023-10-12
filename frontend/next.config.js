@@ -3,6 +3,10 @@ const nextConfig = {
   experimental: {
     serverActions: true,
     serverActionsBodySizeLimit: '5gb',
+    logging: {
+      level: 'verbose',
+      fullUrl: true,
+    },
   },
   output: 'standalone',
   images: {
