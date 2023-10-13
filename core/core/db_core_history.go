@@ -45,6 +45,30 @@ func ReadHistory(args string, values []interface{}) ([]History, error) {
 	return results, nil
 }
 
+func ReadHistoryID(args string, values []interface{}) (res []int, err error) {
+	var sqlresult *sql.Rows
+
+	if args != "" {
+		sqlresult, err = Database.Query("SELECT HistoryID FROM core_history"+" "+args, values...)
+	} else {
+		sqlresult, err = Database.Query("SELECT HistoryID FROM core_history")
+	}
+
+	if err != nil {
+		return res, err
+	}
+	defer sqlresult.Close()
+	for sqlresult.Next() {
+		var result int
+		var err = sqlresult.Scan(&result)
+		if err != nil {
+			return res, err
+		}
+		res = append(res, result)
+	}
+	return res, nil
+}
+
 func (data History) Create() (int, error) {
 	var err error
 

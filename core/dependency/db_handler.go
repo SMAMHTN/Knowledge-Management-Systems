@@ -150,7 +150,7 @@ func LimitMaker(page int, num int) (limit string) {
 	return limit
 }
 
-func (data *QueryType) QueryMaker(Database *sql.DB, tableName string) (query string, values []interface{}, info Info, err error) {
+func (data *QueryType) QueryMaker(AnotherTable func([]SortType, []WhereType) ([]SortType, []WhereType, error), Database *sql.DB, tableName string) (query string, values []interface{}, info Info, err error) {
 	var sortquery []SortType
 	var wherequery []WhereType
 	//DEFAULT VALUE
@@ -160,7 +160,9 @@ func (data *QueryType) QueryMaker(Database *sql.DB, tableName string) (query str
 	if data.Page == 0 {
 		data.Page = 1
 	}
+	//IF HAVE DATA FROM DIFFERENT TABLE
 	//JSON CHECKER
+	fmt.Println(data.Sort)
 	if data.Sort != "" {
 		fmt.Println(data.Sort)
 		err = json.Unmarshal([]byte(data.Sort), &sortquery)
@@ -176,52 +178,17 @@ func (data *QueryType) QueryMaker(Database *sql.DB, tableName string) (query str
 			return query, values, info, err
 		}
 	}
-	//WHERE QUERY CREATOR
-	if len(wherequery) > 0 {
-		query += "WHERE ("
-		for i, condition := range wherequery {
-			if i > 0 {
-				switch condition.Logic {
-				case "AND", "OR", "XOR":
-					query += " " + condition.Logic + " "
-				default:
-					err = errors.New("use only these allowed logic : " + strings.Join(AllowedLogic[:], ", ") + "," + strings.Join(SpecialAllowedLogic[:], ", ") + " but got " + condition.Logic)
-					return query, values, info, err
-				}
-			}
-			//CONDITION CHECKER
-			switch condition.Operator {
-			case "=", "!=", "<=>", ">", "<", ">=", "<=", "LIKE":
-				query += fmt.Sprintf("%s %s ?", condition.Field, condition.Operator)
-				values = append(values, condition.Values[0])
-			case "IN", "NOT IN":
-				query += fmt.Sprintf("%s %s (?%s)", condition.Field, condition.Operator, strings.Repeat(", ?", len(condition.Values)-1))
-				values = append(values, condition.Values...)
-			case "BETWEEN", "NOT BETWEEN":
-				query += fmt.Sprintf("%s %s ? AND ?", condition.Field, condition.Operator)
-				values = append(values, condition.Values[0], condition.Values[1])
-			case "GREATEST", "LEAST":
-				query += fmt.Sprintf("%s (%s)", condition.Operator, condition.Field)
-			case "LowerLIKE":
-				query += fmt.Sprintf("LOWER(%s) LIKE LOWER(?)", condition.Field)
-				values = append(values, condition.Values[0])
-			default:
-				err = errors.New("use only these allowed operator : " + strings.Join(AllowedOperator[:], ", ") + "," + strings.Join(SpecialAllowedOperator[:], ", ") + " but got " + condition.Operator)
-				return query, values, info, err
-			}
+	if AnotherTable != nil {
+		sortquery, wherequery, err = AnotherTable(sortquery, wherequery)
+		if err != nil {
+			err = errors.New("sort field json read error : " + err.Error())
+			return query, values, info, err
 		}
-		query += ") "
 	}
-	if len(sortquery) > 0 {
-		var sortList []string
-		for _, y := range sortquery {
-			if y.Ascending {
-				sortList = append(sortList, y.Field+" ASC")
-			} else {
-				sortList = append(sortList, y.Field+" DESC")
-			}
-		}
-		query = query + "ORDER BY " + strings.Join(sortList, ", ") + " "
+	//WHERE QUERY CREATOR
+	query, values, err = SortQueryMaker(query, values, sortquery, wherequery)
+	if err != nil {
+		return query, values, info, err
 	}
 	//COUNT TOTAL
 	var count int
@@ -260,4 +227,56 @@ func (data *QueryType) QueryMaker(Database *sql.DB, tableName string) (query str
 	}
 	query = query + "LIMIT " + strconv.Itoa(Lowerlimit0) + "," + strconv.Itoa(data.Num)
 	return query, values, info, nil
+}
+
+func SortQueryMaker(queryinit string, valuesinit []interface{}, sortquery []SortType, wherequery []WhereType) (query string, values []interface{}, err error) {
+	query = queryinit
+	values = valuesinit
+	if len(wherequery) > 0 {
+		query += "WHERE ("
+		for i, condition := range wherequery {
+			if i > 0 {
+				switch condition.Logic {
+				case "AND", "OR", "XOR":
+					query += " " + condition.Logic + " "
+				default:
+					err = errors.New("use only these allowed logic : " + strings.Join(AllowedLogic[:], ", ") + "," + strings.Join(SpecialAllowedLogic[:], ", ") + " but got " + condition.Logic)
+					return query, values, err
+				}
+			}
+			//CONDITION CHECKER
+			switch condition.Operator {
+			case "=", "!=", "<=>", ">", "<", ">=", "<=", "LIKE":
+				query += fmt.Sprintf("%s %s ?", condition.Field, condition.Operator)
+				values = append(values, condition.Values[0])
+			case "IN", "NOT IN":
+				query += fmt.Sprintf("%s %s (?%s)", condition.Field, condition.Operator, strings.Repeat(", ?", len(condition.Values)-1))
+				values = append(values, condition.Values...)
+			case "BETWEEN", "NOT BETWEEN":
+				query += fmt.Sprintf("%s %s ? AND ?", condition.Field, condition.Operator)
+				values = append(values, condition.Values[0], condition.Values[1])
+			case "GREATEST", "LEAST":
+				query += fmt.Sprintf("%s (%s)", condition.Operator, condition.Field)
+			case "LowerLIKE":
+				query += fmt.Sprintf("LOWER(%s) LIKE LOWER(?)", condition.Field)
+				values = append(values, condition.Values[0])
+			default:
+				err = errors.New("use only these allowed operator : " + strings.Join(AllowedOperator[:], ", ") + "," + strings.Join(SpecialAllowedOperator[:], ", ") + " but got " + condition.Operator)
+				return query, values, err
+			}
+		}
+		query += ") "
+	}
+	if len(sortquery) > 0 {
+		var sortList []string
+		for _, y := range sortquery {
+			if y.Ascending {
+				sortList = append(sortList, y.Field+" ASC")
+			} else {
+				sortList = append(sortList, y.Field+" DESC")
+			}
+		}
+		query = query + "ORDER BY " + strings.Join(sortList, ", ") + " "
+	}
+	return query, values, nil
 }

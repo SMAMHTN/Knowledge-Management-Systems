@@ -70,6 +70,32 @@ func ReadArticle(args string, values []interface{}) ([]Article_Table, error) {
 	return results, nil
 }
 
+func ReadArticleID(args string, values []interface{}) ([]int, error) {
+	var results []int
+	var sqlresult *sql.Rows
+	var err error
+
+	if args != "" {
+		sqlresult, err = Database.Query("SELECT ArticleID FROM kms_article"+" "+args, values...)
+	} else {
+		sqlresult, err = Database.Query("SELECT ArticleID FROM kms_article")
+	}
+
+	if err != nil {
+		return results, err
+	}
+	defer sqlresult.Close()
+	for sqlresult.Next() {
+		var result int
+		var err = sqlresult.Scan(&result)
+		if err != nil {
+			return results, err
+		}
+		results = append(results, result)
+	}
+	return results, nil
+}
+
 func (data *Article_Table) Create() (int, error) {
 	var err error
 	DocIDList, err := dependency.ConvStringToIntArray(data.DocID)

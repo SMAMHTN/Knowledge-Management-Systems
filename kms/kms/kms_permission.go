@@ -70,6 +70,39 @@ func ListPermission(c echo.Context) error {
 	}
 }
 
+func ListPermissionID(c echo.Context) error {
+
+	permission, _, _ := Check_Admin_Permission_API(c)
+	res := ResponseList{}
+	limit := new(dependency.QueryType)
+	err := c.Bind(limit)
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	if permission {
+		var LimitQuery string
+		var ValuesQuery []interface{}
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_permission")
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		ListPermission, _ := ReadPermissionID(LimitQuery, ValuesQuery)
+		res.StatusCode = http.StatusOK
+		res.Data = ListPermission
+		return c.JSON(http.StatusOK, res)
+	} else {
+		res.StatusCode = http.StatusForbidden
+		res.Data = "ONLY SUPERADMIN HAVE THIS PERMISSION"
+		return c.JSON(http.StatusForbidden, res)
+	}
+}
+
 func ShowPermission(c echo.Context) error {
 	permission, _, _ := Check_Admin_Permission_API(c)
 	var err error

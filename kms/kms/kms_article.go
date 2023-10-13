@@ -145,6 +145,84 @@ func ListArticle(c echo.Context) error {
 	}
 }
 
+func ListArticleID(c echo.Context) error {
+	var LimitQuery string
+	var ValuesQuery []interface{}
+
+	permission, _, _ := Check_Admin_Permission_API(c)
+	res := ResponseList{}
+	limit := new(dependency.QueryType)
+	err := c.Bind(limit)
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	if permission {
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_article")
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		ArticleList, _ := ReadArticleID(LimitQuery, ValuesQuery)
+		res.StatusCode = http.StatusOK
+		res.Data = ArticleList
+		return c.JSON(http.StatusOK, res)
+	} else {
+		AllowedCategoryList, err := GetCurrentUserReadCategoryList(c)
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		var wherequery []dependency.WhereType
+		if limit.Query != "" {
+			err = json.Unmarshal([]byte(limit.Query), &wherequery)
+			if err != nil {
+				err = errors.New("query field json read error : " + err.Error())
+				Logger.Error(err.Error())
+				res.StatusCode = http.StatusInternalServerError
+				res.Data = err
+				return c.JSON(http.StatusInternalServerError, res)
+			}
+		}
+		var convertedAllowedCategoryList []interface{}
+		for _, v := range AllowedCategoryList {
+			convertedAllowedCategoryList = append(convertedAllowedCategoryList, v)
+		}
+		singlewherequery := dependency.WhereType{
+			Field:    "CategoryID",
+			Operator: "IN",
+			Logic:    "AND",
+			Values:   convertedAllowedCategoryList,
+		}
+		wherequery = append(wherequery, singlewherequery)
+		a, err := json.Marshal(wherequery)
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		limit.Query = string(a)
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_article")
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		ArticleList, _ := ReadArticleID(LimitQuery, ValuesQuery)
+		res.StatusCode = http.StatusOK
+		res.Data = ArticleList
+		return c.JSON(http.StatusOK, res)
+	}
+}
+
 func ShowArticle(c echo.Context) error {
 	var err error
 	var res Response

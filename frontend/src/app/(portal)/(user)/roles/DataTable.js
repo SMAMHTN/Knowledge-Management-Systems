@@ -107,11 +107,11 @@ export default function DataTable() {
     setSortParams(newSortParams);
 
     // Fetch data with the updated sorting parameters
-    fetchData(currentPage, itemsPerPage, q, newSortParams);
+    // fetchData(currentPage, itemsPerPage, q, newSortParams);
 
-    // Update the URL with the new sorting parameters
-    const queriesencoded = q !== null ? encodeURIComponent(q) : null;
-    router.push(URLParamsBuilder('', currentPage, itemsPerPage, queriesencoded, newSortParams));
+    // // Update the URL with the new sorting parameters
+    // const queriesencoded = q !== null ? encodeURIComponent(q) : null;
+    // router.push(URLParamsBuilder('', currentPage, itemsPerPage, queriesencoded, newSortParams));
   }
   const columns = [
     {

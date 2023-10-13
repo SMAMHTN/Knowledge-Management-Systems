@@ -30,7 +30,7 @@ func ListRole(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "core_role")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(RoleAnotherTable, Database, "core_role")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -44,6 +44,38 @@ func ListRole(c echo.Context) error {
 		}
 		res.StatusCode = http.StatusOK
 		res.Data = listRoleApi
+		return c.JSON(http.StatusOK, res)
+	} else {
+		res.StatusCode = http.StatusForbidden
+		res.Data = "ONLY SUPERADMIN HAVE THIS PERMISSION"
+		return c.JSON(http.StatusForbidden, res)
+	}
+}
+
+func ListRoleID(c echo.Context) error {
+	permission, _, _ := Check_Permission_API(c)
+	res := ResponseList{}
+	limit := new(dependency.QueryType)
+	err := c.Bind(limit)
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	if permission {
+		var LimitQuery string
+		var ValuesQuery []interface{}
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(RoleAnotherTable, Database, "core_role")
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		listRole, _ := ReadRoleID(LimitQuery, ValuesQuery)
+		res.StatusCode = http.StatusOK
+		res.Data = listRole
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -327,4 +359,66 @@ func (data RoleAPI) ToTable() (res Role, err error) {
 		RoleDescription: data.RoleDescription,
 	}
 	return res, nil
+}
+
+func RoleAnotherTable(Sort []dependency.SortType, Where []dependency.WhereType) (ResSort []dependency.SortType, ResWhere []dependency.WhereType, err error) {
+	var sortroleposition int
+	var sortrole []dependency.SortType
+	var whererolefirstposition bool
+	var whereuser []dependency.WhereType
+	for x, y := range Sort {
+		switch y.Field {
+		case "RoleParentName", "RoleParentDescription":
+			if sortroleposition == 0 {
+				sortroleposition = x + 1
+			}
+			y.Field = y.Field[:4] + y.Field[10:]
+			sortrole = append(sortrole, y)
+		default:
+			ResSort = append(ResSort, y)
+		}
+	}
+	for a, b := range Where {
+		switch b.Field {
+		case "RoleParentName", "RoleParentDescription":
+			if !whererolefirstposition && a == 0 {
+				whererolefirstposition = true
+			}
+			b.Field = b.Field[:4] + b.Field[10:]
+			whereuser = append(whereuser, b)
+		default:
+			ResWhere = append(ResWhere, b)
+		}
+	}
+	if len(sortrole) > 0 || len(whereuser) > 0 {
+		tmpquery, tmpvalue, err := dependency.SortQueryMaker("", nil, sortrole, whereuser)
+		if err != nil {
+			return ResSort, ResWhere, err
+		}
+		RoleParentIDs, err := ReadRoleID(tmpquery, tmpvalue)
+		if err != nil {
+			return ResSort, ResWhere, err
+		}
+		if len(sortrole) > 0 {
+			ConvertedSort := dependency.SortType{
+				Field:     "FIELD(RoleParentID," + dependency.ConvIntArrayToString(RoleParentIDs) + ")",
+				Ascending: sortrole[0].Ascending,
+			}
+			ResSort = append(ResSort[:sortroleposition-1], append([]dependency.SortType{ConvertedSort}, ResSort[sortroleposition-1:]...)...)
+		}
+		if len(whereuser) > 0 {
+			ConvertedWhere := dependency.WhereType{
+				Field:    "RoleParentID",
+				Operator: whereuser[0].Operator,
+				Logic:    "IN",
+				Values:   dependency.SliceIntToInterface(RoleParentIDs),
+			}
+			if whererolefirstposition {
+				ResWhere = append([]dependency.WhereType{ConvertedWhere}, ResWhere...)
+			} else {
+				ResWhere = append(ResWhere, ConvertedWhere)
+			}
+		}
+	}
+	return ResSort, ResWhere, nil
 }

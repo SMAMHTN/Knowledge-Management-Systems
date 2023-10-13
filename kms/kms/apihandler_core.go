@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"net/url"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -34,6 +35,9 @@ func CallCoreAPI(method string, dynamicpath string, body interface{}, username s
 	if err != nil {
 		return nil, err
 	}
+	if resp.StatusCode != 200 {
+		return nil, errors.New(string(bodyresp))
+	}
 	mapbody, err := dependency.JsonToMap(string(bodyresp))
 	if err != nil {
 		return mapbody, errors.New("response is not json")
@@ -62,6 +66,9 @@ func CallCoreAPIPure(method string, dynamicpath string, body interface{}, userna
 	if err != nil {
 		return nil, err
 	}
+	if resp.StatusCode != 200 {
+		return nil, errors.New(string(bodyresp))
+	}
 	mapbody, err := dependency.JsonToMap(string(bodyresp))
 	if err != nil {
 		return mapbody, errors.New("response is not json")
@@ -69,7 +76,7 @@ func CallCoreAPIPure(method string, dynamicpath string, body interface{}, userna
 	return mapbody, nil
 }
 
-func CallCoreAPINoCred(method string, dynamicpath string, body interface{}) (result map[string]interface{}, err error) {
+func CallCoreAPIPureNoCred(method string, dynamicpath string, body interface{}) (result map[string]interface{}, err error) {
 	reqheader := []dependency.ApiHeader{}
 	headerconnection := dependency.ApiHeader{
 		HeaderKey:   "Connection",
@@ -88,6 +95,9 @@ func CallCoreAPINoCred(method string, dynamicpath string, body interface{}) (res
 	bodyresp, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode != 200 {
+		return nil, errors.New(string(bodyresp))
 	}
 	mapbody, err := dependency.JsonToMap(string(bodyresp))
 	if err != nil {
@@ -122,4 +132,33 @@ func GetRole(c echo.Context, RoleID int) (Role RoleAPI, err error) {
 		return Role, err
 	}
 	return Role, nil
+}
+
+func GetCoreIDs(c echo.Context, path string, SortInput dependency.SortType, WhereInput dependency.WhereType) (listIDs []int, err error) {
+	SortJSONString, err := json.Marshal(SortInput)
+	if err != nil {
+		return listIDs, err
+	}
+	WhereJSONString, err := json.Marshal(WhereInput)
+	if err != nil {
+		return listIDs, err
+	}
+	URLParamsValues := url.Values{}
+	URLParamsValues.Add("num", "9999999999999999")
+	// URLParamsValues.Add("page", "1")
+	URLParamsValues.Add("sort", string(SortJSONString))
+	URLParamsValues.Add("query", string(WhereJSONString))
+	_, userpass, _ := c.Request().BasicAuth()
+	cred := strings.Split(userpass, "&&")
+
+	IDsGET, err := CallCoreAPIPure("GET", path+"?"+URLParamsValues.Encode(), nil, dependency.GetElementString(cred, 0), dependency.GetElementString(cred, 1))
+	if err != nil {
+		return listIDs, err
+	}
+	listIDs, isexist := IDsGET["Data"].([]int)
+	if isexist {
+		return listIDs, nil
+	} else {
+		return nil, errors.New("not returning array of int")
+	}
 }
