@@ -20,7 +20,7 @@ func ListTheme(c echo.Context) error {
 	}
 	var LimitQuery string
 	var ValuesQuery []interface{}
-	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, Database, "core_theme")
+	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "core_theme")
 	if err != nil {
 		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
@@ -45,7 +45,7 @@ func ListThemeID(c echo.Context) error {
 	}
 	var LimitQuery string
 	var ValuesQuery []interface{}
-	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, Database, "core_theme")
+	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "core_theme")
 	if err != nil {
 		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest

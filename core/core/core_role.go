@@ -30,7 +30,7 @@ func ListRole(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(RoleAnotherTable, Database, "core_role")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(RoleAnotherTable, nil, nil, Database, "core_role")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -66,7 +66,7 @@ func ListRoleID(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(RoleAnotherTable, Database, "core_role")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(RoleAnotherTable, nil, nil, Database, "core_role")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest

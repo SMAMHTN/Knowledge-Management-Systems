@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/labstack/echo/v4"
 )
 
 type Info struct {
@@ -150,7 +151,7 @@ func LimitMaker(page int, num int) (limit string) {
 	return limit
 }
 
-func (data *QueryType) QueryMaker(AnotherTable func([]SortType, []WhereType) ([]SortType, []WhereType, error), Database *sql.DB, tableName string) (query string, values []interface{}, info Info, err error) {
+func (data *QueryType) QueryMaker(AnotherTable func([]SortType, []WhereType) ([]SortType, []WhereType, error), AnotherTableWithEcho func(echo.Context, []SortType, []WhereType) ([]SortType, []WhereType, error), c echo.Context, Database *sql.DB, tableName string) (query string, values []interface{}, info Info, err error) {
 	var sortquery []SortType
 	var wherequery []WhereType
 	//DEFAULT VALUE
@@ -180,6 +181,12 @@ func (data *QueryType) QueryMaker(AnotherTable func([]SortType, []WhereType) ([]
 	}
 	if AnotherTable != nil {
 		sortquery, wherequery, err = AnotherTable(sortquery, wherequery)
+		if err != nil {
+			err = errors.New("sort field json read error : " + err.Error())
+			return query, values, info, err
+		}
+	} else if AnotherTableWithEcho != nil && c != nil {
+		sortquery, wherequery, err = AnotherTableWithEcho(c, sortquery, wherequery)
 		if err != nil {
 			err = errors.New("sort field json read error : " + err.Error())
 			return query, values, info, err

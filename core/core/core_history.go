@@ -66,7 +66,7 @@ func ListHistory(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(HistoryAnotherTable, Database, "core_history")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(HistoryAnotherTable, nil, nil, Database, "core_history")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
