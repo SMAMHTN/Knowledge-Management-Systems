@@ -6,7 +6,7 @@ import React from 'react';
 import AsyncSelect from 'react-select/async';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 
-function UserSelector({ onChange }) {
+function UserSelector({ onChange, defaultValue }) {
   const loadUsers = (inputValue) => {
     const UrlInputValue = encodeURIComponent(JSON.stringify([{
       field: 'Name',
@@ -33,6 +33,7 @@ function UserSelector({ onChange }) {
       defaultOptions
       loadOptions={loadUsers}
       onChange={onChange}
+      defaultValue={defaultValue}
     />
   );
 }

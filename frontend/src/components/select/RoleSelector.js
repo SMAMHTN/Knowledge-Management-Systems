@@ -6,7 +6,7 @@ import React from 'react';
 import AsyncSelect from 'react-select/async';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 
-function RoleSelector({ onChange }) {
+function RoleSelector({ onChange, defaultValue }) {
   const loadRoles = (inputValue) => {
     const UrlInputValue = encodeURIComponent(JSON.stringify([{
       field: 'RoleName',
@@ -28,6 +28,7 @@ function RoleSelector({ onChange }) {
       defaultOptions
       loadOptions={loadRoles}
       onChange={onChange}
+      defaultValue={defaultValue}
     />
   );
 }

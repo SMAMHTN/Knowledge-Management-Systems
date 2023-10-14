@@ -6,7 +6,7 @@ import React from 'react';
 import AsyncSelect from 'react-select/async';
 import { KmsAPIGET } from '@/dep/kms/kmsHandler';
 
-function CategorySelector({ onChange }) {
+function CategorySelector({ onChange, defaultValue }) {
   const loadCategories = (inputValue) => {
     const UrlInputValue = encodeURIComponent(JSON.stringify([{
       field: 'CategoryName',
@@ -28,6 +28,7 @@ function CategorySelector({ onChange }) {
       defaultOptions
       loadOptions={loadCategories}
       onChange={onChange}
+      defaultValue={defaultValue}
     />
   );
 }
