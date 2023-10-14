@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -9,34 +9,46 @@ import { alertUpdate } from '@/components/Feature';
 import { roleSchema } from '@/constants/schema';
 import { ErrorMessage, RequiredFieldIndicator, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
+import RoleSelector from '@/components/select/RoleSelector';
 
 function UserDetails({ params }) {
+  const [defValRoleParent, setDefValRoleParent] = useState();
   const {
     handleSubmit, control, setValue, formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       RoleID: '',
       RoleName: '',
-      RoleParentID: '',
       RoleDescription: '',
     },
     resolver: yupResolver(roleSchema),
   });
 
+  const [selectedRole, setSelectedRole] = useState({
+    value: 1,
+    label: 'Everyone',
+  });
+  const handleRoleChange = (selectedOption) => {
+    setSelectedRole(selectedOption);
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const response = await CoreAPIGET(`role?RoleID=${params.id}`);
+      const { Data } = response.body;
+      Object.keys(Data).forEach((key) => {
+        setValue(key, Data[key]);
+      });
+      setDefValRoleParent({
+        value: response.body.Data.RoleParentID,
+        label: response.body.Data.RoleParentName,
+      });
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await CoreAPIGET(`role?RoleID=${params.id}`);
-        const { Data } = response.body;
-
-        Object.keys(Data).forEach((key) => {
-          setValue(key, Data[key]);
-        });
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-
     fetchUserData();
   }, [params.id, setValue]);
 
@@ -49,7 +61,13 @@ function UserDetails({ params }) {
         return;
       }
 
-      const response = await CoreAPI('PUT', 'role', formData);
+      const updatedData = {
+        RoleID: formData.RoleID,
+        RoleName: formData.RoleName,
+        RoleParentID: selectedRole.value,
+        RoleDescription: formData.RoleDescription,
+      };
+      const response = await CoreAPI('PUT', 'role', updatedData);
       await new Promise((resolve) => setTimeout(resolve, 300));
       alertUpdate(response);
     } catch (error) {
@@ -90,28 +108,11 @@ function UserDetails({ params }) {
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">
-              Role Parent ID
+              Role Parent
               {' '}
               <RequiredFieldIndicator />
             </label>
-            <Controller
-              name="RoleParentID"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    {...field}
-                    type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
-                    placeholder="Role Parent ID"
-                  />
-                  <p className="text-xs mt-1">
-                    Input a valid Role Parent ID. Number Only. Required.
-                  </p>
-                  {errors.RoleParentID && (<ErrorMessage error={errors.RoleParentID.message} />)}
-                </>
-              )}
-            />
+            <RoleSelector onChange={handleRoleChange} defaultValue={defValRoleParent} />
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">Description</label>
@@ -143,6 +144,7 @@ function UserDetails({ params }) {
           </Button>
         </form>
       </div>
+      { console.log('Updated selectedRole:', defValRoleParent)}
     </section>
   );
 }

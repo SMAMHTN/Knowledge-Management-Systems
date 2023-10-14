@@ -267,7 +267,7 @@ export default function DataTable() {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter Roles Name..."
+          placeholder="Filter Name..."
           onChange={handleFilterChange}
           ref={filterRef}
           className="max-w-sm bg-gray-100"

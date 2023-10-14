@@ -32,11 +32,6 @@ export const roleSchema = yup.object().shape({
     .string()
     .required(requiredMsg)
     .max(50, maxCharMsg),
-  RoleParentID: yup
-    .number(numOnly)
-    .required(requiredMsg)
-    .typeError(numOnly)
-    .integer(integerMsg),
   RoleDescription: yup
     .string()
     .test('no-html', noHTMLMsg, (value) => {
