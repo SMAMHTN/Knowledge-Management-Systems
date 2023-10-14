@@ -3,10 +3,11 @@
 /* eslint-disable import/extensions */
 /* eslint-disable import/no-unresolved */
 import React from 'react';
+import dynamic from 'next/dynamic'
 import AsyncSelect from 'react-select/async';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 
-function RoleSelector({ onChange, defaultValue }) {
+function RoleSelector({ onChange, value }) {
   const loadRoles = (inputValue) => {
     const UrlInputValue = encodeURIComponent(JSON.stringify([{
       field: 'RoleName',
@@ -24,11 +25,12 @@ function RoleSelector({ onChange, defaultValue }) {
   };
   return (
     <AsyncSelect
+      id="RoleSelector"
       cacheOptions
       defaultOptions
       loadOptions={loadRoles}
       onChange={onChange}
-      defaultValue={defaultValue}
+      value={value}
     />
   );
 }

@@ -1,9 +1,12 @@
+/* eslint-disable import/extensions */
+/* eslint-disable import/no-unresolved */
+
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-
+import dynamic from 'next/dynamic'
 import { CoreAPIGET, CoreAPI } from '@/dep/core/coreHandler';
 import { alertUpdate } from '@/components/Feature';
 import { roleSchema } from '@/constants/schema';
@@ -20,6 +23,7 @@ function UserDetails({ params }) {
       RoleID: '',
       RoleName: '',
       RoleDescription: '',
+      RoleParentSelector: '',
     },
     resolver: yupResolver(roleSchema),
   });
@@ -29,6 +33,7 @@ function UserDetails({ params }) {
     label: 'Everyone',
   });
   const handleRoleChange = (selectedOption) => {
+    console.log(selectedOption);
     setSelectedRole(selectedOption);
   };
 
@@ -39,10 +44,16 @@ function UserDetails({ params }) {
       Object.keys(Data).forEach((key) => {
         setValue(key, Data[key]);
       });
+      // console.log('passed here');
+      // setValue('RoleParentSelector', {
+      //   value: response.body.Data.RoleParentID,
+      //   label: response.body.Data.RoleParentName,
+      // });
       setDefValRoleParent({
         value: response.body.Data.RoleParentID,
         label: response.body.Data.RoleParentName,
       });
+      // console.log('passed here2');
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -112,7 +123,18 @@ function UserDetails({ params }) {
               {' '}
               <RequiredFieldIndicator />
             </label>
-            <RoleSelector onChange={handleRoleChange} defaultValue={defValRoleParent} />
+            {/* <Controller
+              name="RoleParentSelector"
+              render={({ field }) => (
+                <RoleSelector
+                  {...field}
+                  onChange={handleRoleChange}
+                  value={defValRoleParent}
+                />
+              )}
+              control={control}
+            /> */}
+            <RoleSelector id="RoleParentSelector" onChange={handleRoleChange} value={defValRoleParent} />
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">Description</label>
@@ -144,7 +166,7 @@ function UserDetails({ params }) {
           </Button>
         </form>
       </div>
-      { console.log('Updated selectedRole:', defValRoleParent)}
+      {/* { console.log('Updated selectedRole:', defValRoleParent)} */}
     </section>
   );
 }
