@@ -11,7 +11,7 @@ const LoginDynamicpath = '/';
 export async function Login(Username, Password) {
   const conf = readConf('frontend_conf.json');
   const credentials = generateCoreCred(Username, Password);
-  const response = await fetch(`${conf.core_link}login`, {
+  const response = await fetch(`${conf.core_link}loginuser`, {
     method: 'GET',
     headers: {
       Authorization: `Basic ${credentials}`,
@@ -33,6 +33,22 @@ export async function Login(Username, Password) {
       sameSite: 'lax',
       path: '/',
     });
+    const responseBody = await response.json();
+    if (responseBody.Data.IsSuperAdmin === true) {
+      cookies().set({
+        name: 'adminstatus',
+        value: 'SuperAdmin',
+        sameSite: 'lax',
+        path: '/',
+      });
+    } else {
+      cookies().set({
+        name: 'adminstatus',
+        value: 'User',
+        sameSite: 'lax',
+        path: '/',
+      });
+    }
     return true;
   }
   return false;
@@ -47,6 +63,12 @@ export async function Logout() {
   });
   cookies().set({
     name: 'password',
+    value: '',
+    sameSite: 'lax',
+    path: '/',
+  });
+  cookies().set({
+    name: 'adminstatus',
     value: '',
     sameSite: 'lax',
     path: '/',
