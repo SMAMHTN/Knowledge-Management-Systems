@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import {
   flexRender,
   getCoreRowModel,
@@ -8,11 +9,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  ArrowUpDown, ChevronDown, MoreHorizontal, Check, X,
+  ArrowUpDown, ChevronDown, MoreHorizontal, Check, X, Search,
 } from 'lucide-react';
-
 import AddUser from './AddUser';
 import {
   Select,
@@ -43,40 +43,73 @@ import {
 import { CoreAPI, CoreAPIGET } from '@/dep/core/coreHandler';
 import PaginationCtrl from '@/components/Table/PaginationCtrl';
 import { DeleteModal, alertDelete } from '@/components/Feature';
+import { URLParamsBuilder, HandleQueryParams, HandleSortParams } from '@/dep/others/HandleParams';
 
 export default function DataTable() {
   const [data, setData] = useState([]);
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
+  const [pageInfo, setPageInfo] = useState({ TotalPage: 1 });
+  let currentPage = searchParams.get('page') || 1;
+  let itemsPerPage = searchParams.get('num') || 5;
+  const q = searchParams.get('query');
+  const [queries, setQueries] = useState('');
+  const filterRef = useRef();
+  const [sortField, setSortField] = useState(null);
+  const [sortAsc, setSortAsc] = useState(false);
+  const [sortParams, setSortParams] = useState(null);
+  const SortPass = searchParams.get('sort');
+
+  const fetchData = async (page = searchParams.get('page'), num = searchParams.get('num'), search = searchParams.get('query'), sortPass = searchParams.get('sort')) => {
+    let response;
+    try {
+      let queriesencoded = null;
+      let sortencoded = null;
+
+      if (search !== null) {
+        queriesencoded = encodeURIComponent(search);
+      }
+
+      if (sortPass !== null) {
+        sortencoded = encodeURIComponent(sortPass);
+      }
+      response = await CoreAPIGET(URLParamsBuilder('listuser', page, num, queriesencoded, sortencoded));
+      setPageInfo(response.body.Info);
+      setData(response.body.Data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+  function SingleSortToggle(FieldName) {
+    let newSortField; let
+      newSortAsc;
+
+    if (sortField === FieldName) {
+      newSortField = FieldName;
+      newSortAsc = !sortAsc;
+    } else {
+      newSortField = FieldName;
+      newSortAsc = false;
+    }
+
+    setSortField(newSortField);
+    setSortAsc(newSortAsc);
+    const newSortParams = HandleSortParams(newSortField, newSortAsc);
+    setSortParams(newSortParams);
+  }
+
   const columns = [
-    {
-      accessorKey: 'Username',
-      header: ({ column }) => (
-        <Button
-          className="hover:bg-gray-300"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Username
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <div>{row.getValue('Username')}</div>
-      ),
-    },
     {
       accessorKey: 'Name',
       header: ({ column }) => (
         <Button
           className="hover:bg-gray-300"
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          onClick={() => SingleSortToggle('Name')}
         >
           Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -105,7 +138,7 @@ export default function DataTable() {
         <Button
           className="hover:bg-gray-300"
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          onClick={() => SingleSortToggle('RoleName')}
         >
           Role
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -140,7 +173,7 @@ export default function DataTable() {
             setDeletingUserID(null);
             fetchData();
           } catch (error) {
-            console.error('Error deleting category:', error);
+            console.error('Error deleting user:', error);
           }
         };
         return (
@@ -189,19 +222,40 @@ export default function DataTable() {
       },
     },
   ];
-  const fetchData = async () => {
-    try {
-      const response = await CoreAPIGET(`listuser?page=${currentPage}&num=${itemsPerPage}`);
-      setPageInfo(response.body.Info);
-      setData(response.body.Data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
 
   useEffect(() => {
-    fetchData();
-  }, [currentPage, itemsPerPage]);
+    fetchData(currentPage, itemsPerPage, q, SortPass);
+    let queriesencoded = null; // Declare queriesencoded outside the if block
+    let sortencoded = null;
+
+    if (q !== null) {
+      queriesencoded = encodeURIComponent(q);
+    }
+
+    if (SortPass !== null) {
+      sortencoded = encodeURIComponent(SortPass);
+    }
+
+    router.push(
+      URLParamsBuilder('', currentPage, itemsPerPage, queriesencoded, sortencoded),
+      { scroll: false },
+    );
+  }, [currentPage, itemsPerPage, q, SortPass]);
+
+  useEffect(() => {
+    fetchData(currentPage, itemsPerPage, q);
+    fetchData(currentPage, itemsPerPage, q, sortParams);
+    let queriesencoded = null; // Declare queriesencoded outside the if block
+
+    if (q !== null) {
+      queriesencoded = encodeURIComponent(q);
+    }
+
+    router.push(
+      URLParamsBuilder('', currentPage, itemsPerPage, queriesencoded, sortParams),
+      { scroll: false },
+    );
+  }, [sortParams]);
 
   const table = useReactTable({
     data,
@@ -222,23 +276,52 @@ export default function DataTable() {
   });
 
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+    currentPage = newPage;
+    let queriesencoded = null;
+    let sortencoded = null;
+
+    if (q !== null) {
+      queriesencoded = encodeURIComponent(q);
+    }
+
+    if (SortPass !== null) {
+      sortencoded = encodeURIComponent(SortPass);
+    }
+    router.push(URLParamsBuilder('', newPage, itemsPerPage, queriesencoded, sortencoded));
   };
+
+  const handleFilterChange = () => {
+    const userInput = filterRef.current.value;
+    const newQ = encodeURIComponent(JSON.stringify([{
+      field: 'Name',
+      operator: 'LowerLIKE',
+      logic: 'AND',
+      values: [`%${userInput}%`],
+    }]));
+    setQueries(newQ);
+  };
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter User Name..."
-          value={(table.getColumn('Name')?.getFilterValue() ?? '')}
-          onChange={(event) => table.getColumn('Name')?.setFilterValue(event.target.value)}
+          placeholder="Filter Roles Name..."
+          onChange={handleFilterChange}
+          ref={filterRef}
           className="max-w-sm bg-gray-100"
         />
+        <Button variant="outline" className=" px-2 ml-2 bg-gray-100  hover:bg-gray-300">
+          <Link href={URLParamsBuilder('/user', 1, itemsPerPage, queries, sortParams)}>
+            <Search className="hidden lg:flex" size={24} />
+            <Search className="flex lg:hidden" size={20} />
+          </Link>
+        </Button>
         <div className=" ml-auto item-justify-end inline-flex">
           <AddUser fetchData={fetchData} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className=" ml-2 bg-gray-100 hover:bg-gray-300">
-                Columns
+                Show
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -279,7 +362,7 @@ export default function DataTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {data !== null ? (table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((
                 row,
               ) => (
@@ -307,6 +390,15 @@ export default function DataTable() {
                   No results.
                 </TableCell>
               </TableRow>
+            )) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
             )}
           </TableBody>
         </Table>
@@ -314,17 +406,19 @@ export default function DataTable() {
       <div className="flex items-center justify-between px-2 py-2">
         <div className="flex-1 text-sm font-medium text-muted-foregroud">
           <div className="hidden sm:flex">
-            Data show
-            {' '}
-            {pageInfo.LowerLimit}
-            {' '}
-            -
-            {' '}
-            {pageInfo.UpperLimit}
-            {' '}
-            of
-            {' '}
-            {pageInfo.TotalRow}
+            {pageInfo.LowerLimit !== undefined && pageInfo.UpperLimit !== undefined && (
+            <span>
+              Data show
+              {' '}
+              {pageInfo.LowerLimit === 0 && pageInfo.UpperLimit === 0
+                ? '0'
+                : `${pageInfo.LowerLimit} - ${pageInfo.UpperLimit}`}
+                {' '}
+              of
+              {' '}
+              {pageInfo.TotalRow}
+            </span>
+            )}
           </div>
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
@@ -334,7 +428,8 @@ export default function DataTable() {
               value={itemsPerPage.toString()}
               onValueChange={(value) => {
                 const newItemsPerPage = Number(value);
-                setItemsPerPage(newItemsPerPage);
+                itemsPerPage = newItemsPerPage;
+                router.push(URLParamsBuilder('', 1, itemsPerPage, queries, sortParams));
               }}
             >
               <SelectTrigger className="h-8 w-[70px] bg-gray-50">
@@ -350,7 +445,7 @@ export default function DataTable() {
             </Select>
           </div>
           <PaginationCtrl
-            currentPage={currentPage}
+            currentPage={Number(currentPage)}
             totalPage={pageInfo.TotalPage}
             onPageChange={handlePageChange}
           />

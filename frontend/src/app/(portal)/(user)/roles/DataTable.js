@@ -52,7 +52,7 @@ export default function DataTable() {
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
-  const [pageInfo, setPageInfo] = useState({ TotalPage: 0 });
+  const [pageInfo, setPageInfo] = useState({ TotalPage: 1 });
   const [sortField, setSortField] = useState(null);
   const [sortAsc, setSortAsc] = useState(false);
   const [sortParams, setSortParams] = useState(null);
@@ -100,18 +100,9 @@ export default function DataTable() {
     setSortField(newSortField);
     setSortAsc(newSortAsc);
 
-    // Update other logic based on the sorting field and direction
     const newSortParams = HandleSortParams(newSortField, newSortAsc);
 
-    // Update the sorting parameters in the state
     setSortParams(newSortParams);
-
-    // Fetch data with the updated sorting parameters
-    // fetchData(currentPage, itemsPerPage, q, newSortParams);
-
-    // // Update the URL with the new sorting parameters
-    // const queriesencoded = q !== null ? encodeURIComponent(q) : null;
-    // router.push(URLParamsBuilder('', currentPage, itemsPerPage, queriesencoded, newSortParams));
   }
   const columns = [
     {
@@ -310,7 +301,7 @@ export default function DataTable() {
           className="max-w-sm bg-gray-100"
         />
         <Button variant="outline" className=" px-2 ml-2 bg-gray-100  hover:bg-gray-300">
-          <Link href={URLParamsBuilder('/roles', currentPage, itemsPerPage, queries, sortParams)}>
+          <Link href={URLParamsBuilder('/roles', 1, itemsPerPage, queries, sortParams)}>
             <Search className="hidden lg:flex" size={24} />
             <Search className="flex lg:hidden" size={20} />
           </Link>
@@ -429,7 +420,7 @@ export default function DataTable() {
               onValueChange={(value) => {
                 const newItemsPerPage = Number(value);
                 itemsPerPage = newItemsPerPage;
-                router.push(URLParamsBuilder('', currentPage, itemsPerPage, queries, sortParams));
+                router.push(URLParamsBuilder('', 1, itemsPerPage, queries, sortParams));
               }}
             >
               <SelectTrigger className="h-8 w-[70px] bg-gray-50">
