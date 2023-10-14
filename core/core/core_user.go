@@ -440,10 +440,12 @@ func UserAnotherTable(Sort []dependency.SortType, Where []dependency.WhereType) 
 	if len(sortrole) > 0 || len(whererole) > 0 {
 		tmpquery, tmpvalue, err := dependency.SortQueryMaker("", nil, sortrole, whererole)
 		if err != nil {
+			Logger.Error(err.Error())
 			return ResSort, ResWhere, err
 		}
 		RoleIDs, err := ReadRoleID(tmpquery, tmpvalue)
 		if err != nil {
+			Logger.Error(err.Error())
 			return ResSort, ResWhere, err
 		}
 		if len(sortrole) > 0 {
@@ -470,10 +472,12 @@ func UserAnotherTable(Sort []dependency.SortType, Where []dependency.WhereType) 
 	if len(sorttheme) > 0 || len(wheretheme) > 0 {
 		tmpquery, tmpvalue, err := dependency.SortQueryMaker("", nil, sorttheme, wheretheme)
 		if err != nil {
+			Logger.Error(err.Error())
 			return ResSort, ResWhere, err
 		}
 		ThemeIDs, err := ReadThemeID(tmpquery, tmpvalue)
 		if err != nil {
+			Logger.Error(err.Error())
 			return ResSort, ResWhere, err
 		}
 		if len(sorttheme) > 0 {

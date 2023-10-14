@@ -1,17 +1,15 @@
 package main
 
-import (
-	"fmt"
-)
+import "core"
 
 func main() {
 	// a := dependency.GetFieldNames(core.User_API{})
 	// fmt.Println(a)
-	// defer core.Database.Close()
-	// defer core.Logger.Sync()
-	// defer core.Logger.Info("CORE SERVER STOPPED")
-	// defer core.Logger.Info("CORE SERVER STARTED")
-	// core.Test_api()
+	defer core.Database.Close()
+	defer core.Logger.Sync()
+	defer core.Logger.Info("CORE SERVER STOPPED")
+	defer core.Logger.Info("CORE SERVER STARTED")
+	core.Test_api()
 	// a := []int{1, 2, 3, 4}
 	// for x, y := range a {
 	// 	fmt.Println(x)
@@ -26,7 +24,7 @@ func main() {
 	// b[0] = 8
 	// fmt.Println(b)
 	// fmt.Println(dependency.ConvIntArrayToString(a))
-	Field := "RoleParentName"
-	Field = Field[:4] + Field[10:]
-	fmt.Println(Field)
+	// Field := "RoleParentName"
+	// Field = Field[:4] + Field[10:]
+	// fmt.Println(Field)
 }

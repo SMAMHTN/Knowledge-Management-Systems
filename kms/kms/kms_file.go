@@ -26,7 +26,7 @@ func ListFile(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_file")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_file")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -59,7 +59,7 @@ func ListFileID(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_file")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_file")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest

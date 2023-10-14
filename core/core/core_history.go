@@ -178,10 +178,12 @@ func HistoryAnotherTable(Sort []dependency.SortType, Where []dependency.WhereTyp
 	if len(sortuser) > 0 || len(whereuser) > 0 {
 		tmpquery, tmpvalue, err := dependency.SortQueryMaker("", nil, sortuser, whereuser)
 		if err != nil {
+			Logger.Error(err.Error())
 			return ResSort, ResWhere, err
 		}
 		UserIDs, err := ReadUserIDWithoutPhoto(tmpquery, tmpvalue)
 		if err != nil {
+			Logger.Error(err.Error())
 			return ResSort, ResWhere, err
 		}
 		if len(sortuser) > 0 {

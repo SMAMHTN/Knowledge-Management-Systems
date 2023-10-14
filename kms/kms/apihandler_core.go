@@ -4,6 +4,7 @@ import (
 	"dependency"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/url"
 	"strings"
@@ -134,7 +135,7 @@ func GetRole(c echo.Context, RoleID int) (Role RoleAPI, err error) {
 	return Role, nil
 }
 
-func GetCoreIDs(c echo.Context, path string, SortInput dependency.SortType, WhereInput dependency.WhereType) (listIDs []int, err error) {
+func GetCoreIDs(c echo.Context, path string, SortInput []dependency.SortType, WhereInput []dependency.WhereType) (listIDs []int, err error) {
 	SortJSONString, err := json.Marshal(SortInput)
 	if err != nil {
 		return listIDs, err
@@ -155,8 +156,15 @@ func GetCoreIDs(c echo.Context, path string, SortInput dependency.SortType, Wher
 	if err != nil {
 		return listIDs, err
 	}
-	listIDs, isexist := IDsGET["Data"].([]int)
+	fmt.Println(IDsGET)
+	fmt.Println(listIDs)
+	fmt.Println(IDsGET["Data"])
+	listIDsInterface, isexist := IDsGET["Data"].([]interface{})
 	if isexist {
+		listIDs, err = dependency.SliceInterfaceToInt(listIDsInterface)
+		if err != nil {
+			return nil, err
+		}
 		return listIDs, nil
 	} else {
 		return nil, errors.New("not returning array of int")

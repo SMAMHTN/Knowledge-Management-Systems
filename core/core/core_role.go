@@ -393,10 +393,12 @@ func RoleAnotherTable(Sort []dependency.SortType, Where []dependency.WhereType) 
 	if len(sortrole) > 0 || len(whereuser) > 0 {
 		tmpquery, tmpvalue, err := dependency.SortQueryMaker("", nil, sortrole, whereuser)
 		if err != nil {
+			Logger.Error(err.Error())
 			return ResSort, ResWhere, err
 		}
 		RoleParentIDs, err := ReadRoleID(tmpquery, tmpvalue)
 		if err != nil {
+			Logger.Error(err.Error())
 			return ResSort, ResWhere, err
 		}
 		if len(sortrole) > 0 {

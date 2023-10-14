@@ -60,7 +60,7 @@ func ListArticle(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_article")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_article")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -120,7 +120,7 @@ func ListArticle(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, res)
 		}
 		limit.Query = string(a)
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_article")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_article")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -160,7 +160,7 @@ func ListArticleID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_article")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_article")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -209,7 +209,7 @@ func ListArticleID(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, res)
 		}
 		limit.Query = string(a)
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_article")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_article")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -762,4 +762,152 @@ func (data Article_API) ToTable() (res Article_Table, err error) {
 	res.Tag, err = dependency.ConvStringArrayToString(data.Tag)
 	res.Title = data.Title
 	return res, err
+}
+
+func ArticleAnotherTable(c echo.Context, Sort []dependency.SortType, Where []dependency.WhereType) (ResSort []dependency.SortType, ResWhere []dependency.WhereType, err error) {
+	var sortownerposition int
+	var sortowner []dependency.SortType
+	var whereownerfirstposition bool
+	var whereowner []dependency.WhereType
+	var sortcategoryposition int
+	var sortcategory []dependency.SortType
+	var wherecategoryfirstposition bool
+	var wherecategory []dependency.WhereType
+	var sortLastEditedByposition int
+	var sortLastEditedBy []dependency.SortType
+	var whereLastEditedByfirstposition bool
+	var whereLastEditedBy []dependency.WhereType
+	for x, y := range Sort {
+		switch y.Field {
+		case "OwnerName", "OwnerUsername":
+			if sortownerposition == 0 {
+				sortownerposition = x + 1
+			}
+			y.Field = y.Field[5:]
+			sortowner = append(sortowner, y)
+		case "CategoryName", "CategoryDescription":
+			if sortcategoryposition == 0 {
+				sortcategoryposition = x + 1
+			}
+			sortcategory = append(sortcategory, y)
+		case "LastEditedByName", "LastEditedByUsername":
+			if sortLastEditedByposition == 0 {
+				sortLastEditedByposition = x + 1
+			}
+			y.Field = y.Field[12:]
+			sortLastEditedBy = append(sortLastEditedBy, y)
+		default:
+			ResSort = append(ResSort, y)
+		}
+	}
+	for a, b := range Where {
+		switch b.Field {
+		case "OwnerName", "OwnerUsername":
+			if !whereownerfirstposition && a == 0 {
+				whereownerfirstposition = true
+			}
+			b.Field = b.Field[5:]
+			whereowner = append(whereowner, b)
+		case "CategoryName", "CategoryDescription":
+			if !wherecategoryfirstposition && a == 0 {
+				wherecategoryfirstposition = true
+			}
+			wherecategory = append(wherecategory, b)
+		case "LastEditedByName", "LastEditedByUsername":
+			if !whereLastEditedByfirstposition && a == 0 {
+				whereLastEditedByfirstposition = true
+			}
+			b.Field = b.Field[12:]
+			whereLastEditedBy = append(whereLastEditedBy, b)
+		default:
+			ResWhere = append(ResWhere, b)
+		}
+	}
+	if len(sortowner) > 0 || len(whereowner) > 0 {
+		RoleIDs, err := GetCoreIDs(c, "listuserid", sortowner, whereowner)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		if len(sortowner) > 0 {
+			ConvertedSort := dependency.SortType{
+				Field:     "FIELD(OwnerID," + dependency.ConvIntArrayToString(RoleIDs) + ")",
+				Ascending: sortowner[0].Ascending,
+			}
+			ResSort = append(ResSort[:sortownerposition-1], append([]dependency.SortType{ConvertedSort}, ResSort[sortownerposition-1:]...)...)
+		}
+		if len(whereowner) > 0 {
+			ConvertedWhere := dependency.WhereType{
+				Field:    "OwnerID",
+				Operator: whereowner[0].Operator,
+				Logic:    "IN",
+				Values:   dependency.SliceIntToInterface(RoleIDs),
+			}
+			if whereownerfirstposition {
+				ResWhere = append([]dependency.WhereType{ConvertedWhere}, ResWhere...)
+			} else {
+				ResWhere = append(ResWhere, ConvertedWhere)
+			}
+		}
+	}
+	if len(sortcategory) > 0 || len(wherecategory) > 0 {
+		tmpquery, tmpvalue, err := dependency.SortQueryMaker("", nil, sortcategory, wherecategory)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		CategoryIDs, err := ReadCategoryID(tmpquery, tmpvalue)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		if len(sortcategory) > 0 {
+			ConvertedSort2 := dependency.SortType{
+				Field:     "FIELD(CategoryID," + dependency.ConvIntArrayToString(CategoryIDs) + ")",
+				Ascending: sortcategory[0].Ascending,
+			}
+			ResSort = append(ResSort[:sortcategoryposition-1], append([]dependency.SortType{ConvertedSort2}, ResSort[sortcategoryposition-1:]...)...)
+		}
+		if len(wherecategory) > 0 {
+			ConvertedWhere2 := dependency.WhereType{
+				Field:    "CategoryID",
+				Operator: wherecategory[0].Operator,
+				Logic:    "IN",
+				Values:   dependency.SliceIntToInterface(CategoryIDs),
+			}
+			if wherecategoryfirstposition {
+				ResWhere = append([]dependency.WhereType{ConvertedWhere2}, ResWhere...)
+			} else {
+				ResWhere = append(ResWhere, ConvertedWhere2)
+			}
+		}
+	}
+	if len(sortLastEditedBy) > 0 || len(whereLastEditedBy) > 0 {
+		LastEditedByIDs, err := GetCoreIDs(c, "listuserid", sortLastEditedBy, whereLastEditedBy)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		if len(sortLastEditedBy) > 0 {
+			ConvertedSort := dependency.SortType{
+				Field:     "FIELD(LastEditedByID," + dependency.ConvIntArrayToString(LastEditedByIDs) + ")",
+				Ascending: sortLastEditedBy[0].Ascending,
+			}
+			ResSort = append(ResSort[:sortLastEditedByposition-1], append([]dependency.SortType{ConvertedSort}, ResSort[sortLastEditedByposition-1:]...)...)
+		}
+		if len(whereLastEditedBy) > 0 {
+			ConvertedWhere := dependency.WhereType{
+				Field:    "LastEditedByID",
+				Operator: whereLastEditedBy[0].Operator,
+				Logic:    "IN",
+				Values:   dependency.SliceIntToInterface(LastEditedByIDs),
+			}
+			if whereLastEditedByfirstposition {
+				ResWhere = append([]dependency.WhereType{ConvertedWhere}, ResWhere...)
+			} else {
+				ResWhere = append(ResWhere, ConvertedWhere)
+			}
+		}
+	}
+	return ResSort, ResWhere, nil
 }

@@ -31,7 +31,7 @@ func ListCategory(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_category")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(CategoryAnotherTable, nil, nil, Database, "kms_category")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -68,7 +68,7 @@ func ListCategoryID(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "kms_category")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(CategoryAnotherTable, nil, nil, Database, "kms_category")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -325,4 +325,68 @@ func (data CategoryAPI) ToTable() (res Category, err error) {
 		CategoryDescription: data.CategoryDescription,
 	}
 	return res, nil
+}
+
+func CategoryAnotherTable(Sort []dependency.SortType, Where []dependency.WhereType) (ResSort []dependency.SortType, ResWhere []dependency.WhereType, err error) {
+	var sortcategoryposition int
+	var sortcategory []dependency.SortType
+	var wherecategoryfirstposition bool
+	var wherecategory []dependency.WhereType
+	for x, y := range Sort {
+		switch y.Field {
+		case "CategoryParentName", "CategoryParentDescription":
+			if sortcategoryposition == 0 {
+				sortcategoryposition = x + 1
+			}
+			y.Field = y.Field[:8] + y.Field[14:]
+			sortcategory = append(sortcategory, y)
+		default:
+			ResSort = append(ResSort, y)
+		}
+	}
+	for a, b := range Where {
+		switch b.Field {
+		case "CategoryParentName", "CategoryParentDescription":
+			if !wherecategoryfirstposition && a == 0 {
+				wherecategoryfirstposition = true
+			}
+			b.Field = b.Field[:8] + b.Field[14:]
+			wherecategory = append(wherecategory, b)
+		default:
+			ResWhere = append(ResWhere, b)
+		}
+	}
+	if len(sortcategory) > 0 || len(wherecategory) > 0 {
+		tmpquery, tmpvalue, err := dependency.SortQueryMaker("", nil, sortcategory, wherecategory)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		RoleParentIDs, err := ReadCategoryID(tmpquery, tmpvalue)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		if len(sortcategory) > 0 {
+			ConvertedSort := dependency.SortType{
+				Field:     "FIELD(CategoryParentID," + dependency.ConvIntArrayToString(RoleParentIDs) + ")",
+				Ascending: sortcategory[0].Ascending,
+			}
+			ResSort = append(ResSort[:sortcategoryposition-1], append([]dependency.SortType{ConvertedSort}, ResSort[sortcategoryposition-1:]...)...)
+		}
+		if len(wherecategory) > 0 {
+			ConvertedWhere := dependency.WhereType{
+				Field:    "CategoryParentID",
+				Operator: wherecategory[0].Operator,
+				Logic:    "IN",
+				Values:   dependency.SliceIntToInterface(RoleParentIDs),
+			}
+			if wherecategoryfirstposition {
+				ResWhere = append([]dependency.WhereType{ConvertedWhere}, ResWhere...)
+			} else {
+				ResWhere = append(ResWhere, ConvertedWhere)
+			}
+		}
+	}
+	return ResSort, ResWhere, nil
 }
