@@ -9,7 +9,6 @@ import (
 )
 
 type HistoryAPI struct {
-	History
 	HistoryID    int `json:"HistoryID" query:"HistoryID"`
 	ActivityType string
 	Time         string
@@ -67,7 +66,7 @@ func ListHistory(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "core_history")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(HistoryAnotherTable, nil, nil, Database, "core_history")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -145,4 +144,68 @@ func (data HistoryAPI) ToTable() (res History, err error) {
 		}
 	}
 	return res, nil
+}
+
+func HistoryAnotherTable(Sort []dependency.SortType, Where []dependency.WhereType) (ResSort []dependency.SortType, ResWhere []dependency.WhereType, err error) {
+	var sortuserposition int
+	var sortuser []dependency.SortType
+	var whereuserfirstposition bool
+	var whereuser []dependency.WhereType
+	for x, y := range Sort {
+		switch y.Field {
+		case "UserName", "UserUserName":
+			if sortuserposition == 0 {
+				sortuserposition = x + 1
+			}
+			y.Field = y.Field[4:]
+			sortuser = append(sortuser, y)
+		default:
+			ResSort = append(ResSort, y)
+		}
+	}
+	for a, b := range Where {
+		switch b.Field {
+		case "UserName", "UserUserName":
+			if !whereuserfirstposition && a == 0 {
+				whereuserfirstposition = true
+			}
+			b.Field = b.Field[4:]
+			whereuser = append(whereuser, b)
+		default:
+			ResWhere = append(ResWhere, b)
+		}
+	}
+	if len(sortuser) > 0 || len(whereuser) > 0 {
+		tmpquery, tmpvalue, err := dependency.SortQueryMaker("", nil, sortuser, whereuser)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		UserIDs, err := ReadUserIDWithoutPhoto(tmpquery, tmpvalue)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		if len(sortuser) > 0 {
+			ConvertedSort := dependency.SortType{
+				Field:     "FIELD(UserID," + dependency.ConvIntArrayToString(UserIDs) + ")",
+				Ascending: sortuser[0].Ascending,
+			}
+			ResSort = append(ResSort[:sortuserposition-1], append([]dependency.SortType{ConvertedSort}, ResSort[sortuserposition-1:]...)...)
+		}
+		if len(whereuser) > 0 {
+			ConvertedWhere := dependency.WhereType{
+				Field:    "UserID",
+				Operator: whereuser[0].Operator,
+				Logic:    "IN",
+				Values:   dependency.SliceIntToInterface(UserIDs),
+			}
+			if whereuserfirstposition {
+				ResWhere = append([]dependency.WhereType{ConvertedWhere}, ResWhere...)
+			} else {
+				ResWhere = append(ResWhere, ConvertedWhere)
+			}
+		}
+	}
+	return ResSort, ResWhere, nil
 }

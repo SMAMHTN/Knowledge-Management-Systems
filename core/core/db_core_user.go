@@ -76,6 +76,32 @@ func ReadUserWithoutPhoto(args string, values []interface{}) ([]User, error) {
 	return results, nil
 }
 
+func ReadUserIDWithoutPhoto(args string, values []interface{}) ([]int, error) {
+	var results []int
+	var sqlresult *sql.Rows
+	var err error
+
+	if args != "" {
+		sqlresult, err = Database.Query("SELECT UserID FROM core_user"+" "+args, values...)
+	} else {
+		sqlresult, err = Database.Query("SELECT UserID FROM core_user")
+	}
+
+	if err != nil {
+		return results, err
+	}
+	defer sqlresult.Close()
+	for sqlresult.Next() {
+		var result int
+		var err = sqlresult.Scan(&result)
+		if err != nil {
+			return results, err
+		}
+		results = append(results, result)
+	}
+	return results, nil
+}
+
 func (data *User) Create() (int, error) {
 	var err error
 	if err != nil {

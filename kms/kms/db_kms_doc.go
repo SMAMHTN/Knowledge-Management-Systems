@@ -38,6 +38,32 @@ func ReadDoc(args string, values []interface{}) ([]Doc, error) {
 	return results, nil
 }
 
+func ReadDocID(args string, values []interface{}) ([]int, error) {
+	var results []int
+	var sqlresult *sql.Rows
+	var err error
+
+	if args != "" {
+		sqlresult, err = Database.Query("SELECT DocID FROM kms_doc"+" "+args, values...)
+	} else {
+		sqlresult, err = Database.Query("SELECT DocID FROM kms_doc")
+	}
+
+	if err != nil {
+		return results, err
+	}
+	defer sqlresult.Close()
+	for sqlresult.Next() {
+		var result int
+		var err = sqlresult.Scan(&result)
+		if err != nil {
+			return results, err
+		}
+		results = append(results, result)
+	}
+	return results, nil
+}
+
 func (data *Doc) Create() (int, error) {
 	var err error
 

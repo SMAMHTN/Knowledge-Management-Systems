@@ -60,3 +60,11 @@ func SliceInterfaceToInt(data []interface{}) ([]int, error) {
 	}
 	return result, nil
 }
+
+func SliceIntToInterface(data []int) []interface{} {
+	var result []interface{}
+	for _, v := range data {
+		result = append(result, v)
+	}
+	return result
+}

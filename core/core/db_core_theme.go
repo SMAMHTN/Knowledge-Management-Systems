@@ -37,6 +37,32 @@ func ReadTheme(args string, values []interface{}) ([]Theme, error) {
 	return results, nil
 }
 
+func ReadThemeID(args string, values []interface{}) ([]int, error) {
+	var results []int
+	var sqlresult *sql.Rows
+	var err error
+
+	if args != "" {
+		sqlresult, err = Database.Query("SELECT AppthemeID FROM core_theme"+" "+args, values...)
+	} else {
+		sqlresult, err = Database.Query("SELECT AppthemeID FROM core_theme")
+	}
+
+	if err != nil {
+		return results, err
+	}
+	defer sqlresult.Close()
+	for sqlresult.Next() {
+		var result int
+		var err = sqlresult.Scan(&result)
+		if err != nil {
+			return results, err
+		}
+		results = append(results, result)
+	}
+	return results, nil
+}
+
 func (data *Theme) Create() (int, error) {
 	var err error
 
