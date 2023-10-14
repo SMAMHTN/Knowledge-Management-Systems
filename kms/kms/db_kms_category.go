@@ -38,6 +38,32 @@ func ReadCategory(args string, values []interface{}) ([]Category, error) {
 	return results, nil
 }
 
+func ReadCategoryID(args string, values []interface{}) ([]int, error) {
+	var results []int
+	var sqlresult *sql.Rows
+	var err error
+
+	if args != "" {
+		sqlresult, err = Database.Query("SELECT CategoryID FROM kms_category"+" "+args, values...)
+	} else {
+		sqlresult, err = Database.Query("SELECT CategoryID FROM kms_category")
+	}
+
+	if err != nil {
+		return results, err
+	}
+	defer sqlresult.Close()
+	for sqlresult.Next() {
+		var result int
+		var err = sqlresult.Scan(&result)
+		if err != nil {
+			return results, err
+		}
+		results = append(results, result)
+	}
+	return results, nil
+}
+
 func (data *Category) Create() (int, error) {
 	var err error
 

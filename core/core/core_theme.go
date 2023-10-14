@@ -20,7 +20,7 @@ func ListTheme(c echo.Context) error {
 	}
 	var LimitQuery string
 	var ValuesQuery []interface{}
-	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "core_theme")
+	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "core_theme")
 	if err != nil {
 		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
@@ -28,6 +28,31 @@ func ListTheme(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	listtheme, _ := ReadTheme(LimitQuery, ValuesQuery)
+	res.StatusCode = http.StatusOK
+	res.Data = listtheme
+	return c.JSON(http.StatusOK, res)
+}
+
+func ListThemeID(c echo.Context) error {
+	res := ResponseList{}
+	limit := new(dependency.QueryType)
+	err := c.Bind(limit)
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	var LimitQuery string
+	var ValuesQuery []interface{}
+	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "core_theme")
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	listtheme, _ := ReadThemeID(LimitQuery, ValuesQuery)
 	res.StatusCode = http.StatusOK
 	res.Data = listtheme
 	return c.JSON(http.StatusOK, res)

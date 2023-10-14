@@ -40,7 +40,7 @@ func ListUser(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(Database, "core_user")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "core_user")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -54,6 +54,38 @@ func ListUser(c echo.Context) error {
 		}
 		res.StatusCode = http.StatusOK
 		res.Data = listUserAPI
+		return c.JSON(http.StatusOK, res)
+	} else {
+		res.StatusCode = http.StatusForbidden
+		res.Data = "ONLY SUPERADMIN HAVE THIS PERMISSION"
+		return c.JSON(http.StatusForbidden, res)
+	}
+}
+
+func ListUserID(c echo.Context) error {
+	permission, _, _ := Check_Permission_API(c)
+	res := ResponseList{}
+	limit := new(dependency.QueryType)
+	err := c.Bind(limit)
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	if permission {
+		var LimitQuery string
+		var ValuesQuery []interface{}
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "core_user")
+		if err != nil {
+			Logger.Warn(err.Error())
+			res.StatusCode = http.StatusBadRequest
+			res.Data = err.Error()
+			return c.JSON(http.StatusBadRequest, res)
+		}
+		listUser, _ := ReadUserIDWithoutPhoto(LimitQuery, ValuesQuery)
+		res.StatusCode = http.StatusOK
+		res.Data = listUser
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
@@ -362,4 +394,112 @@ func (data User_API) ToTable() (res User, err error) {
 	res.IsSuperAdmin = dependency.BooltoInt(data.IsSuperAdmin)
 	res.IsActive = dependency.BooltoInt(data.IsActive)
 	return res, err
+}
+
+func UserAnotherTable(Sort []dependency.SortType, Where []dependency.WhereType) (ResSort []dependency.SortType, ResWhere []dependency.WhereType, err error) {
+	var sortroleposition int
+	var sortrole []dependency.SortType
+	var whererolefirstposition bool
+	var whererole []dependency.WhereType
+	var sortthemeposition int
+	var sorttheme []dependency.SortType
+	var wherethemefirstposition bool
+	var wheretheme []dependency.WhereType
+	for x, y := range Sort {
+		switch y.Field {
+		case "RoleName", "RoleDescription":
+			if sortroleposition == 0 {
+				sortroleposition = x + 1
+			}
+			sortrole = append(sortrole, y)
+		case "AppthemeName":
+			if sortthemeposition == 0 {
+				sortthemeposition = x + 1
+			}
+			sorttheme = append(sorttheme, y)
+		default:
+			ResSort = append(ResSort, y)
+		}
+	}
+	for a, b := range Where {
+		switch b.Field {
+		case "RoleName", "RoleDescription":
+			if !whererolefirstposition && a == 0 {
+				whererolefirstposition = true
+			}
+			whererole = append(whererole, b)
+		case "AppthemeName":
+			if !wherethemefirstposition && a == 0 {
+				wherethemefirstposition = true
+			}
+			wheretheme = append(wheretheme, b)
+		default:
+			ResWhere = append(ResWhere, b)
+		}
+	}
+	if len(sortrole) > 0 || len(whererole) > 0 {
+		tmpquery, tmpvalue, err := dependency.SortQueryMaker("", nil, sortrole, whererole)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		RoleIDs, err := ReadRoleID(tmpquery, tmpvalue)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		if len(sortrole) > 0 {
+			ConvertedSort := dependency.SortType{
+				Field:     "FIELD(RoleParentID," + dependency.ConvIntArrayToString(RoleIDs) + ")",
+				Ascending: sortrole[0].Ascending,
+			}
+			ResSort = append(ResSort[:sortroleposition-1], append([]dependency.SortType{ConvertedSort}, ResSort[sortroleposition-1:]...)...)
+		}
+		if len(whererole) > 0 {
+			ConvertedWhere := dependency.WhereType{
+				Field:    "RoleParentID",
+				Operator: whererole[0].Operator,
+				Logic:    "IN",
+				Values:   dependency.SliceIntToInterface(RoleIDs),
+			}
+			if whererolefirstposition {
+				ResWhere = append([]dependency.WhereType{ConvertedWhere}, ResWhere...)
+			} else {
+				ResWhere = append(ResWhere, ConvertedWhere)
+			}
+		}
+	}
+	if len(sorttheme) > 0 || len(wheretheme) > 0 {
+		tmpquery, tmpvalue, err := dependency.SortQueryMaker("", nil, sorttheme, wheretheme)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		ThemeIDs, err := ReadThemeID(tmpquery, tmpvalue)
+		if err != nil {
+			Logger.Error(err.Error())
+			return ResSort, ResWhere, err
+		}
+		if len(sorttheme) > 0 {
+			ConvertedSort2 := dependency.SortType{
+				Field:     "FIELD(AppthemeID," + dependency.ConvIntArrayToString(ThemeIDs) + ")",
+				Ascending: sorttheme[0].Ascending,
+			}
+			ResSort = append(ResSort[:sortthemeposition-1], append([]dependency.SortType{ConvertedSort2}, ResSort[sortthemeposition-1:]...)...)
+		}
+		if len(wheretheme) > 0 {
+			ConvertedWhere2 := dependency.WhereType{
+				Field:    "AppthemeID",
+				Operator: wheretheme[0].Operator,
+				Logic:    "IN",
+				Values:   dependency.SliceIntToInterface(ThemeIDs),
+			}
+			if wherethemefirstposition {
+				ResWhere = append([]dependency.WhereType{ConvertedWhere2}, ResWhere...)
+			} else {
+				ResWhere = append(ResWhere, ConvertedWhere2)
+			}
+		}
+	}
+	return ResSort, ResWhere, nil
 }

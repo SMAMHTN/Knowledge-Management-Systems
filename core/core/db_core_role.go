@@ -38,6 +38,30 @@ func ReadRole(args string, values []interface{}) ([]Role, error) {
 	return results, nil
 }
 
+func ReadRoleID(args string, values []interface{}) (results []int, err error) {
+	var sqlresult *sql.Rows
+
+	if args != "" {
+		sqlresult, err = Database.Query("SELECT RoleID FROM core_role"+" "+args, values...)
+	} else {
+		sqlresult, err = Database.Query("SELECT RoleID FROM core_role")
+	}
+
+	if err != nil {
+		return results, err
+	}
+	defer sqlresult.Close()
+	for sqlresult.Next() {
+		var result int
+		var err = sqlresult.Scan(&result)
+		if err != nil {
+			return results, err
+		}
+		results = append(results, result)
+	}
+	return results, nil
+}
+
 func (data *Role) Create() (int, error) {
 	var err error
 

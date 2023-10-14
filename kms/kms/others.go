@@ -46,7 +46,7 @@ func RecordHistory(c echo.Context, ActivityType string, Changes string) error {
 }
 
 func GetTimeZone() (timezone string, err error) {
-	response, err := CallCoreAPINoCred("GET", "tz", nil)
+	response, err := CallCoreAPIPureNoCred("GET", "tz", nil)
 	if err != nil {
 		return "", err
 	}
