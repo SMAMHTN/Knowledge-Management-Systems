@@ -309,7 +309,7 @@ func (data Category) ToAPI() (res CategoryAPI) {
 		CategoryParentName:  "",
 		CategoryDescription: data.CategoryDescription,
 	}
-	CategoryParent := Category{CategoryID: data.CategoryID}
+	CategoryParent := Category{CategoryID: data.CategoryParentID}
 	err := CategoryParent.Read()
 	if err == nil {
 		res.CategoryParentName = CategoryParent.CategoryName
