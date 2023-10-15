@@ -317,6 +317,16 @@ func AddArticle(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
+		now_user_id, err := dependency.InterfaceToInt(user["UserID"])
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		uOri.OwnerID = now_user_id
+		uOri.LastEditedByID = now_user_id
+		uOri.LastEditedTime = time.Now()
 		_, err = uOri.Create()
 		if err != nil {
 			Logger.Warn(err.Error())
@@ -430,6 +440,15 @@ func EditArticle(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
+		now_user_id, err := dependency.InterfaceToInt(user["UserID"])
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		oriu.LastEditedByID = now_user_id
+		oriu.LastEditedTime = time.Now()
 		err = oriu.Update()
 		if err != nil {
 			Logger.Warn(err.Error())
