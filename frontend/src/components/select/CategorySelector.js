@@ -1,12 +1,8 @@
-/* eslint-disable no-console */
-/* eslint-disable react/prop-types */
-/* eslint-disable import/extensions */
-/* eslint-disable import/no-unresolved */
 import React from 'react';
 import AsyncSelect from 'react-select/async';
 import { KmsAPIGET } from '@/dep/kms/kmsHandler';
 
-function CategorySelector({ onChange, defaultValue }) {
+function CategorySelector({ onChange, value }) {
   const loadCategories = (inputValue) => {
     const UrlInputValue = encodeURIComponent(JSON.stringify([{
       field: 'CategoryName',
@@ -24,11 +20,12 @@ function CategorySelector({ onChange, defaultValue }) {
   };
   return (
     <AsyncSelect
+      className="md:max-w-md"
       cacheOptions
       defaultOptions
       loadOptions={loadCategories}
       onChange={onChange}
-      defaultValue={defaultValue}
+      value={value}
     />
   );
 }

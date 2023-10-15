@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { KmsAPI } from '@/dep/kms/kmsHandler';
@@ -6,7 +6,7 @@ import { KmsAPI } from '@/dep/kms/kmsHandler';
 import { catSchema } from '@/constants/schema';
 import { RequiredFieldIndicator, ErrorMessage, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
-
+import CategorySelector from '@/components/select/CategorySelector';
 import {
   useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';
@@ -20,7 +20,6 @@ function AddCategory({ fetchData }) {
   } = useForm({
     defaultValues: {
       CategoryName: '',
-      CategoryParentID: '',
       CategoryDescription: '',
     },
     resolver: yupResolver(catSchema),
@@ -33,6 +32,14 @@ function AddCategory({ fetchData }) {
     closeModal();
   };
 
+  const [selectedCategory, setSelectedCategory] = useState({
+    value: 1,
+    label: 'Public',
+  });
+  const handleCategoryChange = (selectedOption) => {
+    setSelectedCategory(selectedOption);
+  };
+
   const onSubmit = async (formData, e) => {
     e.preventDefault();
     try {
@@ -43,7 +50,13 @@ function AddCategory({ fetchData }) {
         return;
       }
 
-      const response = await KmsAPI('POST', 'category', formData);
+      const updatedData = {
+        CategoryName: formData.CategoryName,
+        CategoryParentID: selectedCategory.value,
+        CategoryDescription: formData.CategoryDescription,
+      };
+
+      const response = await KmsAPI('POST', 'category', updatedData);
       await new Promise((resolve) => setTimeout(resolve, 300));
       fetchData();
       alertAdd(response);
@@ -114,28 +127,14 @@ function AddCategory({ fetchData }) {
             </div>
             <div className="mb-6">
               <label className="block font-medium mb-1">
-                Category Parent ID
+                Category Parent
                 {' '}
                 <RequiredFieldIndicator />
               </label>
-              <Controller
-                name="CategoryParentID"
-                control={control}
-                render={({ field }) => (
-                  <>
-                    <input
-                      {...field}
-                      type="text"
-                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
-                      placeholder="Category Parent ID"
-                    />
-                    <p className="text-xs mt-1">
-                      Input a valid Characters Parent ID. Number Only. Required.
-                    </p>
-                    {errors.CategoryParentID && (<ErrorMessage error={errors.CategoryParentID.message} />)}
-                  </>
-                )}
-              />
+              <CategorySelector onChange={handleCategoryChange} value={selectedCategory} />
+              <p className="text-xs mt-1">
+                Select category. Required.
+              </p>
             </div>
 
             <div className="mb-6">

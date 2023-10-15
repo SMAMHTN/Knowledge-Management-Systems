@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { MoreHorizontal } from 'lucide-react';
 import { getUserData, Logout } from '@/dep/core/coreHandler';
 import { searchIcon, dashboardIcon } from '@/constants/icon';
 import { Separator } from '@/components/SmComponent';
@@ -24,20 +25,22 @@ function Home() {
   }, []);
 
   return (
-    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
-      <div className="flex flex-col w-full">
-        <h2 className="text-2xl font-semibold mb-1">Dashboard</h2>
-        {userData && (
+    <section className="w-full">
+      <div className=" flex flex-auto w-full h-screen">
+        <div className="flex flex-col w-full bg-red-900">
+
+          <h2 className="text-2xl font-semibold mb-1">Dashboard</h2>
+          {userData && (
           <p className="mb-4 font-medium">
             Welcome &nbsp;
             {userData.Name}
           </p>
-        )}
-        <Separator className="mb-4" />
-        <div className="space-y-4 mb-4">
+          )}
+          <Separator className="mb-4" />
+          <div className="space-y-4 mb-4">
 
-          <div className="rounded-2xl shadow-3xl">
-            <form className="flex py-2 px-2 md:px-20 mb-14">
+            <div className="rounded-l shadow-3xl">
+              {/* <form className="flex py-2 px-2 md:px-20 mb-14">
               <span className="flex bg-white border-r-0 border rounded-tl rounded-bl pl-2 pr-3 shadow-md">{ searchIcon }</span>
               <input
                 type="text"
@@ -50,9 +53,9 @@ function Home() {
               >
                 Search
               </button>
-            </form>
-          </div>
-          {userData && (
+            </form> */}
+            </div>
+            {/* {userData && (
           <>
             <Link href="/settings" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
               Settings
@@ -64,8 +67,51 @@ function Home() {
               Management S.Admin
             </Link>
           </>
-          )}
+          )} */}
+
+          </div>
+          <div className="grid grid-cols-6 grid-rows-4 gap-4 w-full h-full">
+            <div className="bg-blue-200 col-span-2 row-span-2 p-4 rounded-lg flex flex-col">
+              <div className="flex items-center justify-between">
+                <h1 className="hidden lg:flex text-l font-semibold">Revenue | This Month</h1>
+                <h1 className="flex lg:hidden text-l font-semibold">Revenue</h1>
+                <MoreHorizontal size={24} color="gray" />
+              </div>
+              <p className="text-l font-bold">$3,264</p>
+              <p className="text-green-600">8% increase</p>
+            </div>
+            <div className="bg-green-200 col-span-2 row-span-2 col-start-3 p-4 rounded-lg flex flex-col">
+              <div className="flex items-center justify-between">
+                <h1 className="hidden lg:flex text-l font-semibold">Revenue | This Month</h1>
+                <h1 className="flex lg:hidden text-l font-semibold">Revenue</h1>
+                <MoreHorizontal size={24} color="gray" />
+              </div>
+              <p className=" text-l font-bold">$3,264</p>
+              <p className="text-green-600">8% increase</p>
+            </div>
+            <div className="bg-red-200 col-span-2 row-span-4 col-start-5 p-4 rounded-lg flex flex-col">
+              <div className="flex items-center justify-between">
+                <h1 className="hidden lg:flex text-l font-semibold"> Recent Activity | This Month</h1>
+                <h1 className="flex lg:hidden text-l font-semibold">Recent Activity </h1>
+                <MoreHorizontal size={24} color="gray" />
+              </div>
+              <p className=" text-l font-bold">$3,264</p>
+
+              <p className="text-green-600">8% increase</p>
+            </div>
+            <div className="bg-yellow-200 col-span-4 row-span-2 row-start-3 p-4 rounded-lg flex flex-col">
+              <div className="flex items-center justify-between">
+                <h1 className="hidden lg:flex text-l font-semibold">Revenue | This Month</h1>
+                <h1 className="flex lg:hidden text-l font-semibold">Revenue</h1>
+                <MoreHorizontal size={24} color="gray" />
+              </div>
+              <p className="text-l font-bold">$3,264</p>
+              <p className="text-green-600">8% increase</p>
+            </div>
+          </div>
+
         </div>
+
       </div>
     </section>
   );

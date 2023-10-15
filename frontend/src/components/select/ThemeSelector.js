@@ -2,17 +2,17 @@ import React from 'react';
 import AsyncSelect from 'react-select/async';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 
-function RoleSelector({ onChange, value }) {
-  const loadRoles = (inputValue) => {
+function ThemeSelector({ onChange, value }) {
+  const loadTheme = (inputValue) => {
     const UrlInputValue = encodeURIComponent(JSON.stringify([{
-      field: 'RoleName',
+      field: 'AppthemeName',
       operator: 'LowerLIKE',
       logic: 'AND',
       values: [`%${inputValue}%`],
     }]));
 
-    return CoreAPIGET(`listrole?num=20&query=${UrlInputValue}`)
-      .then((dataAPI) => dataAPI.body.Data.map((item) => ({ value: item.RoleID, label: item.RoleName })))
+    return CoreAPIGET(`listtheme?num=20&query=${UrlInputValue}`)
+      .then((dataAPI) => dataAPI.body.Data.map((item) => ({ value: item.AppthemeID, label: item.AppthemeName })))
       .catch((error) => {
         console.error('Error fetching roles:', error);
         throw error;
@@ -21,14 +21,13 @@ function RoleSelector({ onChange, value }) {
   return (
     <AsyncSelect
       className="md:max-w-md"
-      id="RoleSelector"
       cacheOptions
       defaultOptions
-      loadOptions={loadRoles}
+      loadOptions={loadTheme}
       onChange={onChange}
       value={value}
     />
   );
 }
 
-export default RoleSelector;
+export default ThemeSelector;

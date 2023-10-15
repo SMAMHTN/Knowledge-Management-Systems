@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -9,20 +9,21 @@ import { alertUpdate } from '@/components/Feature';
 import { userSchema } from '@/constants/schema';
 import { ErrorMessage, RequiredFieldIndicator, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
+import RoleSelector from '@/components/select/RoleSelector';
+import ThemeSelector from '@/components/select/ThemeSelector';
 
 function UserDetails({ params }) {
   const {
     handleSubmit, control, setValue, formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
+      UserID: '',
       Username: '',
       Password: '',
       Name: '',
       Email: '',
       Address: '',
       Phone: '',
-      RoleID: '',
-      AppthemeID: '',
       Note: '',
       IsSuperAdmin: false,
       IsActive: false,
@@ -30,21 +31,44 @@ function UserDetails({ params }) {
     resolver: yupResolver(userSchema),
   });
 
+  const [selectedRole, setSelectedRole] = useState({
+    value: 1,
+    label: 'Everyone',
+  });
+  const handleRoleChange = (selectedOption) => {
+    setSelectedRole(selectedOption);
+  };
+  const [selectedTheme, setSelectedTheme] = useState({
+    value: 1,
+    label: 'Default Theme',
+  });
+  const handleThemeChange = (selectedOption) => {
+    setSelectedTheme(selectedOption);
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const response = await CoreAPIGET(`user?UserID=${params.id}`);
+      const { Data } = response.body;
+      console.log(response);
+      Object.keys(Data).forEach((key) => {
+        setValue(key, Data[key]);
+      });
+      setSelectedRole({
+        value: response.body.Data.RoleID,
+        label: response.body.Data.RoleName,
+      });
+      setSelectedTheme({
+        value: response.body.Data.AppthemeID,
+        label: response.body.Data.AppthemeName,
+      });
+    } catch (error) {
+      // Handle errors here
+      console.error('Error fetching user data:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await CoreAPIGET(`user?UserID=${params.id}`);
-        const { Data } = response.body;
-
-        Object.keys(Data).forEach((key) => {
-          setValue(key, Data[key]);
-        });
-      } catch (error) {
-        // Handle errors here
-        console.error('Error fetching user data:', error);
-      }
-    };
-
     fetchUserData();
   }, [params.id, setValue]);
 
@@ -57,9 +81,24 @@ function UserDetails({ params }) {
         console.error('Validation error:', error.details);
         return;
       }
-
-      const response = await CoreAPI('PUT', 'user', formData);
+      const updatedData = {
+        UserID: formData.UserID,
+        Username: formData.Username,
+        Password: formData.Password,
+        Name: formData.Name,
+        Email: formData.Email,
+        Address: formData.Address,
+        Phone: formData.Phone,
+        RoleID: selectedRole.value,
+        AppthemeID: SelectedTheme.value,
+        Note: formData.Note,
+        IsSuperAdmin: formData.IsSuperAdmin,
+        IsActive: formData.IsActive,
+      };
+      console.log(updatedData);
+      const response = await CoreAPI('PUT', 'user', updatedData);
       await new Promise((resolve) => setTimeout(resolve, 300));
+      console.log(response);
       alertUpdate(response);
     } catch (error) {
       console.log(error);
@@ -211,48 +250,20 @@ function UserDetails({ params }) {
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">
-              Role ID
+              Role
               <RequiredFieldIndicator />
             </label>
-            <Controller
-              name="RoleID"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    {...field}
-                    type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
-                    placeholder="Role ID"
-                  />
-                  <p className="text-xs mt-1">
-                    Input a valid Role ID. Number Only. Required.
-                  </p>
-                  {errors.RoleID && (<ErrorMessage error={errors.RoleID.message} />)}
-                </>
-              )}
-            />
+            <RoleSelector onChange={handleRoleChange} value={selectedRole} />
+            <p className="text-xs mt-1">
+              Select Role. Required.
+            </p>
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">Theme App</label>
-            <Controller
-              name="AppthemeID"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    {...field}
-                    type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
-                    placeholder="App Theme ID"
-                  />
-                  <p className="text-xs mt-1">
-                    Input a valid Theme App. Number Only. Required.
-                  </p>
-                  {errors.AppthemeID && (<ErrorMessage error={errors.AppThemeID.message} />)}
-                </>
-              )}
-            />
+            <ThemeSelector onChange={handleThemeChange} value={selectedTheme} />
+            <p className="text-xs mt-1">
+              Select Theme. Required.
+            </p>
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">Note</label>

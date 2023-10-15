@@ -34,8 +34,8 @@ function AddRole({ fetchData }) {
   };
 
   const [selectedRole, setSelectedRole] = useState({
-    value: 0,
-    label: 'Role Parent',
+    value: 1,
+    label: 'Everyone',
   });
   const handleRoleChange = (selectedOption) => {
     setSelectedRole(selectedOption);
@@ -130,7 +130,10 @@ function AddRole({ fetchData }) {
                 Role Parent
                 <RequiredFieldIndicator />
               </label>
-              <RoleSelector onChange={handleRoleChange} />
+              <RoleSelector onChange={handleRoleChange} value={selectedRole} />
+              <p className="text-xs mt-1">
+                Select Role. Required.
+              </p>
             </div>
             <div className="mb-6">
               <label className="block font-medium mb-1">

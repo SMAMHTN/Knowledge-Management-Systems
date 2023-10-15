@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -6,6 +6,8 @@ import { permSchema } from '@/constants/schema';
 import { RequiredFieldIndicator, ErrorMessage, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
 import { KmsAPI } from '@/dep/kms/kmsHandler';
+import RoleSelector from '@/components/select/RoleSelector';
+import CategorySelector from '@/components/select/CategorySelector';
 import {
   useOutsideClick, useModal, alertAdd,
 } from '@/components/Feature';
@@ -18,8 +20,6 @@ function AddPermission({ fetchData }) {
     handleSubmit, control, reset, formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      CategoryID: '',
-      RoleID: '',
       Create: false,
       Read: false,
       Update: false,
@@ -37,6 +37,22 @@ function AddPermission({ fetchData }) {
     closeModal();
   };
 
+  const [selectedCategory, setSelectedCategory] = useState({
+    value: 1,
+    label: 'Public',
+  });
+  const handleCategoryChange = (selectedOption) => {
+    setSelectedCategory(selectedOption);
+  };
+
+  const [selectedRole, setSelectedRole] = useState({
+    value: 1,
+    label: 'Everyone',
+  });
+  const handleRoleChange = (selectedOption) => {
+    setSelectedRole(selectedOption);
+  };
+
   const onSubmit = async (formData, e) => {
     e.preventDefault();
     try {
@@ -48,15 +64,27 @@ function AddPermission({ fetchData }) {
         return value;
       };
 
-      formData.FileType = splitAndTrim(formData.FileType);
-      formData.DocType = splitAndTrim(formData.DocType);
+      const ChangedFileType = splitAndTrim(formData.FileType);
+      const ChangedDocType = splitAndTrim(formData.DocType);
 
       const { error } = permSchema.validate(formData);
       if (error) {
         console.error('Validation error:', error.details);
         return;
       }
-      const response = await KmsAPI('POST', 'permission', formData);
+
+      const updatedData = {
+        CategoryID: selectedCategory.value,
+        RoleID: selectedRole.value,
+        Create: formData.Create,
+        Read: formData.Read,
+        Update: formData.Update,
+        Delete: formData.Delete,
+        DocType: ChangedDocType,
+        FileType: ChangedFileType,
+      };
+
+      const response = await KmsAPI('POST', 'permission', updatedData);
       await new Promise((resolve) => setTimeout(resolve, 300));
       fetchData();
       alertAdd(response);
@@ -98,55 +126,27 @@ function AddPermission({ fetchData }) {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-4">
               <label className="block font-medium mb-1">
-                Category ID
+                Category
                 <RequiredFieldIndicator />
               </label>
-              <Controller
-                name="CategoryID"
-                control={control}
-                render={({ field }) => (
-                  <>
-                    <input
-                      type="text"
-                      {...field}
-                      className=" text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-                      placeholder="Category ID"
-                    />
-                    <p className="text-xs mt-1">
-                      Input a valid Category ID. Number Only. Required.
-                    </p>
-                    {errors.CategoryID && (<ErrorMessage error={errors.CategoryID.message} />)}
-                  </>
-                )}
-              />
+              <CategorySelector onChange={handleCategoryChange} value={selectedCategory} />
+              <p className="text-xs mt-1">
+                Select Category. Required.
+              </p>
             </div>
             <div className="mb-4">
               <label className="block font-medium mb-1">
                 Role ID
                 <RequiredFieldIndicator />
               </label>
-              <Controller
-                name="RoleID"
-                control={control}
-                render={({ field }) => (
-                  <>
-                    <input
-                      type="text"
-                      {...field}
-                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-                      placeholder="Role ID"
-                    />
-                    <p className="text-xs mt-1">
-                      Input a valid Role ID. Number Only. Required.
-                    </p>
-                    {errors.RoleID && (<ErrorMessage error={errors.RoleID.message} />)}
-                  </>
-                )}
-              />
+              <RoleSelector onChange={handleRoleChange} value={selectedRole} />
+              <p className="text-xs mt-1">
+                Select Role. Required.
+              </p>
             </div>
             <div className="mb-2">
               <label className="block font-medium mb-1">Action Permissions</label>
-              <div className="grid grid-cols-2 gap-2 md:w-1/2 w-full">
+              <div className="grid grid-cols-2 gap-4 md:w-1/2 w-full">
                 <div>
                   <Controller
                     name="Create"
@@ -278,7 +278,7 @@ function AddPermission({ fetchData }) {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="rounded bg-blue-500 text-white w-full md:w-36"
+                className="rounded bg-blue-500 hover:bg-blue-600 text-white w-full md:w-36"
               >
                 Add Permission
               </Button>

@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 import { CoreAPI, CoreAPIGET, getUserData } from '@/dep/core/coreHandler';
 import { alertUpdate } from '@/components/Feature';
 import LogoUpload from '@/app/(portal)/settings/LogoUpload';
 import ProfileImage from '@/components/Navbar/ShowUserPhoto';
 import { Separator } from '@/components/SmComponent';
+import { Input } from '@/components/ui/input';
 
 function UserSettings() {
   const [data, setData] = useState({});
@@ -96,26 +98,26 @@ function UserSettings() {
     setData({ ...data, UserPhoto: base64String });
   };
   return (
-    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+    <section className="h-screen flex flex-auto w-full">
       <div className="flex flex-col w-full">
-        <h2 className="text-2xl font-semibold mb-1">Profile settings</h2>
+        <h2 className="text-2xl font-semibold mb-2">Profile settings</h2>
         <p className="text-xs mb-4">
           Customize and manage your profile details.
         </p>
         <Separator className="mb-4" />
         {/* Small Viewport Table (Without Left Column) */}
-        <table className="w-full block sm:hidden">
+        <table className="w-full block sm:hidden ">
           <tbody>
             {initialSettings.map((setting, index) => (
               <tr key={index} className="border-y border-black">
-                <td className="p-2 w-1/4">
+                <td className="p-2 w-2/4">
                   {/* Middle column */}
                   {editing === index ? (
-                    <input
+                    <Input
                       type="text"
                       value={data[setting.field]}
                       onChange={(e) => handleInputChange(setting.field, e.target.value)}
-                      className="border px-2 py-1 w-full"
+                      className="border rounded px-2 py-1 w-full bg-white"
                     />
                   ) : (
                     setting.value
@@ -124,8 +126,8 @@ function UserSettings() {
                 <td className="p-2">
                   {editing === index ? (
                     <div className="flex items-center space-x-2">
-                      <button onClick={handleCancelClick} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">
-                        Cancel
+                      <button onClick={handleCancelClick} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-1 py-1 rounded">
+                        <X />
                       </button>
                       <button
                         onClick={handleSaveClick}
@@ -165,8 +167,8 @@ function UserSettings() {
               <td className="p-2">
                 {editing === 'apptheme' ? (
                   <div className="flex items-center space-x-2">
-                    <button onClick={handleCancelClick} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">
-                      Cancel
+                    <button onClick={handleCancelClick} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-1 py-1 rounded">
+                      <X />
                     </button>
                     <button
                       onClick={handleSaveClick}
@@ -211,18 +213,18 @@ function UserSettings() {
           <tbody>
             {initialSettings.map((setting, index) => (
               <tr key={index} className="border-y border-black">
-                <td className="p-2 w-1/4">
+                <td className="p-2 w-2/4">
                   {/* The left column */}
                   {setting.field}
                 </td>
                 {/* Middle column */}
-                <td className="p-2 w-1/4">
+                <td className="p-2 w-2/4">
                   {editing === index ? (
-                    <input
+                    <Input
                       type="text"
                       value={data[setting.field]}
                       onChange={(e) => handleInputChange(setting.field, e.target.value)}
-                      className="border px-2 py-1 w-full"
+                      className="border rounded px-2 py-1 w-full bg-white"
                     />
                   ) : (
                     setting.value
@@ -294,6 +296,7 @@ function UserSettings() {
                   >
                     Edit
                   </button>
+
                 )}
               </td>
             </tr>

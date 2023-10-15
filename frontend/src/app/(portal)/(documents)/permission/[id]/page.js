@@ -8,6 +8,8 @@ import { alertUpdate } from '@/components/Feature';
 import { permSchema } from '@/constants/schema';
 import { ErrorMessage, RequiredFieldIndicator, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
+import RoleSelector from '@/components/select/RoleSelector';
+import CategorySelector from '@/components/select/CategorySelector';
 
 function PermissionDetail({ params }) {
   const {
@@ -15,8 +17,6 @@ function PermissionDetail({ params }) {
   } = useForm({
     defaultValues: {
       PermissionID: '',
-      CategoryID: '',
-      RoleID: '',
       Create: false,
       Read: false,
       Update: false,
@@ -28,6 +28,21 @@ function PermissionDetail({ params }) {
   });
 
   const [data, setData] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState({
+    value: 1,
+    label: 'Public',
+  });
+  const handleCategoryChange = (selectedOption) => {
+    setSelectedCategory(selectedOption);
+  };
+
+  const [selectedRole, setSelectedRole] = useState({
+    value: 1,
+    label: 'Everyone',
+  });
+  const handleRoleChange = (selectedOption) => {
+    setSelectedRole(selectedOption);
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -37,6 +52,14 @@ function PermissionDetail({ params }) {
         console.log(response);
         Object.keys(response.body.Data).forEach((key) => {
           setValue(key, response.body.Data[key]);
+        });
+        setSelectedCategory({
+          value: response.body.Data.CategoryID,
+          label: response.body.Data.CategoryName,
+        });
+        setSelectedRole({
+          value: response.body.Data.RoleID,
+          label: response.body.Data.RoleName,
         });
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -57,15 +80,28 @@ function PermissionDetail({ params }) {
         return value;
       };
 
-      formData.FileType = splitAndTrim(formData.FileType);
-      formData.DocType = splitAndTrim(formData.DocType);
+      const ChangedFileType = splitAndTrim(formData.FileType);
+      const ChangedDocType = splitAndTrim(formData.DocType);
 
       const { error } = permSchema.validate(formData);
       if (error) {
         console.error('Validation error:', error.details);
         return;
       }
-      const response = await KmsAPI('PUT', 'permission', formData);
+
+      const updatedData = {
+        PermissionID: formData.PermissionID,
+        CategoryID: selectedCategory.value,
+        RoleID: selectedRole.value,
+        Create: formData.Create,
+        Read: formData.Read,
+        Update: formData.Update,
+        Delete: formData.Delete,
+        DocType: ChangedDocType,
+        FileType: ChangedFileType,
+      };
+
+      const response = await KmsAPI('PUT', 'permission', updatedData);
       await new Promise((resolve) => setTimeout(resolve, 300));
       alertUpdate(response);
     } catch (error) {
@@ -84,71 +120,24 @@ function PermissionDetail({ params }) {
         <Separator className="mb-4" />
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label className="block font-medium mb-1">Permission ID</label>
-            <Controller
-              name="PermissionID"
-              control={control}
-              readOnly
-              render={({ field }) => (
-                <>
-                  <input
-                    type="text"
-                    {...field}
-                    className=" text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-                    placeholder="Permission ID"
-                  />
-                  {errors.CategoryID && (<ErrorMessage error={errors.CategoryID.message} />)}
-                </>
-              )}
-            />
-          </div>
-          <div className="mb-4">
             <label className="block font-medium mb-1">
               Category ID
               <RequiredFieldIndicator />
             </label>
-            <Controller
-              name="CategoryID"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    type="text"
-                    {...field}
-                    className=" text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-                    placeholder="Category ID"
-                  />
-                  <p className="text-xs mt-1">
-                    Input a valid Category ID. Number Only. Required.
-                  </p>
-                  {errors.CategoryID && (<ErrorMessage error={errors.CategoryID.message} />)}
-                </>
-              )}
-            />
+            <CategorySelector onChange={handleCategoryChange} value={selectedCategory} />
+            <p className="text-xs mt-1">
+              Select Category. Required.
+            </p>
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">
               Role ID
               <RequiredFieldIndicator />
             </label>
-            <Controller
-              name="RoleID"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    type="text"
-                    {...field}
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-                    placeholder="Role ID"
-                  />
-                  <p className="text-xs mt-1">
-                    Input a valid Role ID. Number Only. Required.
-                  </p>
-                  {errors.RoleID && (<ErrorMessage error={errors.RoleID.message} />)}
-                </>
-              )}
-            />
+            <RoleSelector onChange={handleRoleChange} value={selectedRole} />
+            <p className="text-xs mt-1">
+              Select Role. Required.
+            </p>
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">Action Permissions</label>

@@ -125,9 +125,9 @@ export default function DataTable() {
       cell: ({ row }) => (
         <div className="text text-justify items-center align-middle">
           {row.getValue('IsActive') ? (
-            <Check size={16} />
+            <Check size={16} color="green" />
           ) : (
-            <X size={16} />
+            <X size={16} color="red" />
           )}
         </div>
       ),

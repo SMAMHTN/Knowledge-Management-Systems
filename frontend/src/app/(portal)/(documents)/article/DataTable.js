@@ -180,9 +180,9 @@ export default function DataTable() {
       cell: ({ row }) => (
         <div>
           {row.getValue('IsActive') ? (
-            <Check size={16} />
+            <Check size={16} color="green" />
           ) : (
-            <X size={16} />
+            <X size={16} color="red" />
           )}
 
         </div>

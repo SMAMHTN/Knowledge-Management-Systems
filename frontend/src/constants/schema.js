@@ -14,11 +14,6 @@ export const catSchema = yup.object().shape({
     .string()
     .required(requiredMsg)
     .max(50, maxCharMsg),
-  CategoryParentID: yup
-    .number()
-    .typeError(numOnly)
-    .required(requiredMsg)
-    .integer(integerMsg),
   CategoryDescription: yup
     .string()
     .test('no-html', noHTMLMsg, (value) => {
@@ -41,16 +36,6 @@ export const roleSchema = yup.object().shape({
 });
 
 export const permSchema = yup.object().shape({
-  CategoryID: yup
-    .number()
-    .typeError(numOnly)
-    .required(requiredMsg)
-    .integer(integerMsg),
-  RoleID: yup
-    .number()
-    .typeError(numOnly)
-    .required(requiredMsg)
-    .integer(integerMsg),
   Create: yup.boolean(),
   Read: yup.boolean(),
   Update: yup.boolean(),
@@ -81,16 +66,6 @@ export const userSchema = yup.object().shape({
   Phone: yup
     .string()
     .max(50, maxCharMsg),
-  RoleID: yup
-    .number(numOnly)
-    .required(requiredMsg)
-    .typeError(numOnly)
-    .integer(integerMsg),
-  AppthemeID: yup
-    .number(numOnly)
-    .required(requiredMsg)
-    .typeError(numOnly)
-    .integer(integerMsg),
   Note: yup
     .string()
     .test('no-html', noHTMLMsg, (value) => {

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { useOutsideClick, useModal, alertAdd } from '@/components/Feature';
 import { closeIcon } from '@/constants/icon';
 import { CoreAPI } from '@/dep/core/coreHandler';
+import RoleSelector from '@/components/select/RoleSelector';
+import ThemeSelector from '@/components/select/ThemeSelector';
 
 function AddUser({ fetchData }) {
   const { isModalOpen, openModal, closeModal } = useModal();
@@ -38,6 +40,20 @@ function AddUser({ fetchData }) {
     closeModal();
   };
 
+  const [selectedRole, setSelectedRole] = useState({
+    value: 1,
+    label: 'Everyone',
+  });
+  const handleRoleChange = (selectedOption) => {
+    setSelectedRole(selectedOption);
+  };
+  const [selectedTheme, setSelectedTheme] = useState({
+    value: 1,
+    label: 'Default Theme',
+  });
+  const handleThemeChange = (selectedOption) => {
+    setSelectedTheme(selectedOption);
+  };
   const onSubmit = async (formData, e) => {
     e.preventDefault();
     try {
@@ -47,8 +63,20 @@ function AddUser({ fetchData }) {
         console.error('Validation error:', error.details);
         return;
       }
-
-      const response = await CoreAPI('POST', 'user', formData);
+      const updatedData = {
+        Username: formData.Username,
+        Password: formData.Password,
+        Name: formData.Name,
+        Email: formData.Email,
+        Address: formData.Address,
+        Phone: formData.Phone,
+        RoleID: selectedRole.value,
+        AppthemeID: selectedTheme.value,
+        Note: formData.Note,
+        IsSuperAdmin: formData.IsSuperAdmin,
+        IsActive: formData.IsActive,
+      };
+      const response = await CoreAPI('POST', 'user', updatedData);
       await new Promise((resolve) => setTimeout(resolve, 300));
       fetchData();
       alertAdd(response);
@@ -227,51 +255,23 @@ function AddUser({ fetchData }) {
             </div>
             <div className="mb-4">
               <label className="block font-medium mb-1">
-                Role ID
+                Role
                 <RequiredFieldIndicator />
               </label>
-              <Controller
-                name="RoleID"
-                control={control}
-                render={({ field }) => (
-                  <>
-                    <input
-                      {...field}
-                      type="text"
-                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
-                      placeholder="Role ID"
-                    />
-                    <p className="text-xs mt-1">
-                      Input a valid Role ID. Number Only. Required.
-                    </p>
-                    {errors.RoleID && (<ErrorMessage error={errors.RoleID.message} />)}
-                  </>
-                )}
-              />
+              <RoleSelector onChange={handleRoleChange} value={selectedRole} />
+              <p className="text-xs mt-1">
+                Select Role. Required.
+              </p>
             </div>
             <div className="mb-4">
               <label className="block font-medium mb-1">
-                App Theme ID
+                App Theme
                 <RequiredFieldIndicator />
               </label>
-              <Controller
-                name="AppthemeID"
-                control={control}
-                render={({ field }) => (
-                  <>
-                    <input
-                      {...field}
-                      type="text"
-                      className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
-                      placeholder="App Theme ID"
-                    />
-                    <p className="text-xs mt-1">
-                      Input a valid Theme App. Number Only. Required.
-                    </p>
-                    {errors.AppthemeID && (<ErrorMessage error={errors.AppthemeID.message} />)}
-                  </>
-                )}
-              />
+              <ThemeSelector onChange={handleThemeChange} value={selectedTheme} />
+              <p className="text-xs mt-1">
+                Select Theme. Required.
+              </p>
             </div>
             <div className="mb-4">
               <label className="block font-medium mb-1">Note</label>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -9,6 +9,7 @@ import { alertUpdate } from '@/components/Feature';
 import { catSchema } from '@/constants/schema';
 import { ErrorMessage, RequiredFieldIndicator, Separator } from '@/components/SmComponent';
 import { Button } from '@/components/ui/button';
+import CategorySelector from '@/components/select/CategorySelector';
 
 function CategoryDetail({ params }) {
   const {
@@ -17,11 +18,18 @@ function CategoryDetail({ params }) {
     defaultValues: {
       CategoryID: '',
       CategoryName: '',
-      CategoryParentID: '',
       CategoryDescription: '',
     },
     resolver: yupResolver(catSchema),
   });
+
+  const [selectedCategory, setSelectedCategory] = useState({
+    value: 1,
+    label: 'Public',
+  });
+  const handleCategoryChange = (selectedOption) => {
+    setSelectedCategory(selectedOption);
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -31,6 +39,10 @@ function CategoryDetail({ params }) {
 
         Object.keys(Data).forEach((key) => {
           setValue(key, Data[key]);
+        });
+        setSelectedCategory({
+          value: response.body.Data.CategoryParentID,
+          label: response.body.Data.CategoryParentName,
         });
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -49,7 +61,15 @@ function CategoryDetail({ params }) {
         console.error('Validation error:', error.details);
         return;
       }
-      const response = await KmsAPI('PUT', 'category', formData);
+
+      const updatedData = {
+        CategoryID: formData.CategoryID,
+        CategoryName: formData.CategoryName,
+        CategoryParentID: selectedCategory.value,
+        CategoryDescription: formData.CategoryDescription,
+      };
+
+      const response = await KmsAPI('PUT', 'category', updatedData);
       await new Promise((resolve) => setTimeout(resolve, 300));
       alertUpdate(response);
     } catch (error) {
@@ -93,27 +113,13 @@ function CategoryDetail({ params }) {
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">
-              Category Parent ID
+              Category Parent
               <RequiredFieldIndicator />
             </label>
-            <Controller
-              name="CategoryParentID"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    {...field}
-                    type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
-                    placeholder="Category Parent ID"
-                  />
-                  <p className="text-xs mt-1">
-                    Input a valid Characters Parent ID. Number Only. Required.
-                  </p>
-                  {errors.CategoryParentID && (<ErrorMessage error={errors.CategoryParentID.message} />)}
-                </>
-              )}
-            />
+            <CategorySelector onChange={handleCategoryChange} value={selectedCategory} />
+            <p className="text-xs mt-1">
+              Select category. Required.
+            </p>
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">Description</label>
