@@ -384,14 +384,14 @@ func EditArticle(c echo.Context) error {
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	oriu, err := u.ToTable()
+	Trueoriu, err := u.ToTable()
 	if err != nil {
 		Logger.Error(err.Error())
 		res.StatusCode = http.StatusInternalServerError
 		res.Data = err
 		return c.JSON(http.StatusInternalServerError, res)
 	}
-	err = oriu.Read()
+	err = Trueoriu.Read()
 	if err != nil {
 		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusBadRequest
@@ -406,7 +406,7 @@ func EditArticle(c echo.Context) error {
 		res.Data = err
 		return c.JSON(http.StatusInternalServerError, res)
 	}
-	_, _, TrueUpdate, _, err := GetTruePermission(c, oriu.CategoryID, role_id)
+	_, _, TrueUpdate, _, err := GetTruePermission(c, Trueoriu.CategoryID, role_id)
 	if err != nil {
 		Logger.Warn(err.Error())
 		res.StatusCode = http.StatusForbidden
@@ -433,7 +433,7 @@ func EditArticle(c echo.Context) error {
 		// 	res.Data = "UPDATE ERROR : " + err.Error()
 		// 	return c.JSON(http.StatusBadRequest, res)
 		// }
-		oriu, err = u.ToTable()
+		oriu, err := u.ToTable()
 		if err != nil {
 			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
@@ -449,6 +449,7 @@ func EditArticle(c echo.Context) error {
 		}
 		oriu.LastEditedByID = now_user_id
 		oriu.LastEditedTime = time.Now()
+		oriu.FillEmpty(Trueoriu)
 		err = oriu.Update()
 		if err != nil {
 			Logger.Warn(err.Error())
@@ -781,6 +782,30 @@ func (data Article_API) ToTable() (res Article_Table, err error) {
 	res.Tag, err = dependency.ConvStringArrayToString(data.Tag)
 	res.Title = data.Title
 	return res, err
+}
+
+func (data *Article_Table) FillEmpty(res Article_Table) {
+	if data.OwnerID == 0 {
+		data.OwnerID = res.OwnerID
+	}
+	if data.Tag == "" {
+		data.Tag = res.Tag
+	}
+	if data.Title == "" {
+		data.Title = res.Title
+	}
+	if data.CategoryID == 0 {
+		data.CategoryID = res.CategoryID
+	}
+	if data.Article == "" {
+		data.Article = res.Article
+	}
+	if data.FileID == "" {
+		data.FileID = res.FileID
+	}
+	if data.DocID == "" {
+		data.DocID = res.DocID
+	}
 }
 
 func ArticleAnotherTable(c echo.Context, Sort []dependency.SortType, Where []dependency.WhereType) (ResSort []dependency.SortType, ResWhere []dependency.WhereType, err error) {
