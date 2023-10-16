@@ -3,19 +3,30 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { MoreHorizontal } from 'lucide-react';
-import { getUserData, Logout } from '@/dep/core/coreHandler';
+import {
+  CoreAPI, CoreAPIGET, getUserData, Logout,
+} from '@/dep/core/coreHandler';
 import { searchIcon, dashboardIcon } from '@/constants/icon';
 import { Separator } from '@/components/SmComponent';
+import listhistory from '../(user)/activity-log/page';
+import { URLParamsBuilder } from '@/dep/others/HandleParams';
+import { KmsAPIGET } from '@/dep/kms/kmsHandler';
 
 function Home() {
   const [error, setError] = useState('');
   const [userData, setUserData] = useState('');
-
+  const [logData, setLogData] = useState([]);
+  const [articleData, setArticleData] = useState([]);
   useEffect(() => {
     async function fetchData() {
       try {
         const data = await getUserData();
         setUserData(data);
+        const log = await CoreAPIGET(URLParamsBuilder('listhistory'));
+        setLogData(log.body.Data);
+        const article = await KmsAPIGET(URLParamsBuilder('listarticle'));
+        setArticleData(article.body.Data);
+        console.log(articleData);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -27,7 +38,7 @@ function Home() {
   return (
     <section className="w-full">
       <div className=" flex flex-auto w-full h-screen">
-        <div className="flex flex-col w-full bg-red-900">
+        <div className="flex flex-col w-full">
 
           <h2 className="text-2xl font-semibold mb-1">Dashboard</h2>
           {userData && (
@@ -73,8 +84,8 @@ function Home() {
           <div className="grid grid-cols-6 grid-rows-4 gap-4 w-full h-full">
             <div className="bg-blue-200 col-span-2 row-span-2 p-4 rounded-lg flex flex-col">
               <div className="flex items-center justify-between">
-                <h1 className="hidden lg:flex text-l font-semibold">Revenue | This Month</h1>
-                <h1 className="flex lg:hidden text-l font-semibold">Revenue</h1>
+                <h1 className="hidden lg:flex text-l font-semibold">Category | This Month</h1>
+                <h1 className="flex lg:hidden text-l font-semibold">Category</h1>
                 <MoreHorizontal size={24} color="gray" />
               </div>
               <p className="text-l font-bold">$3,264</p>
@@ -82,12 +93,17 @@ function Home() {
             </div>
             <div className="bg-green-200 col-span-2 row-span-2 col-start-3 p-4 rounded-lg flex flex-col">
               <div className="flex items-center justify-between">
-                <h1 className="hidden lg:flex text-l font-semibold">Revenue | This Month</h1>
-                <h1 className="flex lg:hidden text-l font-semibold">Revenue</h1>
+                <h1 className="hidden lg:flex text-l font-semibold">Article | This Month</h1>
+                <h1 className="flex lg:hidden text-l font-semibold">Article</h1>
                 <MoreHorizontal size={24} color="gray" />
               </div>
-              <p className=" text-l font-bold">$3,264</p>
-              <p className="text-green-600">8% increase</p>
+              {articleData.map((item) => (
+                <p className="text-sm px-1" key={item.ArticleID}>
+                  -
+                  {' '}
+                  {item.Title}
+                </p>
+              ))}
             </div>
             <div className="bg-red-200 col-span-2 row-span-4 col-start-5 p-4 rounded-lg flex flex-col">
               <div className="flex items-center justify-between">
@@ -95,9 +111,13 @@ function Home() {
                 <h1 className="flex lg:hidden text-l font-semibold">Recent Activity </h1>
                 <MoreHorizontal size={24} color="gray" />
               </div>
-              <p className=" text-l font-bold">$3,264</p>
-
-              <p className="text-green-600">8% increase</p>
+              {logData.map((item) => (
+                <p className="text-sm px-1" key={item.HistoryID}>
+                  -
+                  {' '}
+                  {item.Changes}
+                </p>
+              ))}
             </div>
             <div className="bg-yellow-200 col-span-4 row-span-2 row-start-3 p-4 rounded-lg flex flex-col">
               <div className="flex items-center justify-between">
