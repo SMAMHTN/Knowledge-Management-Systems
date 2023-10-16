@@ -84,3 +84,17 @@ export const settingsSchema = yup.object().shape({
   CompanyName: yup.string().required(requiredMsg),
   CompanyAddress: yup.string().required(requiredMsg),
 });
+
+export const articleSchema = yup.object().shape({
+  Title: yup
+    .string()
+    .required(requiredMsg)
+    .max(50, maxCharMsg),
+  Tag: yup.string().transform((value) => {
+    if (value) {
+      return value.split(',').map((tag) => tag.trim()).join(', ');
+    }
+    return '';
+  }),
+  IsActive: yup.boolean(),
+});

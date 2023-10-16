@@ -8,8 +8,8 @@ import plugin from 'grapesjs-blocks-basic';
 // import { useState } from 'react';
 import { KmsAPI, KmsAPIGET } from '../kms/kmsHandler';
 
-function ArticleEditor() {
-  const projectID = 1;
+function ArticleEditor(ProjectID) {
+  const projectID = ProjectID;
   const onEditor = (editor) => {
     console.log('Editor loaded', { editor });
     const storageManager = editor.Storage;

@@ -9,8 +9,8 @@ function LogoUpload({ onUpload }) {
     setSelectedFile(file);
   };
 
-  const handleUpload = () => {
-    event.preventDefault();
+  const handleUpload = (e) => {
+    e.preventDefault();
     console.log('Upload button clicked in LogoUpload');
     if (selectedFile) {
       // Convert the selected image to base64 here

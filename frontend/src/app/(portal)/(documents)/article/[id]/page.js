@@ -8,7 +8,7 @@ function ArticleDetail({ params }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       try {
         const response = await KmsAPIGET(`article?ArticleID=${params.id}`);
         setData(response.body.Data);
@@ -18,7 +18,7 @@ function ArticleDetail({ params }) {
       }
     };
 
-    fetchUserData();
+    fetchData();
   }, [params.id]);
 
   useEffect(() => {

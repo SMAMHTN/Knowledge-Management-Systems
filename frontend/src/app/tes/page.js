@@ -8,16 +8,16 @@ import CategorySelector from '@/components/select/CategorySelector';
 
 function tes() {
   const [selectedRole, setSelectedRole] = useState({
-    value: 1,
-    label: 'Everyone',
+    value: 0,
+    label: 'test',
   });
   const [selectedUser, setSelectedUser] = useState({
-    value: 1,
-    label: 'Admin',
+    value: 0,
+    label: 'test',
   });
   const [selectedCategory, setSelectedCategory] = useState({
-    value: 1,
-    label: 'Parent',
+    value: 0,
+    label: 'test',
   });
   const handleRoleChange = (selectedOption) => {
     setSelectedRole(selectedOption);
@@ -31,13 +31,13 @@ function tes() {
   return (
     <>
       <ArticleEditor />
-      <RoleSelector onChange={handleRoleChange} defaultValue={selectedRole} />
+      <RoleSelector onChange={handleRoleChange} />
       <p>{selectedRole.value}</p>
       <p>{selectedRole.label}</p>
-      <UserSelector onChange={handleUserChange} defaultValue={selectedUser} />
+      <UserSelector onChange={handleUserChange} />
       <p>{selectedUser.value}</p>
       <p>{selectedUser.label}</p>
-      <CategorySelector onChange={handleCategoryChange} defaultValue={selectedCategory} />
+      <CategorySelector onChange={handleCategoryChange} />
       <p>{selectedCategory.value}</p>
       <p>{selectedCategory.label}</p>
     </>

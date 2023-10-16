@@ -349,10 +349,18 @@ export default function DataTable() {
           </Link>
         </Button>
         <div className=" ml-auto item-justify-end inline-flex">
-          <AddArticle fetchData={fetchData} />
+          {/* <AddArticle fetchData={fetchData} /> */}
+          <Button
+            type="button"
+            className=" bg-gray-100 ml-2  hover:bg-gray-300 border-white border"
+          >
+            <Link href={URLParamsBuilder('/article/edit')}>
+              +
+            </Link>
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className=" ml-2 bg-gray-100">
+              <Button variant="outline" className=" ml-2 bg-gray-100 hover:bg-gray-300 border-white border">
                 Show
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
