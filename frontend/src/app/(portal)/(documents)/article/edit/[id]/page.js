@@ -36,7 +36,7 @@ function articleEditing({ params }) {
         <Separator className="mb-4" />
         <div className="mb-4">
           <label className="block font-semibold mb-1">Edit Article Content</label>
-          <ArticleEditor ProjectID={params.id} />
+          <ArticleEditor ArticleID={params.id} />
           <p>
             click here to see how to make an article
             {' '}

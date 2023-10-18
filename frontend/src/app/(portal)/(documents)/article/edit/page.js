@@ -60,8 +60,6 @@ function AddArticle() {
       alertAdd(response);
       const nextPage = response.body.Data.ArticleID;
       const status = response.body.StatusCode;
-      console.log(response);
-      console.log(status);
       if (status === 200) {
         router.push(
           URLParamsBuilder(`edit/${nextPage}`),
@@ -108,7 +106,7 @@ function AddArticle() {
           </div>
           <div className="mb-6">
             <label className="block font-medium mb-1">
-              Category Parent
+              Category
               {' '}
               <RequiredFieldIndicator />
             </label>

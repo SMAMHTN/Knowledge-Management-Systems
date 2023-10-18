@@ -1,33 +1,92 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import { alertUpdate } from '@/components/Feature';
+import UploadDoc from '@/components/UploadDoc';
+import UploadFile from '@/components/UploadFile';
+import ArticleEditor from '@/dep/grapesjs/ArticleEditor';
+import { URLParamsBuilder } from '@/dep/others/HandleParams';
+import { Button } from '@/components/ui/button';
+import { RequiredFieldIndicator, ErrorMessage, Separator } from '@/components/SmComponent';
+import { articleSchema } from '@/constants/schema';
+import CategorySelector from '@/components/select/CategorySelector';
 
 function ArticleDetail({ params }) {
+  const router = useRouter();
   const [data, setData] = useState([]);
+  const {
+    handleSubmit, control, setValue, formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      ArticleID: '',
+      Tag: '',
+      Title: '',
+      CategoryID: '',
+      IsActive: false,
+    },
+    resolver: yupResolver(articleSchema),
+  });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await KmsAPIGET(`article?ArticleID=${params.id}`);
-        setData(response.body.Data);
-      } catch (error) {
-        // Handle errors here
-        console.error('Error fetching user data:', error);
-      }
-    };
+  const [selectedCategory, setSelectedCategory] = useState({
+    value: 1,
+    label: 'Public',
+  });
+  const handleCategoryChange = (selectedOption) => {
+    setSelectedCategory(selectedOption);
+  };
 
-    fetchData();
-  }, [params.id]);
-
-  useEffect(() => {
-    console.log(data); // Log the 'data' value after it updates
-  }, [data]);
-
-  const handleUpdate = async () => {
+  const fetchData = async () => {
     try {
-      const response = await KmsAPI('PUT', 'article', data);
+      const response = await KmsAPIGET(`article?ArticleID=${params.id}`);
+      setData(response.body.Data);
+      const { Data } = response.body;
+
+      Object.keys(Data).forEach((key) => {
+        setValue(key, Data[key]);
+      });
+      setSelectedCategory({
+        value: response.body.Data.CategoryID,
+        label: response.body.Data.CategoryName,
+      });
+    } catch (error) {
+      // Handle errors here
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [params.id, setValue]);
+
+  const onSubmit = async (formData, e) => {
+    e.preventDefault();
+    try {
+      const { error } = articleSchema.validate(formData);
+
+      if (error) {
+        console.error('Validation error:', error.details);
+        return;
+      }
+      // convert tag into array before sent to server
+      const stringArrayTag = formData.Tag
+        ? formData.Tag.split(',').map((item) => item.trim()).filter((item) => item !== '')
+        : [];
+
+      const updatedData = {
+        ArticleID: formData.ArticleID,
+        Title: formData.Title,
+        Tag: stringArrayTag,
+        CategoryID: selectedCategory.value,
+        IsActive: formData.IsActive,
+      };
+
+      const response = await KmsAPI('PUT', 'article', updatedData);
+      await new Promise((resolve) => setTimeout(resolve, 300));
       alertUpdate(response);
     } catch (error) {
       console.log(error);
@@ -36,377 +95,115 @@ function ArticleDetail({ params }) {
   };
 
   return (
-    <section className="max-w-screen-xl h-screen flex flex-col flex-auto">
-      {/* buat s.admin */}
-      <div className="max-w-md ml-14 p-4 mt-9">
-        <div className="max-w-3xl mx-auto p-4">
-          <h2 className="text-2xl font-bold mb-4">article edit</h2>
-          <form action={handleUpdate}>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">ArticleID</label>
-              <input
-                type="text"
-                value={data.ArticleID || ''}
-                className="border px-2 py-1 w-full"
-                readOnly
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">OwnerID</label>
-              <input
-                type="text"
-                value={data.OwnerID || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, OwnerID: parseInt(e.target.value, 10) })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">
-                LastEditedByID
-              </label>
-              <input
-                type="text"
-                value={data.LastEditedByID || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({
-                  ...data,
-                  LastEditedByID: parseInt(e.target.value, 10),
-                })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">
-                LastEditedTime
-              </label>
-              <input
-                type="text"
-                value={data.LastEditedTime || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, LastEditedTime: e.target.value })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Tag</label>
-              <input
-                type="text"
-                value={data.Tag || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, Tag: e.target.value })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Title</label>
-              <input
-                type="text"
-                value={data.Title || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, Title: e.target.value })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">CategoryID</label>
-              <input
-                type="text"
-                value={data.CategoryID || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, CategoryID: e.target.value })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Article</label>
-              <input
-                type="text"
-                value={data.Article || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, Article: e.target.value })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">FileID</label>
-              <input
-                type="text"
-                value={data.FileID || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, FileID: e.target.value })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Doc</label>
-              <input
-                type="text"
-                value={data.DocID || ''}
-                className="border px-2 py-1 w-full"
-                onChange={(e) => setData({ ...data, DocID: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="font-medium">
-                <input
-                  type="checkbox"
-                  className="mr-1"
-                  checked={data.IsActive === 1 || 0} // Check if IsActive is 1
-                  onChange={() => setData({
-                    ...data,
-                    IsActive: data.IsActive === 1 ? 0 : 1,
-                  })}
-                />
-                Is Active
-              </label>
-            </div>
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Update
-            </button>
-          </form>
-        </div>
+    <section className="h-screen flex flex-col flex-auto">
+      <div className="flex flex-col">
+        <h2 className="text-2xl font-semibold mb-1">Edit Article</h2>
+        <p className="text-xs mb-4">
+          Change the content of your article and upload files and documents.
+        </p>
+        <Separator className="mb-4" />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="mb-4">
+            <label className="block font-medium mb-1">
+              Article Title
+              <RequiredFieldIndicator />
+            </label>
+            <Controller
+              name="Title"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <input
+                    {...field}
+                    type="text"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    placeholder="Public"
+                  />
+                  <p className="text-xs mt-1">
+                    Min 2 characters & Max 50 characters. Required.
+                  </p>
+                  {errors.Title && (<ErrorMessage error={errors.Title.message} />)}
+                </>
+              )}
+            />
+          </div>
+          <div className="mb-6">
+            <label className="block font-medium mb-1">
+              Category
+              {' '}
+              <RequiredFieldIndicator />
+            </label>
+            <CategorySelector onChange={handleCategoryChange} value={selectedCategory} />
+            <p className="text-xs mt-1">
+              Select category. Required.
+            </p>
+          </div>
+          <div className="mb-4">
+            <label className="block font-medium mb-1">Tags</label>
+            <Controller
+              name="Tag"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <textarea
+                    {...field}
+                    type="textarea"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                    placeholder="Designed for public"
+                  />
+                  <p className="text-xs mt-1">
+                    Write with commas to separate new tags
+                  </p>
+                  <p className="text-xs mt-1">
+                    Example : 2021, Money, Advice
+                  </p>
+                  {errors.Tag && (<ErrorMessage error={errors.Tag.message} />)}
+                </>
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="IsActive"
+              control={control}
+              render={({ field }) => (
+                <div className="flex items-center my-2 md:my-0">
+                  <input
+                    {...field}
+                    type="checkbox"
+                    checked={field.value}
+                    className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
+                  />
+                  <span className="text-sm sm:text-base">Active</span>
+                </div>
+              )}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Edit Article Content</label>
+            <ArticleEditor ArticleID={data.ArticleID} />
+            <p>
+              click here to see how to make an article
+              {' '}
+              <span className="text-blue-500 underline">links here</span>
+            </p>
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Upload Document</label>
+            <UploadDoc categoryID={data.CategoryID} />
+            <label className="block font-semibold mb-1">Upload File</label>
+            <UploadFile categoryID={data.CategoryID} />
+          </div>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="rounded bg-blue-500 text-white w-full md:w-36 my-2 mb-4"
+          >
+            Publish
+          </Button>
+        </form>
       </div>
-      {/* buat user biasa */}
 
-      {/* <div className="h-full mt-14">
-          <div className="fixed w-full ml-1">
-            <h1 className="text-white text-2xl font-bold mb-4">Dashboard</h1>
-          </div>
-          <div className="container fixed mt-11 max-h-full w-5/6 md:w-3/4 overflow-y-auto overscroll-none bg-green-500">
-            <div className="rounded-lg bg-yellow-500 mb-48 ">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">2</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">3</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">4</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">5</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">5</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">6</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">7</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">8</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">9</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">1,257</p>
-                    <p>mngmnt KMS</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">557 42</p>
-                    <p>mngmnnt s admin</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">10</p>
-                    <p>Sales</p>
-                  </div>
-                </div>
-                <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                  <div className="text-right">
-                    <p className="text-2xl">END</p>
-                    <p>End</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> */}
     </section>
   );
 }

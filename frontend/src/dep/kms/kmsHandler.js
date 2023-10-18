@@ -113,7 +113,7 @@ export async function KmsAPIGET(path) {
   }
 }
 
-export async function KmsAPIBlob(method, path, CategoryID, File) {
+export async function KmsAPIBlob(method, path, formData) {
   const conf = readConf('frontend_conf.json');
   const cookieStore = cookies();
   let un; let
@@ -154,10 +154,9 @@ export async function KmsAPIBlob(method, path, CategoryID, File) {
         body: fileBlob,
       };
     } if (method === 'POST') {
-      const formData = new FormData();
-      formData.append('CategoryID', CategoryID);
-      formData.append('File', File);
-
+      // const formData = new FormData();
+      // formData.append('CategoryID', CategoryID);
+      // formData.append('File', File);
       response = await fetch(conf.kms_link + path, {
         method,
         headers,

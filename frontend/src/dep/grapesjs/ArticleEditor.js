@@ -8,15 +8,18 @@ import plugin from 'grapesjs-blocks-basic';
 // import { useState } from 'react';
 import { KmsAPI, KmsAPIGET } from '../kms/kmsHandler';
 
-function ArticleEditor(ProjectID) {
-  const projectID = ProjectID;
+function ArticleEditor(ArticleID) {
+  const projectID = ArticleID.ArticleID;
+  console.log(projectID);
   const onEditor = (editor) => {
     console.log('Editor loaded', { editor });
+
     const storageManager = editor.Storage;
     storageManager.add('kms_remote', {
       async load(storageOptions) {
         console.log('storageOptions');
         console.log(storageOptions);
+        console.log(projectID);
         const res = await KmsAPIGET(`articlegrapesjs?id=${projectID}`);
         const datares = res.body.data;
         return JSON.parse(datares);
