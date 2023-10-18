@@ -152,7 +152,7 @@ func AddFile(c echo.Context) error {
 		res.Data = "YOU DONT HAVE PERMISSION TO UPLOAD IN THIS CATEGORY"
 		return c.JSON(http.StatusForbidden, res)
 	}
-	if !TrueCreate {
+	if !TrueCreate && !permission {
 		res.StatusCode = http.StatusForbidden
 		res.Data = "YOU DONT HAVE PERMISSION TO UPLOAD IN THIS CATEGORY"
 		return c.JSON(http.StatusForbidden, res)
@@ -250,7 +250,7 @@ func DeleteFile(c echo.Context) error {
 		res.Data = "FILE NOT FOUND ON DATABASE"
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	_, user, _ := Check_Admin_Permission_API(c)
+	permission, user, _ := Check_Admin_Permission_API(c)
 	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	if err != nil {
 		Logger.Error(err.Error())
@@ -265,7 +265,7 @@ func DeleteFile(c echo.Context) error {
 		res.Data = err
 		return c.JSON(http.StatusForbidden, res)
 	}
-	if !TrueDelete {
+	if !TrueDelete && !permission {
 		res.StatusCode = http.StatusForbidden
 		res.Data = "YOU DONT HAVE PERMISSION TO DELETE THIS DOCUMENT"
 		return c.JSON(http.StatusForbidden, res)
