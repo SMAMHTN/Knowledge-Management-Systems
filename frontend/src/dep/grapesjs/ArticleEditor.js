@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import grapesjs from 'grapesjs';
 import GjsEditor from '@grapesjs/react';
 import 'grapesjs/dist/css/grapes.min.css';
@@ -8,8 +9,13 @@ import plugin from 'grapesjs-blocks-basic';
 // import { useState } from 'react';
 import { KmsAPI, KmsAPIGET } from '../kms/kmsHandler';
 
-function ArticleEditor(ArticleID) {
-  const projectID = ArticleID.ArticleID;
+function ArticleEditor({ ArticleID }) {
+  const [projectID, setProjectID] = useState(undefined);
+  useEffect(() => {
+    if (ArticleID !== undefined) {
+      setProjectID(ArticleID);
+    }
+  }, [ArticleID]);
   console.log(projectID);
   const onEditor = (editor) => {
     console.log('Editor loaded', { editor });
@@ -33,6 +39,9 @@ function ArticleEditor(ArticleID) {
       },
     });
   };
+  if (projectID === undefined) {
+    return null; // or some loading indicator
+  }
 
   return (
     <GjsEditor
