@@ -15,6 +15,7 @@ function articleEditing({ params }) {
   const fetchData = async () => {
     try {
       const response = await KmsAPIGET(`article?ArticleID=${params.id}`);
+
       setData(response.body.Data);
     } catch (error) {
       // Handle errors here
@@ -36,7 +37,7 @@ function articleEditing({ params }) {
         <Separator className="mb-4" />
         <div className="mb-4">
           <label className="block font-semibold mb-1">Edit Article Content</label>
-          <ArticleEditor ArticleID={params.id} />
+          <ArticleEditor ArticleID={data.ArticleID} />
           <p>
             click here to see how to make an article
             {' '}

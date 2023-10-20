@@ -91,7 +91,7 @@ export const articleSchema = yup.object().shape({
     .required(requiredMsg)
     .max(50, maxCharMsg),
   Tag: yup.string().transform((value) => {
-    if (value) {
+    if (typeof value === 'string') {
       return value.split(',').map((tag) => tag.trim()).join(', ');
     }
     return '';

@@ -2,7 +2,11 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { MoreHorizontal } from 'lucide-react';
+import {
+  MoreHorizontal, Check, X,
+  Users, Tag,
+} from 'lucide-react';
+
 import {
   CoreAPI, CoreAPIGET, getUserData, Logout,
 } from '@/dep/core/coreHandler';
@@ -11,22 +15,28 @@ import { Separator } from '@/components/SmComponent';
 import listhistory from '../(user)/activity-log/page';
 import { URLParamsBuilder } from '@/dep/others/HandleParams';
 import { KmsAPIGET } from '@/dep/kms/kmsHandler';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import WidgetActivityLog from './widget/WidgetActivityLog';
+import WidgetArticle from './widget/WidgetArticle';
+import WidgetUser from './widget/WidgetUser';
+import WidgetRole from './widget/WidgetRole';
 
 function Home() {
   const [error, setError] = useState('');
   const [userData, setUserData] = useState('');
-  const [logData, setLogData] = useState([]);
-  const [articleData, setArticleData] = useState([]);
   useEffect(() => {
     async function fetchData() {
       try {
         const data = await getUserData();
         setUserData(data);
-        const log = await CoreAPIGET(URLParamsBuilder('listhistory'));
-        setLogData(log.body.Data);
-        const article = await KmsAPIGET(URLParamsBuilder('listarticle'));
-        setArticleData(article.body.Data);
-        console.log(articleData);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -41,12 +51,18 @@ function Home() {
         <div className="flex flex-col w-full">
 
           <h2 className="text-2xl font-semibold mb-1">Dashboard</h2>
-          {userData && (
-          <p className="mb-4 font-medium">
-            Welcome &nbsp;
-            {userData.Name}
-          </p>
+          {userData ? (
+            <p className="mb-4 font-medium">
+              Welcome &nbsp;
+              {userData.Name ? userData.Name : 'User'}
+            </p>
+          ) : (
+            <p className="mb-4 font-medium">
+              Welcome &nbsp;
+              User
+            </p>
           )}
+
           <Separator className="mb-4" />
           <div className="space-y-4 mb-4">
 
@@ -82,51 +98,38 @@ function Home() {
 
           </div>
           <div className="grid grid-cols-6 grid-rows-4 gap-4 w-full h-full">
-            <div className="bg-blue-200 col-span-2 row-span-2 p-4 rounded-lg flex flex-col">
+            <div className="bg-white col-span-2 row-span-2 p-4 rounded-lg flex flex-col">
               <div className="flex items-center justify-between">
-                <h1 className="hidden lg:flex text-l font-semibold">Category | This Month</h1>
-                <h1 className="flex lg:hidden text-l font-semibold">Category</h1>
+                <div>
+                  <Users size={48} />
+                  <h1 className="text-gray-500 text-sm font-semibold">User Stats </h1>
+                </div>
+              </div>
+              <WidgetUser />
+            </div>
+            <div className="bg-white col-span-2 row-span-2 col-start-3 p-4 rounded-lg flex flex-col">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Tag size={48} />
+                  <h1 className="text-gray-500 text-sm font-semibold">Role Stats </h1>
+                </div>
+              </div>
+              <WidgetRole />
+            </div>
+            <div className="bg-white col-span-2 row-span-4 col-start-5 p-4 rounded-lg flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="text-l font-semibold">Recent Activity </h1>
                 <MoreHorizontal size={24} color="gray" />
               </div>
-              <p className="text-l font-bold">$3,264</p>
-              <p className="text-green-600">8% increase</p>
+              <WidgetActivityLog />
             </div>
-            <div className="bg-green-200 col-span-2 row-span-2 col-start-3 p-4 rounded-lg flex flex-col">
-              <div className="flex items-center justify-between">
-                <h1 className="hidden lg:flex text-l font-semibold">Article | This Month</h1>
+            <div className="bg-white col-span-4 row-span-2 row-start-3 p-4 rounded-lg flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="hidden lg:flex text-l font-semibold">Recent Article</h1>
                 <h1 className="flex lg:hidden text-l font-semibold">Article</h1>
                 <MoreHorizontal size={24} color="gray" />
               </div>
-              {articleData.map((item) => (
-                <p className="text-sm px-1" key={item.ArticleID}>
-                  -
-                  {' '}
-                  {item.Title}
-                </p>
-              ))}
-            </div>
-            <div className="bg-red-200 col-span-2 row-span-4 col-start-5 p-4 rounded-lg flex flex-col">
-              <div className="flex items-center justify-between">
-                <h1 className="hidden lg:flex text-l font-semibold"> Recent Activity | This Month</h1>
-                <h1 className="flex lg:hidden text-l font-semibold">Recent Activity </h1>
-                <MoreHorizontal size={24} color="gray" />
-              </div>
-              {logData.map((item) => (
-                <p className="text-sm px-1" key={item.HistoryID}>
-                  -
-                  {' '}
-                  {item.Changes}
-                </p>
-              ))}
-            </div>
-            <div className="bg-yellow-200 col-span-4 row-span-2 row-start-3 p-4 rounded-lg flex flex-col">
-              <div className="flex items-center justify-between">
-                <h1 className="hidden lg:flex text-l font-semibold">Revenue | This Month</h1>
-                <h1 className="flex lg:hidden text-l font-semibold">Revenue</h1>
-                <MoreHorizontal size={24} color="gray" />
-              </div>
-              <p className="text-l font-bold">$3,264</p>
-              <p className="text-green-600">8% increase</p>
+              <WidgetArticle />
             </div>
           </div>
 

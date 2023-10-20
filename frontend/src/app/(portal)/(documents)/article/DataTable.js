@@ -13,7 +13,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowUpDown, ChevronDown, MoreHorizontal, Check, X, Search,
 } from 'lucide-react';
-import AddArticle from './AddArticle';
 import {
   Select,
   SelectContent,
@@ -43,7 +42,7 @@ import {
 import { KmsAPIGET, KmsAPI } from '@/dep/kms/kmsHandler';
 import PaginationCtrl from '@/components/Table/PaginationCtrl';
 import { DeleteModal, alertDelete } from '@/components/Feature';
-import { URLParamsBuilder, HandleQueryParams, HandleSortParams } from '@/dep/others/HandleParams';
+import { URLParamsBuilder, HandleSortParams } from '@/dep/others/HandleParams';
 
 export default function DataTable() {
   const [data, setData] = useState([]);
@@ -105,36 +104,7 @@ export default function DataTable() {
   }
 
   const columns = [
-    {
-      accessorKey: 'LastEditedTime',
-      header: ({ column }) => (
-        <Button
-          className="hover:bg-gray-300"
-          variant="ghost"
-          onClick={() => SingleSortToggle('LastEditedTime')}
-        >
-          Last Edited
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue('LastEditedTime')}</div>
-      ),
-    },
-    {
-      accessorKey: 'Tag',
-      header: ({ column }) => (
-        <Button
-          className="hover:bg-gray-300"
-          variant="ghost"
-          onClick={() => SingleSortToggle('Tag')}
-        >
-          Tag
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => <div className="lowercase">{row.getValue('Tag')}</div>,
-    },
+
     {
       accessorKey: 'Title',
       header: ({ column }) => (
@@ -150,19 +120,33 @@ export default function DataTable() {
       cell: ({ row }) => <div className="lowercase">{row.getValue('Title')}</div>,
     },
     {
-      accessorKey: 'CategoryID',
+      accessorKey: 'Tag',
       header: ({ column }) => (
         <Button
           className="hover:bg-gray-300"
           variant="ghost"
-          onClick={() => SingleSortToggle('CategoryID')}
+          onClick={() => SingleSortToggle('Tag')}
         >
-          Cat ID
+          Tag
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div className="lowercase">{row.getValue('Tag').join(', ')}</div>,
+    },
+    {
+      accessorKey: 'CategoryName',
+      header: ({ column }) => (
+        <Button
+          className="hover:bg-gray-300"
+          variant="ghost"
+          onClick={() => SingleSortToggle('CategoryName')}
+        >
+          Category
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => (
-        <div>{row.getValue('CategoryID')}</div>
+        <div>{row.getValue('CategoryName')}</div>
       ),
     },
     {
@@ -173,7 +157,7 @@ export default function DataTable() {
           variant="ghost"
           onClick={() => SingleSortToggle('IsActive')}
         >
-          Active
+          Publish
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -185,6 +169,24 @@ export default function DataTable() {
             <X size={16} color="red" />
           )}
 
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'LastEditedTime',
+      header: ({ column }) => (
+        <Button
+          className="hover:bg-gray-300"
+          variant="ghost"
+          onClick={() => SingleSortToggle('LastEditedTime')}
+        >
+          Last Edited
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="capitalize">
+          {new Date(row.getValue('LastEditedTime')).toLocaleString()}
         </div>
       ),
     },
