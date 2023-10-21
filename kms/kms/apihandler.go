@@ -260,6 +260,8 @@ func Test_api() {
 	e.GET("/queryarticle", QueryArticle, basicAuthMiddleware, LogMiddleware)
 	e.GET("/articlegrapesjs", ReadArticleGrapesjs, basicAuthMiddleware, LogMiddleware)
 	e.PUT("/articlegrapesjs", UpdateArticleGrapesjs, basicAuthMiddleware, LogMiddleware)
+	e.POST("/article/solr", IndexArticle, basicAuthMiddleware, LogMiddleware)
+	e.PUT("/article/solr", IndexArticle, basicAuthMiddleware, LogMiddleware)
 	e.GET("/article", ShowArticle, basicAuthMiddleware, LogMiddleware)
 	e.POST("/article", AddArticle, basicAuthMiddleware, LogMiddleware)
 	e.PUT("/article", EditArticle, basicAuthMiddleware, LogMiddleware)

@@ -5,7 +5,18 @@ import grapesjs from 'grapesjs';
 import GjsEditor from '@grapesjs/react';
 import 'grapesjs/dist/css/grapes.min.css';
 import './grapejs.css';
-import plugin from 'grapesjs-blocks-basic';
+import 'grapick/dist/grapick.min.css';
+import * as pluginBlockBasic from 'grapesjs-blocks-basic';
+import * as pluginStyleBg from 'grapesjs-style-bg';
+import * as pluginTuiImageEditor from 'grapesjs-tui-image-editor';
+import * as pluginTyped from 'grapesjs-typed';
+import * as pluginCKEditor from 'grapesjs-plugin-ckeditor';
+import customCodePlugin from 'grapesjs-custom-code';
+import parserPostCSS from 'grapesjs-parser-postcss';
+import grapesjsTabsPlugin from 'grapesjs-tabs';
+import styleFilter from 'grapesjs-style-filter';
+import gjsForms from 'grapesjs-plugin-forms';
+import pluginCountdown from 'grapesjs-component-countdown';
 // import { useState } from 'react';
 import { KmsAPI, KmsAPIGET } from '../kms/kmsHandler';
 
@@ -52,7 +63,19 @@ function ArticleEditor({ ArticleID }) {
       // This is an optional prop, you can always import the CSS directly in your JS if you wish.
       grapesjsCss="https://unpkg.com/grapesjs/dist/css/grapes.min.css"
       // GrapesJS init options
-      plugins={[plugin]}
+      plugins={[
+        pluginBlockBasic,
+        customCodePlugin,
+        parserPostCSS,
+        grapesjsTabsPlugin,
+        pluginStyleBg,
+        pluginTuiImageEditor,
+        styleFilter,
+        pluginTyped,
+        gjsForms,
+        pluginCountdown,
+        pluginCKEditor,
+      ]}
       options={{
         height: '100vh',
         width: 'auto',
@@ -77,7 +100,7 @@ function ArticleEditor({ ArticleID }) {
           onLoad: (result) => result.data,
         },
         pluginsOpts: {
-          [plugin]: {
+          [pluginBlockBasic]: {
             blocks: ['column1', 'column2', 'column3', 'column3-7', 'text', 'link', 'image', 'video', 'map'],
           },
         },
