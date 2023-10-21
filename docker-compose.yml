@@ -63,12 +63,15 @@ services:
   # #     - "3000:3000"
   solr:
     image: "solr:9.2.0"
+    environment:
+      - SOLR_HEAP=4g
     ulimits:
       nofile:
         soft: 65000
         hard: 65000
     volumes:
       - ./solr:/var/solr
+      # - ./solr/solr.in.sh:/etc/default/solr.in.sh
     ports:
       - "8983:8983"
     user: root 
