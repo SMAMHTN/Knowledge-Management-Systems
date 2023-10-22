@@ -3,14 +3,16 @@ import { Button } from '@/components/ui/button';
 import { KmsAPIBlob } from '@/dep/kms/kmsHandler';
 import { alertAdd } from './Feature';
 
-function UploadFile({ categoryID }) {
+function UploadFile({ categoryID, FileAdd }) {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [currentState, setCurrentState] = useState(1);
   const fileInputRef = useRef(null);
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     console.log(file);
     console.log(typeof (file));
     setSelectedFile(file);
+    setCurrentState(2);
   };
 
   const categoryIdValue = categoryID;
@@ -26,9 +28,13 @@ function UploadFile({ categoryID }) {
       formData.append('File', FileSent);
       const response = await KmsAPIBlob('POST', 'file', formData);
       alertAdd(response);
-      if (response.body.StatusCode === 200) {
+      if (response.status === 200) {
         setSelectedFile(null);
+        FileAdd(response.body.Data.FileID);
+        setCurrentState(3);
         fileInputRef.current.value = '';
+      } else {
+        setCurrentState(4);
       }
     } catch (error) {
       console.log(error);
@@ -60,6 +66,11 @@ function UploadFile({ categoryID }) {
         <div className="col-span-5 row-start-2">
           <p className="text-xs mt-1 mb-4">
             Upload a File from your device. Image should be a .jpg, .jpeg, .png file. Notes: to use the uploaded File on this article, you need to click the upload button.
+          </p>
+          <p>
+            Current State :
+            {' '}
+            {currentState}
           </p>
         </div>
       </div>

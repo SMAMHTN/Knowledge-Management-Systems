@@ -1,12 +1,12 @@
 'use server';
 
-import { redirect } from 'next/navigation';
+// import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { readConf } from '../others/confHandler';
 // eslint-disable-next-line import/named
 import { generateCoreCred } from '../others/generateCred';
 
-const LoginDynamicpath = '/';
+// const LoginDynamicpath = '/';
 
 export async function Login(Username, Password) {
   const conf = readConf('frontend_conf.json');
@@ -99,12 +99,13 @@ export async function CoreAPI(method, path, data) {
     },
     body: JSON.stringify(data),
   });
-  if (response.status === 401) {
-    redirect(LoginDynamicpath);
-  }
+  // if (response.status === 401) {
+  //   redirect(LoginDynamicpath);
+  // }
   const responseBody = await response.json();
 
   return {
+    status: response.status,
     head: response.headers,
     body: responseBody,
   };
@@ -129,12 +130,13 @@ export async function CoreAPIGET(path) {
       Connection: 'keep-alive',
     },
   });
-  if (response.status === 401) {
-    redirect(LoginDynamicpath);
-  }
+  // if (response.status === 401) {
+  //   redirect(LoginDynamicpath);
+  // }
   const responseBody = await response.json();
 
   return {
+    status: response.status,
     head: response.headers,
     body: responseBody,
   };
@@ -165,13 +167,14 @@ export async function CoreAPIBlob(method, path, CategoryID, File) {
       method,
       headers,
     });
-    if (response.status === 401) {
-      redirect(LoginDynamicpath);
-    }
+    // if (response.status === 401) {
+    //   redirect(LoginDynamicpath);
+    // }
 
     const fileBlob = await response.blob();
 
     return {
+      status: response.status,
       head: response.headers,
       body: fileBlob,
     };
@@ -185,13 +188,14 @@ export async function CoreAPIBlob(method, path, CategoryID, File) {
       headers,
       body: formData,
     });
-    if (response.status === 401) {
-      redirect(LoginDynamicpath);
-    }
+    // if (response.status === 401) {
+    //   redirect(LoginDynamicpath);
+    // }
 
     const responseBody = await response.json();
 
     return {
+      status: response.status,
       head: response.headers,
       body: responseBody,
     };

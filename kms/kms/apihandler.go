@@ -190,7 +190,10 @@ func Test_api() {
 
 	basicAuthMiddleware := middleware.BasicAuth(Validator)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
+		AllowOrigins:  []string{"*"},
+		AllowHeaders:  []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderContentDisposition},
+		ExposeHeaders: []string{echo.HeaderContentDisposition, echo.HeaderContentLength, echo.HeaderContentEncoding, echo.HeaderContentType},
+		// AllowHeaders:  []string{echo.HeaderContentDisposition, echo.HeaderContentLength, echo.HeaderContentEncoding, echo.HeaderContentType},
 	}))
 	e.Use(middleware.BodyLimit(Conf.Max_upload))
 	e.IPExtractor = echo.ExtractIPFromXFFHeader()

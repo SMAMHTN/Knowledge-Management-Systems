@@ -76,7 +76,8 @@ func Test_api() {
 	//Auth Middleware
 	basicAuthMiddleware := middleware.BasicAuth(Validator)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
+		AllowOrigins:  []string{"*"},
+		ExposeHeaders: []string{"Content-Disposition", "Content-Length"},
 	}))
 	e.Use(middleware.BodyLimit("8M"))
 	e.IPExtractor = echo.ExtractIPFromXFFHeader()

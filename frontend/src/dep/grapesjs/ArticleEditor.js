@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -27,22 +30,22 @@ function ArticleEditor({ ArticleID }) {
       setProjectID(ArticleID);
     }
   }, [ArticleID]);
-  console.log(projectID);
+  // console.log(projectID);
   const onEditor = (editor) => {
-    console.log('Editor loaded', { editor });
+    // console.log('Editor loaded', { editor });
 
     const storageManager = editor.Storage;
     storageManager.add('kms_remote', {
       async load(storageOptions) {
-        console.log('storageOptions');
-        console.log(storageOptions);
-        console.log(projectID);
+        // console.log('storageOptions');
+        // console.log(storageOptions);
+        // console.log(projectID);
         const res = await KmsAPIGET(`articlegrapesjs?id=${projectID}`);
         const datares = res.body.data;
         return JSON.parse(datares);
       },
       async store(data, storageOptions) {
-        console.log('storing data');
+        // console.log('storing data');
         // console.log("data");
         // console.log(data);
         // console.log("storageOptions");

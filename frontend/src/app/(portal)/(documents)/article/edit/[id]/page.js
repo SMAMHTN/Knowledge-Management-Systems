@@ -8,15 +8,45 @@ import UploadDoc from '@/components/UploadDoc';
 import UploadFile from '@/components/UploadFile';
 import { Button } from '@/components/ui/button';
 import { URLParamsBuilder } from '@/dep/others/HandleParams';
-import { KmsAPIGET } from '@/dep/kms/kmsHandler';
+import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
+import ListFile from '@/components/ListFromArray';
 
 function articleEditing({ params }) {
   const [data, setData] = useState([]);
+  const [fileList, setFileList] = useState([]);
+  const [docList, setDocList] = useState([]);
+  const AddFile = (value) => {
+    // Check if the value is not already in the fileList
+    if (!fileList.includes(value)) {
+      // Add the value to the fileList
+      KmsAPI('PUT', 'article', {
+        ArticleID: data.ArticleID,
+        FileID: [...fileList, value],
+        IsActive: data.IsActive,
+      });
+      setFileList((prevList) => [...prevList, value]);
+    }
+  };
+
+  const AddDoc = (value) => {
+    // Check if the value is not already in the docList
+    if (!docList.includes(value)) {
+      // Add the value to the docList
+      KmsAPI('PUT', 'article', {
+        ArticleID: data.ArticleID,
+        DocID: [...docList, value],
+        IsActive: data.IsActive,
+      });
+      setDocList((prevList) => [...prevList, value]);
+    }
+  };
   const fetchData = async () => {
     try {
       const response = await KmsAPIGET(`article?ArticleID=${params.id}`);
 
       setData(response.body.Data);
+      setDocList(response.body.Data.DocID);
+      setFileList(response.body.Data.FileID);
     } catch (error) {
       // Handle errors here
       console.error('Error fetching user data:', error);
@@ -46,9 +76,13 @@ function articleEditing({ params }) {
         </div>
         <div className="mb-4">
           <label className="block font-semibold mb-1">Upload Document</label>
-          <UploadDoc categoryID={data.CategoryID} />
+          <UploadDoc categoryID={data.CategoryID} DocAdd={AddDoc} />
+          <p>{docList}</p>
+          <ListFile idArray={docList} path="/api/doc/" />
           <label className="block font-semibold mb-1">Upload File</label>
-          <UploadFile categoryID={data.CategoryID} />
+          <UploadFile categoryID={data.CategoryID} FileAdd={AddFile} />
+          <p>{fileList}</p>
+          <ListFile idArray={fileList} path="/api/file/" />
         </div>
         <Button
           type="button"
