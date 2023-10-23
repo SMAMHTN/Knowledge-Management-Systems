@@ -76,7 +76,7 @@ func GetNameUsername(c echo.Context, UserID int) (Name string, Username string, 
 	_, userpass, _ := c.Request().BasicAuth()
 	cred := strings.Split(userpass, "&&")
 
-	User, err := CallCoreAPI("GET", "user", map[string]int{"UserID": UserID}, dependency.GetElementString(cred, 0), dependency.GetElementString(cred, 1))
+	User, err := CallCoreAPI("GET", "checkuserexist", map[string]int{"UserID": UserID}, dependency.GetElementString(cred, 0), dependency.GetElementString(cred, 1))
 	if err != nil {
 		return "", "", err
 	}
