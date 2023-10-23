@@ -343,7 +343,7 @@ func CheckUserExist(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, res)
 	}
 	res.StatusCode = http.StatusOK
-	res.Data = u
+	res.Data = uOri
 	return c.JSON(http.StatusOK, res)
 }
 
