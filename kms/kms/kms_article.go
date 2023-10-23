@@ -30,25 +30,25 @@ type Article_API struct {
 	FileID               []int
 	DocID                []int
 	IsActive             bool
+	Create               bool
+	Read                 bool
+	Update               bool
+	Delete               bool
 }
 
-type Article_GrapesJS struct {
-	StatusCode int
-	Id         int                    `json:"id" query:"id"`
-	Data       string                 `json:"data"`
-	Dumpvalue  map[string]interface{} `json:"dump"`
-}
-
-type GrapesJS_Data struct {
-	Data      map[string]interface{}   `json:"data"`
-	PagesHtml []map[string]interface{} `json:"pagesHtml"`
+type CategoryPermission struct {
+	CategoryID int
+	Create     bool
+	Read       bool
+	Update     bool
+	Delete     bool
 }
 
 func ListArticle(c echo.Context) error {
 	var LimitQuery string
 	var ValuesQuery []interface{}
 
-	permission, _, _ := Check_Admin_Permission_API(c)
+	permission, user, _ := Check_Admin_Permission_API(c)
 	res := ResponseList{}
 	limit := new(dependency.QueryType)
 	err := c.Bind(limit)
@@ -57,6 +57,15 @@ func ListArticle(c echo.Context) error {
 		res.StatusCode = http.StatusBadRequest
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
+	}
+	role_id, err := dependency.InterfaceToInt(user["RoleID"])
+	if err != nil {
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
 	}
 	if permission {
 		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_article")
@@ -76,6 +85,10 @@ func ListArticle(c echo.Context) error {
 				res.Data = err
 				return c.JSON(http.StatusInternalServerError, res)
 			}
+			tmp.Create = true
+			tmp.Read = true
+			tmp.Update = true
+			tmp.Delete = true
 			ArticleListAPI = append(ArticleListAPI, tmp)
 		}
 		res.StatusCode = http.StatusOK
@@ -88,6 +101,17 @@ func ListArticle(c echo.Context) error {
 			res.StatusCode = http.StatusInternalServerError
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
+		}
+		var CategoryPermissionList []CategoryPermission
+		for _, y := range AllowedCategoryList {
+			var CategoryPermissionSingle = CategoryPermission{CategoryID: y}
+			CategoryPermissionSingle.Create, CategoryPermissionSingle.Read, CategoryPermissionSingle.Update, CategoryPermissionSingle.Delete, err = GetTruePermission(c, y, role_id)
+			if err != nil {
+				Logger.Error(err.Error())
+				res.StatusCode = http.StatusInternalServerError
+				res.Data = err
+				return c.JSON(http.StatusInternalServerError, res)
+			}
 		}
 		var wherequery []dependency.WhereType
 		if limit.Query != "" {
@@ -135,6 +159,14 @@ func ListArticle(c echo.Context) error {
 				res.StatusCode = http.StatusInternalServerError
 				res.Data = err
 				return c.JSON(http.StatusInternalServerError, res)
+			}
+			for _, CategoryPermissionSingle := range CategoryPermissionList {
+				if tmp.CategoryID == CategoryPermissionSingle.CategoryID {
+					tmp.Create = CategoryPermissionSingle.Create
+					tmp.Read = CategoryPermissionSingle.Read
+					tmp.Update = CategoryPermissionSingle.Update
+					tmp.Delete = CategoryPermissionSingle.Delete
+				}
 			}
 			ArticleListAPI = append(ArticleListAPI, tmp)
 		}

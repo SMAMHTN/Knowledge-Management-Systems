@@ -10,6 +10,18 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type Article_GrapesJS struct {
+	StatusCode int
+	Id         int                    `json:"id" query:"id"`
+	Data       string                 `json:"data"`
+	Dumpvalue  map[string]interface{} `json:"dump"`
+}
+
+type GrapesJS_Data struct {
+	Data      map[string]interface{}   `json:"data"`
+	PagesHtml []map[string]interface{} `json:"pagesHtml"`
+}
+
 func UpdateArticleGrapesjs(c echo.Context) error {
 	var err error
 	var res Article_GrapesJS
