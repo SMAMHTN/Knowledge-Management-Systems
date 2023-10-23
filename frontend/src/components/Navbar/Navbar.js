@@ -1,5 +1,3 @@
-'use client';
-
 import UserProfileDropdown from './UserProfileDropdown';
 import Sidebar from './Sidebar';
 import ShowLogo, { CompanyName } from './ShowLogo';

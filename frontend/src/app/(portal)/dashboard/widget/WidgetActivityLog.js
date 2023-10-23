@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import {
   Table,
@@ -10,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 import { URLParamsBuilder, HandleSortParams } from '@/dep/others/HandleParams';
-import TimeAgo from '@/components/TimeAgo';
+import TimeAgo from '@/components/Time/TimeAgo';
 
 function WidgetActivityLog() {
   const [logData, setLogData] = useState([]);

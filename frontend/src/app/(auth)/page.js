@@ -15,7 +15,7 @@ export default function Page() {
   const handleLogin = async () => {
     try {
       const response = await Login(username, password);
-
+      console.log(response);
       if (response === true) {
         const response2 = await CoreAPIGET('loginuser');
 

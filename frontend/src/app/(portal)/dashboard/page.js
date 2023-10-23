@@ -1,67 +1,160 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  MoreHorizontal, Check, X,
+  MoreHorizontal,
   Users, Tag,
 } from 'lucide-react';
 
 import {
   CoreAPI, CoreAPIGET, getUserData, Logout,
 } from '@/dep/core/coreHandler';
-import { searchIcon, dashboardIcon } from '@/constants/icon';
+import { searchIcon } from '@/constants/icon';
 import { Separator } from '@/components/SmComponent';
-import listhistory from '../(user)/activity-log/page';
-import { URLParamsBuilder } from '@/dep/others/HandleParams';
-import { KmsAPIGET } from '@/dep/kms/kmsHandler';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import WidgetActivityLog from './widget/WidgetActivityLog';
 import WidgetArticle from './widget/WidgetArticle';
 import WidgetUser from './widget/WidgetUser';
 import WidgetRole from './widget/WidgetRole';
+import UserGreetings from './UserGreetings';
+import getSuperAdminStatus from '@/dep/core/getSuperAdminStatus';
+import DashboardUser from './DashboardUser';
+
+function DashboardSuperAdmin() {
+  return (
+    <>
+      {' '}
+      <div className="hidden lg:grid grid-cols-6 grid-rows-4 gap-4 w-full h-full">
+        <div className="bg-white col-span-2 row-span-2 p-4 rounded-lg flex flex-col">
+          <div className="flex items-center justify-between">
+            <div>
+              <Users size={48} />
+              <h1 className="text-gray-500 text-sm font-semibold">User Stats </h1>
+            </div>
+          </div>
+          <WidgetUser />
+        </div>
+        <div className="bg-white col-span-2 row-span-2 col-start-3 p-4 rounded-lg flex flex-col">
+          <div className="flex items-center justify-between">
+            <div>
+              <Tag size={48} />
+              <h1 className="text-gray-500 text-sm font-semibold">Role Stats </h1>
+            </div>
+          </div>
+          <WidgetRole />
+        </div>
+        <div className="bg-white col-span-2 row-span-4 col-start-5 p-4 rounded-lg flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-l font-semibold">Recent Activity </h1>
+            <MoreHorizontal size={24} color="gray" />
+          </div>
+          <WidgetActivityLog />
+        </div>
+        <div className="bg-white col-span-4 row-span-2 row-start-3 p-4 rounded-lg flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="hidden lg:flex text-l font-semibold">Recent Article</h1>
+            <h1 className="flex lg:hidden text-l font-semibold">Article</h1>
+            <MoreHorizontal size={24} color="gray" />
+          </div>
+          <WidgetArticle />
+        </div>
+      </div>
+      <div className="lg:hidden grid grid-cols-2 grid-rows-4 gap-2 lg:rounded h-full">
+        <div className="bg-white rounded-lg">1</div>
+        <div className="bg-white rounded-lg">2</div>
+        <div className="col-span-2 row-span-2 bg-white rounded-lg">
+          {' '}
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="hidden lg:flex text-l font-semibold">Recent Article</h1>
+            <h1 className="flex lg:hidden text-l font-semibold ml-4 p-4">Article</h1>
+            <MoreHorizontal size={24} color="gray" />
+          </div>
+          <WidgetArticle />
+
+        </div>
+        <div className="col-span-2 row-span-2 row-start-4 bg-white rounded-lg">4</div>
+      </div>
+    </>
+  );
+}
+function DashboardAdmin() {
+  return (
+    <>
+      {' '}
+      <div className="hidden lg:grid grid-cols-6 grid-rows-4 gap-4 w-full h-full">
+        <div className="bg-white col-span-2 row-span-2 p-4 rounded-lg flex flex-col">
+          <div className="flex items-center justify-between">
+            <div>
+              <Users size={48} />
+              <h1 className="text-gray-500 text-sm font-semibold">User Stats </h1>
+            </div>
+          </div>
+          <WidgetUser />
+        </div>
+        <div className="bg-white col-span-2 row-span-2 col-start-3 p-4 rounded-lg flex flex-col">
+          <div className="flex items-center justify-between">
+            <div>
+              <Tag size={48} />
+              <h1 className="text-gray-500 text-sm font-semibold">Role Stats </h1>
+            </div>
+          </div>
+          <WidgetRole />
+        </div>
+        <div className="bg-white col-span-2 row-span-4 col-start-5 p-4 rounded-lg flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-l font-semibold">Recent Activity </h1>
+            <MoreHorizontal size={24} color="gray" />
+          </div>
+          <WidgetActivityLog />
+        </div>
+        <div className="bg-white col-span-4 row-span-2 row-start-3 p-4 rounded-lg flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="hidden lg:flex text-l font-semibold">Recent Article</h1>
+            <h1 className="flex lg:hidden text-l font-semibold">Article</h1>
+            <MoreHorizontal size={24} color="gray" />
+          </div>
+          <WidgetArticle />
+        </div>
+      </div>
+      <div className="lg:hidden grid grid-cols-2 grid-rows-4 gap-2 lg:rounded h-full">
+        <div className="bg-white rounded-lg">1</div>
+        <div className="bg-white rounded-lg">2</div>
+        <div className="col-span-2 row-span-2 bg-white rounded-lg">
+          {' '}
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="hidden lg:flex text-l font-semibold">Recent Article</h1>
+            <h1 className="flex lg:hidden text-l font-semibold ml-4 p-4">Article</h1>
+            <MoreHorizontal size={24} color="gray" />
+          </div>
+          <WidgetArticle />
+
+        </div>
+        <div className="col-span-2 row-span-2 row-start-4 bg-white rounded-lg">4</div>
+      </div>
+    </>
+  );
+}
 
 function Home() {
-  const [error, setError] = useState('');
-  const [userData, setUserData] = useState('');
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await getUserData();
-        setUserData(data);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    }
+  const userStatus = getSuperAdminStatus();
+  const [menuComponent, setMenuComponent] = useState(null);
 
-    fetchData();
-  }, []);
+  useEffect(() => {
+    if (userStatus === 1) {
+      setMenuComponent(<DashboardSuperAdmin />);
+    } else if (userStatus === 2) {
+      setMenuComponent(<DashboardAdmin />);
+    } else {
+      setMenuComponent(<DashboardUser />);
+    }
+  }, [userStatus]);
 
   return (
     <section className="w-full">
       <div className=" flex flex-auto w-full h-screen">
         <div className="flex flex-col w-full">
 
-          <h2 className="text-2xl font-semibold mb-1">Dashboard</h2>
-          {userData ? (
-            <p className="mb-4 font-medium">
-              Welcome &nbsp;
-              {userData.Name ? userData.Name : 'User'}
-            </p>
-          ) : (
-            <p className="mb-4 font-medium">
-              Welcome &nbsp;
-              User
-            </p>
-          )}
+          <UserGreetings />
 
           <Separator className="mb-4" />
           <div className="space-y-4 mb-4">
@@ -97,41 +190,7 @@ function Home() {
           )} */}
 
           </div>
-          <div className="grid grid-cols-6 grid-rows-4 gap-4 w-full h-full">
-            <div className="bg-white col-span-2 row-span-2 p-4 rounded-lg flex flex-col">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Users size={48} />
-                  <h1 className="text-gray-500 text-sm font-semibold">User Stats </h1>
-                </div>
-              </div>
-              <WidgetUser />
-            </div>
-            <div className="bg-white col-span-2 row-span-2 col-start-3 p-4 rounded-lg flex flex-col">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Tag size={48} />
-                  <h1 className="text-gray-500 text-sm font-semibold">Role Stats </h1>
-                </div>
-              </div>
-              <WidgetRole />
-            </div>
-            <div className="bg-white col-span-2 row-span-4 col-start-5 p-4 rounded-lg flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h1 className="text-l font-semibold">Recent Activity </h1>
-                <MoreHorizontal size={24} color="gray" />
-              </div>
-              <WidgetActivityLog />
-            </div>
-            <div className="bg-white col-span-4 row-span-2 row-start-3 p-4 rounded-lg flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h1 className="hidden lg:flex text-l font-semibold">Recent Article</h1>
-                <h1 className="flex lg:hidden text-l font-semibold">Article</h1>
-                <MoreHorizontal size={24} color="gray" />
-              </div>
-              <WidgetArticle />
-            </div>
-          </div>
+          {menuComponent}
 
         </div>
 

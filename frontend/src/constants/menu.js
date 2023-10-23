@@ -52,6 +52,12 @@ export const userSetting = {
   link: '/dashboard/settings',
 };
 
+export const post = {
+  id: 'post',
+  title: 'post',
+  link: '/post',
+};
+
 const defaultExport = userSetting;
 
 export { defaultExport as default };
