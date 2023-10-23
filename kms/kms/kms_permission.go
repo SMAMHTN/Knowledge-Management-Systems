@@ -382,6 +382,11 @@ func GetTruePermission(c echo.Context, CategoryID int, RoleID int) (Create bool,
 			}
 		}
 	}
+	for _, singcat := range CategoryIDList {
+		if singcat == 1 {
+			Read = true
+		}
+	}
 	return Create, Read, Update, Delete, err
 }
 
@@ -539,6 +544,14 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 				CategoryIDList = append(CategoryIDList, CategoryParentTMP...)
 			}
 		}
+	}
+	if !slices.Contains(CategoryIDList, 1) {
+		CategoryTMP := Category{CategoryID: 1}
+		CategoryParentTMP, err := CategoryTMP.ListAllCategoryChild()
+		if err != nil {
+			return CategoryIDList, err
+		}
+		CategoryIDList = append(CategoryIDList, CategoryParentTMP...)
 	}
 	return CategoryIDList, nil
 }
