@@ -586,6 +586,7 @@ func QueryArticle(c echo.Context) error {
 	q := c.QueryParam("q")
 	search := c.QueryParam("search")
 	pageString := c.QueryParam("page")
+	show := c.QueryParam("show")
 	page, err := strconv.Atoi(pageString)
 	if err != nil {
 		Logger.Warn(err.Error())
@@ -601,7 +602,7 @@ func QueryArticle(c echo.Context) error {
 		res.Data = "DATA INPUT ERROR : NUM IS NOT A NUMBER - " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	response, _, err := SolrCallQuery(c, q, query, search, page, num)
+	response, _, err := SolrCallQuery(c, q, query, search, page, num, show)
 	if err != nil {
 		Logger.Error(err.Error())
 		res.StatusCode = http.StatusInternalServerError

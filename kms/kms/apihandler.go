@@ -123,7 +123,7 @@ func SolrCallUpdateHard(apimethod string, data interface{}) ([]byte, *http.Respo
 	return a, b, c
 }
 
-func SolrCallQuery(c echo.Context, q string, query string, search string, page int, num int) (res []byte, header *http.Response, err error) {
+func SolrCallQuery(c echo.Context, q string, query string, search string, page int, num int, show string) (res []byte, header *http.Response, err error) {
 	var qSolr string
 	permission, user, _ := Check_Admin_Permission_API(c)
 	if permission {
@@ -166,7 +166,11 @@ func SolrCallQuery(c echo.Context, q string, query string, search string, page i
 	params.Set("q.op", "AND")
 	params.Set("q", qSolr)
 	params.Set("indent", "false")
-	params.Set("fl", "ArticleID,OwnerID,OwnerUsername,OwnerName,LastEditedByID,LastEditedByUsername,LastEditedByName,LastEditedTime,Tag,Title,CategoryID,CategoryName,CategoryParent,CategoryDescription,Article,FileID,DocID,IsActive")
+	if show != "" {
+		params.Set("fl", show)
+	} else {
+		params.Set("fl", "ArticleID,OwnerID,OwnerUsername,OwnerName,LastEditedByID,LastEditedByUsername,LastEditedByName,LastEditedTime,Tag,Title,CategoryID,CategoryName,CategoryParent,CategoryDescription,Article,FileID,DocID,IsActive")
+	}
 	if query != "" {
 		res, header, err = dependency.SolrCallQuery(Conf.Solr_link+SolrV2SelectAddURL+"?"+params.Encode()+"&"+query, Conf.Solr_username, Conf.Solr_password)
 	} else {
