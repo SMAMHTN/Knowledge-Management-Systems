@@ -123,15 +123,30 @@ func SolrCallUpdateHard(apimethod string, data interface{}) ([]byte, *http.Respo
 	return a, b, c
 }
 
-func SolrCallQuery(CategoryIDList []int, q string, query string, search string) ([]byte, *http.Response, error) {
-	if len(CategoryIDList) == 0 {
-		return nil, nil, errors.New("category list empty")
+func SolrCallQuery(c echo.Context, q string, query string, search string) ([]byte, *http.Response, error) {
+	var qSolr string
+	permission, user, _ := Check_Admin_Permission_API(c)
+	if permission {
+		qSolr = "IsActive:1"
+	} else {
+		role_id, err := dependency.InterfaceToInt(user["RoleID"])
+		if err != nil {
+			return nil, nil, err
+		}
+		CategoryIDList, err := GetReadCategoryList(c, role_id)
+		if err != nil {
+			return nil, nil, err
+		}
+		if len(CategoryIDList) == 0 {
+			return nil, nil, errors.New("category list empty")
+		}
+		qSolr = "(IsActive:1"
+		qSolr = qSolr + " AND CategoryID:("
+		for _, SingleCategoryID := range CategoryIDList {
+			qSolr += strconv.Itoa(SingleCategoryID) + " OR "
+		}
+		qSolr = qSolr[:len(qSolr)-4] + "))"
 	}
-	qSolr := "(IsActive:1 AND CategoryID:("
-	for _, SingleCategoryID := range CategoryIDList {
-		qSolr += strconv.Itoa(SingleCategoryID) + " OR "
-	}
-	qSolr = qSolr[:len(qSolr)-4] + "))"
 	if q != "" {
 		qSolr += " AND " + q
 	}

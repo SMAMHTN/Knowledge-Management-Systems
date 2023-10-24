@@ -583,25 +583,9 @@ func QueryArticle(c echo.Context) error {
 	var err error
 	var res Response
 	query := c.QueryParam("query")
-	_, user, _ := Check_Admin_Permission_API(c)
-	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	q := c.QueryParam("q")
 	search := c.QueryParam("search")
-
-	if err != nil {
-		Logger.Error(err.Error())
-		res.StatusCode = http.StatusInternalServerError
-		res.Data = err
-		return c.JSON(http.StatusInternalServerError, res)
-	}
-	CategoryIDList, err := GetReadCategoryList(c, role_id)
-	if err != nil {
-		Logger.Error(err.Error())
-		res.StatusCode = http.StatusInternalServerError
-		res.Data = err
-		return c.JSON(http.StatusInternalServerError, res)
-	}
-	response, _, err := SolrCallQuery(CategoryIDList, q, query, search)
+	response, _, err := SolrCallQuery(c, q, query, search)
 	if err != nil {
 		Logger.Error(err.Error())
 		res.StatusCode = http.StatusInternalServerError
