@@ -2,6 +2,8 @@ package kms
 
 import (
 	"dependency"
+	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -28,29 +30,62 @@ func ListCategory(c echo.Context) error {
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	if permission {
-		var LimitQuery string
-		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(CategoryAnotherTable, nil, nil, Database, "kms_category")
+	if !permission {
+		AllowedCategoryList, err := GetCurrentUserReadCategoryList(c)
 		if err != nil {
-			Logger.Warn(err.Error())
-			res.StatusCode = http.StatusBadRequest
-			res.Data = err.Error()
-			return c.JSON(http.StatusBadRequest, res)
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
 		}
-		listCategory, _ := ReadCategory(LimitQuery, ValuesQuery)
-		var listCategoryAPI []CategoryAPI
-		for _, x := range listCategory {
-			listCategoryAPI = append(listCategoryAPI, x.ToAPI())
+		var wherequery []dependency.WhereType
+		if limit.Query != "" {
+			err = json.Unmarshal([]byte(limit.Query), &wherequery)
+			if err != nil {
+				err = errors.New("query field json read error : " + err.Error())
+				Logger.Error(err.Error())
+				res.StatusCode = http.StatusInternalServerError
+				res.Data = err
+				return c.JSON(http.StatusInternalServerError, res)
+			}
 		}
-		res.StatusCode = http.StatusOK
-		res.Data = listCategoryAPI
-		return c.JSON(http.StatusOK, res)
-	} else {
-		res.StatusCode = http.StatusForbidden
-		res.Data = "ONLY SUPERADMIN HAVE THIS PERMISSION"
-		return c.JSON(http.StatusForbidden, res)
+		var convertedAllowedCategoryList []interface{}
+		for _, v := range AllowedCategoryList {
+			convertedAllowedCategoryList = append(convertedAllowedCategoryList, v)
+		}
+		singlewherequery := dependency.WhereType{
+			Field:    "CategoryID",
+			Operator: "IN",
+			Logic:    "AND",
+			Values:   convertedAllowedCategoryList,
+		}
+		wherequery = append(wherequery, singlewherequery)
+		a, err := json.Marshal(wherequery)
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		limit.Query = string(a)
 	}
+	var LimitQuery string
+	var ValuesQuery []interface{}
+	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(CategoryAnotherTable, nil, nil, Database, "kms_category")
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	listCategory, _ := ReadCategory(LimitQuery, ValuesQuery)
+	var listCategoryAPI []CategoryAPI
+	for _, x := range listCategory {
+		listCategoryAPI = append(listCategoryAPI, x.ToAPI())
+	}
+	res.StatusCode = http.StatusOK
+	res.Data = listCategoryAPI
+	return c.JSON(http.StatusOK, res)
 }
 
 func ListCategoryID(c echo.Context) error {
@@ -146,6 +181,20 @@ func ShowCategory(c echo.Context) error {
 		res.Data = "DATA INPUT ERROR : " + err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
+	AllowedCategoryList, err := GetCurrentUserReadCategoryList(c)
+	if err != nil {
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+	}
+	for _, singleid := range AllowedCategoryList {
+		if singleid == u.CategoryID {
+			permission = true
+		}
+	}
 	if permission {
 		uOri, err := u.ToTable()
 		if err != nil {
@@ -166,7 +215,7 @@ func ShowCategory(c echo.Context) error {
 		return c.JSON(http.StatusOK, res)
 	} else {
 		res.StatusCode = http.StatusForbidden
-		res.Data = "ONLY SUPERADMIN HAVE THIS PERMISSION"
+		res.Data = "YOU DONT HAVE ACCESS"
 		return c.JSON(http.StatusForbidden, res)
 	}
 }
