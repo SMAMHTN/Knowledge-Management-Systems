@@ -579,41 +579,6 @@ func DeleteArticle(c echo.Context) error {
 	}
 }
 
-func QueryArticle(c echo.Context) error {
-	var err error
-	var res Response
-	query := c.QueryParam("query")
-	q := c.QueryParam("q")
-	search := c.QueryParam("search")
-	pageString := c.QueryParam("page")
-	show := c.QueryParam("show")
-	page, err := strconv.Atoi(pageString)
-	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR : PAGE IS NOT A NUMBER - " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
-	}
-	numString := c.QueryParam("num")
-	num, err := strconv.Atoi(numString)
-	if err != nil {
-		Logger.Warn(err.Error())
-		res.StatusCode = http.StatusBadRequest
-		res.Data = "DATA INPUT ERROR : NUM IS NOT A NUMBER - " + err.Error()
-		return c.JSON(http.StatusBadRequest, res)
-	}
-	response, _, err := SolrCallQuery(c, q, query, search, page, num, show)
-	if err != nil {
-		Logger.Error(err.Error())
-		res.StatusCode = http.StatusInternalServerError
-		res.Data = err
-		return c.JSON(http.StatusInternalServerError, res)
-	}
-	res.StatusCode = http.StatusOK
-	res.Data = string(response)
-	return c.JSON(http.StatusOK, res)
-}
-
 func (data Article_Table) ToAPI(c echo.Context) (res Article_API, err error) {
 	res.Article = data.Article
 	res.ArticleID = data.ArticleID
