@@ -11,8 +11,8 @@ import (
 )
 
 type SolrResponse struct {
-	ResponseHeader interface{} `json:"ResponseHeader"`
-	Response       interface{} `json:"response"`
+	ResponseHeader map[string]interface{} `json:"ResponseHeader"`
+	Response       map[string]interface{} `json:"response"`
 }
 
 func QueryArticle(c echo.Context) error {
@@ -58,7 +58,8 @@ func QueryArticle(c echo.Context) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(a)
+	fmt.Println(a.Response)
+	fmt.Println(a.Response["numFound"])
 	return c.JSON(http.StatusOK, res)
 }
 

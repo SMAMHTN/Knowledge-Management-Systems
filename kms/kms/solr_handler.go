@@ -2,6 +2,7 @@ package kms
 
 import (
 	"dependency"
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -88,6 +89,23 @@ func (data *ArticleSolr) PrepareSolrData(c echo.Context) (err error) {
 			Logger.Warn(err.Error())
 		}
 		data.DocContent += SingleDocString
+	}
+	var tmpGrapesJS GrapesJS_Data
+	err = json.Unmarshal([]byte(data.Article), &tmpGrapesJS)
+	if err == nil {
+		tmparticlepure, err := dependency.InterfaceToString(tmpGrapesJS.PagesHtml[0]["html"])
+		if err == nil {
+			tmparticleextracted, _, err := dependency.GetTextTikaPure(Conf.Tika_link+TikaAddURL, []byte(tmparticlepure))
+			if err == nil {
+				data.Article = tmparticleextracted
+			} else {
+				Logger.Warn(err.Error())
+			}
+		} else {
+			Logger.Warn(err.Error())
+		}
+	} else {
+		Logger.Warn(err.Error())
 	}
 	return nil
 }
