@@ -4,6 +4,7 @@ import (
 	"dependency"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -17,7 +18,8 @@ type SolrResponse struct {
 
 func QueryArticle(c echo.Context) error {
 	var err error
-	var res Response
+	var res ResponseList
+	var resInfo dependency.Info
 	var page int
 	var num int
 	query := c.QueryParam("query")
@@ -58,8 +60,33 @@ func QueryArticle(c echo.Context) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(a.Response)
-	fmt.Println(a.Response["numFound"])
+	resInfo.TotalRow, _ = dependency.InterfaceToInt(a.Response["numFound"])
+	resInfo.TotalPage = int(math.Ceil(float64(resInfo.TotalRow) / float64(num)))
+	resInfo.CurrentPage = page
+	Lowerlimit0 := (page - 1) * num
+	if resInfo.TotalPage == resInfo.CurrentPage {
+		resInfo.TotalShow = resInfo.TotalRow % num
+		resInfo.UpperLimit = Lowerlimit0 + resInfo.TotalShow
+		resInfo.LowerLimit = Lowerlimit0 + 1
+		if num == 1 {
+			resInfo.TotalShow = num
+			resInfo.UpperLimit = resInfo.TotalRow
+			resInfo.LowerLimit = resInfo.TotalRow
+		}
+	} else if resInfo.TotalRow < 1 {
+		resInfo.TotalShow = 0
+		resInfo.UpperLimit = 0
+		resInfo.LowerLimit = 0
+	} else if resInfo.TotalPage < resInfo.CurrentPage {
+		resInfo.TotalShow = 0
+		resInfo.UpperLimit = Lowerlimit0 + 1
+		resInfo.LowerLimit = Lowerlimit0 + 1
+	} else {
+		resInfo.TotalShow = num
+		resInfo.UpperLimit = Lowerlimit0 + resInfo.TotalShow
+		resInfo.LowerLimit = Lowerlimit0 + 1
+	}
+	res.Info = resInfo
 	return c.JSON(http.StatusOK, res)
 }
 

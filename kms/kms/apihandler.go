@@ -80,7 +80,6 @@ func GetNameUsername(c echo.Context, UserID int) (Name string, Username string, 
 	if err != nil {
 		return "", "", err
 	}
-	fmt.Println(User)
 	Name, err = dependency.InterfaceToString(User["Name"])
 	if err != nil {
 		return "", "", err
