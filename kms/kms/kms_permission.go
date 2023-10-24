@@ -537,7 +537,7 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 		if val.PRead != 0 {
 			if !slices.Contains(CategoryIDList, val.CategoryID) {
 				CategoryTMP := Category{CategoryID: val.CategoryID}
-				CategoryParentTMP, err := CategoryTMP.ListAllCategoryChild()
+				CategoryParentTMP, err := CategoryTMP.ListAllCategoryParent()
 				if err != nil {
 					return CategoryIDList, err
 				}
@@ -547,7 +547,7 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 	}
 	if !slices.Contains(CategoryIDList, 1) {
 		CategoryTMP := Category{CategoryID: 1}
-		CategoryParentTMP, err := CategoryTMP.ListAllCategoryChild()
+		CategoryParentTMP, err := CategoryTMP.ListAllCategoryParent()
 		if err != nil {
 			return CategoryIDList, err
 		}
