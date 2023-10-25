@@ -8,52 +8,6 @@ import { generateCoreCred } from '../others/generateCred';
 
 // const LoginDynamicpath = '/';
 
-export async function Login(Username, Password) {
-  const conf = readConf('frontend_conf.json');
-  const credentials = generateCoreCred(Username, Password);
-  const response = await fetch(`${conf.core_link}loginuser`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Basic ${credentials}`,
-      Accept: '*/*',
-      Connection: 'keep-alive',
-    },
-  });
-
-  if (response.ok) {
-    cookies().set({
-      name: 'username',
-      value: Username,
-      sameSite: 'lax',
-      path: '/',
-    });
-    cookies().set({
-      name: 'password',
-      value: Password,
-      sameSite: 'lax',
-      path: '/',
-    });
-    const responseBody = await response.json();
-    if (responseBody.Data.IsSuperAdmin === true) {
-      cookies().set({
-        name: 'adminstatus',
-        value: 'SuperAdmin',
-        sameSite: 'lax',
-        path: '/',
-      });
-    } else {
-      cookies().set({
-        name: 'adminstatus',
-        value: 'User',
-        sameSite: 'lax',
-        path: '/',
-      });
-    }
-    return true;
-  }
-  return false;
-}
-
 export async function Logout() {
   cookies().set({
     name: 'username',
@@ -69,6 +23,12 @@ export async function Logout() {
   });
   cookies().set({
     name: 'adminstatus',
+    value: '',
+    sameSite: 'lax',
+    path: '/',
+  });
+  cookies().set({
+    name: 'theme',
     value: '',
     sameSite: 'lax',
     path: '/',
@@ -200,6 +160,69 @@ export async function CoreAPIBlob(method, path, CategoryID, File) {
       body: responseBody,
     };
   }
+}
+
+async function SetThemeCookies() {
+  const response = await CoreAPIGET('loginuser');
+  const response2 = await CoreAPIGET('setting');
+  const ThemeID = (response.status !== 401) ? response.body.Data.AppthemeID : response2.body.Data.AppthemeID;
+  const responseTheme = await CoreAPIGET(`theme?AppthemeID=${ThemeID}`);
+  const themevaluestring = JSON.stringify(responseTheme.body.Data.AppthemeValue);
+  cookies().set({
+    name: 'theme',
+    value: themevaluestring,
+    sameSite: 'lax',
+    path: '/',
+  });
+  return true;
+}
+
+export async function Login(Username, Password) {
+  const conf = readConf('frontend_conf.json');
+  const credentials = generateCoreCred(Username, Password);
+  const response = await fetch(`${conf.core_link}loginuser`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Basic ${credentials}`,
+      Accept: '*/*',
+      Connection: 'keep-alive',
+    },
+  });
+
+  if (response.ok) {
+    cookies().set({
+      name: 'username',
+      value: Username,
+      sameSite: 'lax',
+      path: '/',
+    });
+    cookies().set({
+      name: 'password',
+      value: Password,
+      sameSite: 'lax',
+      path: '/',
+    });
+    const responseBody = await response.json();
+    if (responseBody.Data.IsSuperAdmin === true) {
+      cookies().set({
+        name: 'adminstatus',
+        value: 'SuperAdmin',
+        sameSite: 'lax',
+        path: '/',
+      });
+    } else {
+      cookies().set({
+        name: 'adminstatus',
+        value: 'User',
+        sameSite: 'lax',
+        path: '/',
+      });
+    }
+    await SetThemeCookies();
+    return true;
+  }
+  await SetThemeCookies();
+  return false;
 }
 
 export async function getUserData() {
