@@ -503,6 +503,19 @@ func GetCurrentUserReadCategoryList(c echo.Context) (CategoryIDList []int, err e
 	return CategoryIDList, nil
 }
 
+func GetAnyCUDPermission(c echo.Context) (AnyCUDPermission bool, err error) {
+	_, user, _ := Check_Admin_Permission_API(c)
+	role_id, err := dependency.InterfaceToInt(user["RoleID"])
+	if err != nil {
+		return AnyCUDPermission, err
+	}
+	AnyCUDPermission, err = GetAnyCreateUpdateDeletePermission(c, role_id)
+	if err != nil {
+		return AnyCUDPermission, err
+	}
+	return AnyCUDPermission, nil
+}
+
 func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err error) {
 	_, userpass, _ := c.Request().BasicAuth()
 	err = nil
@@ -554,6 +567,44 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 		CategoryIDList = append(CategoryIDList, CategoryParentTMP...)
 	}
 	return CategoryIDList, nil
+}
+
+func GetAnyCreateUpdateDeletePermission(c echo.Context, RoleID int) (HaveCUDAccess bool, err error) {
+	_, userpass, _ := c.Request().BasicAuth()
+	err = nil
+	cred := strings.Split(userpass, "&&")
+	SendData := map[string]interface{}{"RoleID": RoleID}
+	RoleIDListPure, err := CallCoreAPIPure("GET", "listrolechild", SendData, dependency.GetElementString(cred, 0), dependency.GetElementString(cred, 1))
+	if err != nil {
+		return HaveCUDAccess, err
+	}
+	RoleIDListInterface, isexist := RoleIDListPure["Data"].([]interface{})
+	if !isexist {
+		return HaveCUDAccess, err
+	}
+
+	RoleIDList, err := dependency.SliceInterfaceToInt(RoleIDListInterface)
+	if err != nil {
+		return HaveCUDAccess, err
+	}
+
+	var roleIDListString string
+	roleIDListString = fmt.Sprintf("%d", RoleIDList[0])
+	for i := 1; i < len(RoleIDList); i++ {
+		roleIDListString += fmt.Sprintf(", %d", RoleIDList[i])
+	}
+
+	FinalQuery := fmt.Sprintf("WHERE RoleID IN (%s)", roleIDListString)
+	PermissionList, err := ReadPermission(FinalQuery, nil)
+	if err != nil {
+		return HaveCUDAccess, err
+	}
+	for _, val := range PermissionList {
+		if val.PCreate != 0 || val.PUpdate != 0 || val.PDelete != 0 {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func (data Permission) ToAPI(c echo.Context) (res Permission_API, err error) {
