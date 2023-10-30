@@ -344,7 +344,7 @@ func GetTruePermission(c echo.Context, CategoryID int, RoleID int) (Create bool,
 	CategoryIDData := Category{
 		CategoryID: CategoryID,
 	}
-	CategoryIDList, err := CategoryIDData.ListAllCategoryParent()
+	CategoryIDList, err := CategoryIDData.ListAllCategoryChild()
 	if err != nil {
 		return Create, Read, Update, Delete, err
 	}
@@ -418,7 +418,7 @@ func GetAllFileTypePermission(c echo.Context, CategoryID int, RoleID int) (FileT
 	CategoryIDData := Category{
 		CategoryID: CategoryID,
 	}
-	CategoryIDList, err := CategoryIDData.ListAllCategoryParent()
+	CategoryIDList, err := CategoryIDData.ListAllCategoryChild()
 	if err != nil {
 		return nil, err
 	}
@@ -468,7 +468,7 @@ func GetAllDocTypePermission(c echo.Context, CategoryID int, RoleID int) (DocTyp
 	CategoryIDData := Category{
 		CategoryID: CategoryID,
 	}
-	CategoryIDList, err := CategoryIDData.ListAllCategoryParent()
+	CategoryIDList, err := CategoryIDData.ListAllCategoryChild()
 	if err != nil {
 		return nil, err
 	}
@@ -567,21 +567,21 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 		if val.PRead != 0 {
 			if !slices.Contains(CategoryIDList, val.CategoryID) {
 				CategoryTMP := Category{CategoryID: val.CategoryID}
-				CategoryParentTMP, err := CategoryTMP.ListAllCategoryChild()
+				CategoryChildTMP, err := CategoryTMP.ListAllCategoryChild()
 				if err != nil {
 					return CategoryIDList, err
 				}
-				CategoryIDList = append(CategoryIDList, CategoryParentTMP...)
+				CategoryIDList = append(CategoryIDList, CategoryChildTMP...)
 			}
 		}
 	}
 	if !slices.Contains(CategoryIDList, 1) {
 		CategoryTMP := Category{CategoryID: 1}
-		CategoryParentTMP, err := CategoryTMP.ListAllCategoryChild()
+		CategoryChildTMP, err := CategoryTMP.ListAllCategoryChild()
 		if err != nil {
 			return CategoryIDList, err
 		}
-		CategoryIDList = append(CategoryIDList, CategoryParentTMP...)
+		CategoryIDList = append(CategoryIDList, CategoryChildTMP...)
 	}
 	return CategoryIDList, nil
 }
