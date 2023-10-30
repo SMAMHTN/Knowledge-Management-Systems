@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Pencil, Settings, MoreHorizontal } from 'lucide-react';
+import {
+  Pencil, Settings, MoreHorizontal, GitFork,
+} from 'lucide-react';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 import { URLParamsBuilder, HandleSortParams } from '@/dep/others/HandleParams';
 import { Button } from '@/components/ui/button';
@@ -26,7 +28,28 @@ function WidgetRole() {
   }, []);
 
   return (
-    <div className="grid grid-cols-2 grid-rows-3 gap-1 h-full mt-2">
+    <>
+      <div className="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:scale-110">
+        <GitFork size={30} />
+      </div>
+
+      <div className="text-right">
+
+        {roleStats ? (
+          <>
+            <p className="text-2xl">
+              {roleStats.TotalRow}
+            </p>
+            <p className="text-sm">Roles</p>
+          </>
+        ) : (
+          <div className="flex items-center">
+            <MoreHorizontal color="gray" className="animate-pulse mr-2" />
+          </div>
+        )}
+
+      </div>
+      {/* <div className="grid grid-cols-2 grid-rows-3 gap-1 h-full mt-2">
       <div className=" p-2 col-span-2 text-2xl font-semibold flex flex-col-reverse">
         {roleStats ? (
           <span>
@@ -73,7 +96,7 @@ function WidgetRole() {
         <Button variant="ghost" className="w-full h-full hover:bg-gray-100">
           { lastRole.length > 0 ? (lastRole.map((item) => (
             <span key={item.RoleID}>
-              <Link href={`/role/${item.RoleID}`} className="text-gray-700">
+              <Link href={`/roles/${item.RoleID}`} className="text-gray-700">
                 <Pencil size={28} className="mx-auto" />
                 <span className="hidden xl:flex ">Edit last role</span>
               </Link>
@@ -87,7 +110,8 @@ function WidgetRole() {
         </Button>
 
       </div>
-    </div>
+    </div> */}
+    </>
   );
 }
 

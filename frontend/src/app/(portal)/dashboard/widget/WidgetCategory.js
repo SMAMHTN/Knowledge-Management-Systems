@@ -3,23 +3,23 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  Pencil, Settings, MoreHorizontal, Newspaper,
+  Pencil, Settings, MoreHorizontal, Layers,
 } from 'lucide-react';
 import { KmsAPIGET } from '@/dep/kms/kmsHandler';
 import { URLParamsBuilder, HandleSortParams } from '@/dep/others/HandleParams';
 import { Button } from '@/components/ui/button';
 
-function WidgetArticle() {
-  const [articleStats, setArticleStats] = useState('');
+function WidgetCategory() {
+  const [catStats, setCatStats] = useState('');
   const [lastRole, setLastRole] = useState([]);
   const newSortField = 'CategoryID';
   const newSortParams = HandleSortParams(newSortField, false);
   useEffect(() => {
     async function fetchData() {
       try {
-        const log = await KmsAPIGET(URLParamsBuilder('listarticle', null, 1, null, newSortParams));
+        const log = await KmsAPIGET(URLParamsBuilder('listcategory', null, 1, null, newSortParams));
         setLastRole(log.body.Data);
-        setArticleStats(log.body.Info);
+        setCatStats(log.body.Info);
       } catch (error) {
         console.error('Error fetching role data:', error);
       }
@@ -30,17 +30,17 @@ function WidgetArticle() {
   return (
     <>
       <div className="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:scale-110">
-        <Newspaper size={30} />
+        <Layers size={30} />
       </div>
 
       <div className="text-right">
 
-        {articleStats ? (
+        {catStats ? (
           <>
             <p className="text-2xl">
-              {articleStats.TotalRow}
+              {catStats.TotalRow}
             </p>
-            <p className="text-sm">Article</p>
+            <p className="text-sm">Category</p>
           </>
         ) : (
           <div className="flex items-center">
@@ -115,4 +115,4 @@ function WidgetArticle() {
   );
 }
 
-export default WidgetArticle;
+export default WidgetCategory;

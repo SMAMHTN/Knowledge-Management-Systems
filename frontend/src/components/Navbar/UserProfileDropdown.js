@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -18,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 
 function UserProfile({ maxWidth, maxHeight }) {
+  const router = useRouter();
   const [error, setError] = useState('');
   const [userData, setUserData] = useState(null);
 
@@ -69,6 +71,9 @@ function UserProfile({ maxWidth, maxHeight }) {
 
   const handleLogout = async () => {
     const success = await Logout();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log('logout successfully');
+    router.push('/');
   };
   return (
     <DropdownMenu>

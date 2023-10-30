@@ -67,11 +67,11 @@ function UploadDoc({ categoryID, DocAdd }) {
           <p className="text-xs mt-1 mb-4">
             Upload a document from your device. Image should be a .jpg, .jpeg, .png file. Notes: to use the uploaded document on this article, you need to click the upload button.
           </p>
-          <p>
+          {/* <p>
             Current State :
             {' '}
             {currentState}
-          </p>
+          </p> */}
         </div>
       </div>
     </div>

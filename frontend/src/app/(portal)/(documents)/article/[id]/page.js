@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Loader2 } from 'lucide-react';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import { alertUpdate } from '@/components/Feature';
 import UploadDoc from '@/components/UploadDoc';
@@ -15,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { RequiredFieldIndicator, ErrorMessage, Separator } from '@/components/SmComponent';
 import { articleSchema } from '@/constants/schema';
 import CategorySelector from '@/components/select/CategorySelector';
+import ListFile from '@/components/ListFromArray';
 
 function ArticleDetail({ params }) {
   const router = useRouter();
@@ -38,6 +40,34 @@ function ArticleDetail({ params }) {
   });
   const handleCategoryChange = (selectedOption) => {
     setSelectedCategory(selectedOption);
+  };
+
+  const [fileList, setFileList] = useState([]);
+  const [docList, setDocList] = useState([]);
+  const AddFile = (value) => {
+    // Check if the value is not already in the fileList
+    if (!fileList.includes(value)) {
+      // Add the value to the fileList
+      KmsAPI('PUT', 'article', {
+        ArticleID: data.ArticleID,
+        FileID: [...fileList, value],
+        IsActive: data.IsActive,
+      });
+      setFileList((prevList) => [...prevList, value]);
+    }
+  };
+
+  const AddDoc = (value) => {
+    // Check if the value is not already in the docList
+    if (!docList.includes(value)) {
+      // Add the value to the docList
+      KmsAPI('PUT', 'article', {
+        ArticleID: data.ArticleID,
+        DocID: [...docList, value],
+        IsActive: data.IsActive,
+      });
+      setDocList((prevList) => [...prevList, value]);
+    }
   };
 
   const fetchData = async () => {
@@ -84,8 +114,16 @@ function ArticleDetail({ params }) {
         CategoryID: selectedCategory.value,
         IsActive: formData.IsActive,
       };
+      const indexingID = {
+        ArticleID: parseInt(params.id, 10),
+      };
 
       const response = await KmsAPI('PUT', 'article', updatedData);
+      const indexing = await KmsAPI('PUT', 'article/solr', indexingID);
+      // console.log('----indexing-----------------------------------');
+      // console.log(indexing);
+      // console.log('----response-----------------------------------');
+      console.log(response);
       await new Promise((resolve) => setTimeout(resolve, 300));
       alertUpdate(response);
     } catch (error) {
@@ -179,7 +217,7 @@ function ArticleDetail({ params }) {
               )}
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-4 mt-20">
             <label className="block font-semibold mb-1">Edit Article Content</label>
             <ArticleEditor ArticleID={data.ArticleID} />
             <p>
@@ -190,16 +228,21 @@ function ArticleDetail({ params }) {
           </div>
           <div className="mb-4">
             <label className="block font-semibold mb-1">Upload Document</label>
-            <UploadDoc categoryID={data.CategoryID} />
+            <UploadDoc categoryID={data.CategoryID} DocAdd={AddDoc} />
+            <p>{docList}</p>
+            <ListFile idArray={docList} path="/api/doc/" />
             <label className="block font-semibold mb-1">Upload File</label>
-            <UploadFile categoryID={data.CategoryID} />
+            <UploadFile categoryID={data.CategoryID} FileAdd={AddFile} />
+            <p>{fileList}</p>
+            <ListFile idArray={fileList} path="/api/file/" />
           </div>
           <Button
             type="submit"
             disabled={isSubmitting}
             className="rounded bg-blue-500 text-white w-full md:w-36 my-2 mb-4"
           >
-            Publish
+            {isSubmitting ? (<Loader2 className="animate-spin mr-2" size={16} />) : null}
+            {isSubmitting ? ('Publishing') : ('Publish')}
           </Button>
         </form>
       </div>

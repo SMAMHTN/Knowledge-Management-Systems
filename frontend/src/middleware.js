@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export function middleware(req) {
-  const pathname = req.nextUrl.pathname;
-  const protectedPaths = ["/settings", "/admin"];
-  const isPathProtected = protectedPaths?.some((path) => pathname == path);
+  const { pathname } = req.nextUrl;
+  const protectedPaths = ['settings', 'dashboard', 'article', 'user', 'category', 'roles', 'permission'];
+  const isPathProtected = protectedPaths?.some((path) => pathname.includes(path));
   const res = NextResponse.next();
 
   if (isPathProtected) {
@@ -12,8 +12,11 @@ export function middleware(req) {
     // isLogin().then((x) => {
     //   AlreadyLogin = x;
     // });
-    if (!req.cookies.has('username') && !req.cookies.has('password')) {
-      const url = new URL(`/`, req.url);
+
+    const username = req.cookies.get('username');
+    const password = req.cookies.get('password');
+    if (!req.cookies.has('username') || !req.cookies.has('password') || username.value === '' || password.value === '') {
+      const url = new URL('/', req.url);
       return NextResponse.redirect(url);
     }
   }

@@ -6,8 +6,6 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from '@/components/ui/table';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
@@ -21,7 +19,7 @@ function WidgetActivityLog() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const log = await CoreAPIGET(URLParamsBuilder('listhistory', null, 15, null, newSortParams));
+        const log = await CoreAPIGET(URLParamsBuilder('listhistory', null, 5, null, newSortParams));
         setLogData(log.body.Data);
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -40,9 +38,10 @@ function WidgetActivityLog() {
           <TableRow key={item.HistoryID}>
             <TableCell className="text-xs ">
               <TimeAgo timestamp={item.Time} />
+              &nbsp; Ago
               {/* {console.log(item.Time)} */}
             </TableCell>
-            <TableCell className="text-sm">{item.Changes.length <= 30 ? item.Changes : `${item.Changes.substring(0, 30)}...`}</TableCell>
+            <TableCell className="text-xs">{item.Changes.length <= 30 ? item.Changes : `${item.Changes.substring(0, 50)}...`}</TableCell>
           </TableRow>
         ))}
       </TableBody>

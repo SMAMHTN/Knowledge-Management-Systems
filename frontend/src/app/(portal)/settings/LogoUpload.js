@@ -45,9 +45,9 @@ function LogoUpload({ onUpload }) {
       <Button
         type="button"
         onClick={handleUpload}
-        className="rounded bg-blue-500 text-white w-full md:w-36"
+        className="rounded bg-blue-500 text-white w-full md:w-36 hover:bg-blue-600"
       >
-        Upload logo
+        Upload
       </Button>
     </div>
   );

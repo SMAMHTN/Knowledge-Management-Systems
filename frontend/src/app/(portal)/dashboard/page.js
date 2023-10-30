@@ -13,66 +13,54 @@ import {
 import { searchIcon } from '@/constants/icon';
 import { Separator } from '@/components/SmComponent';
 import WidgetActivityLog from './widget/WidgetActivityLog';
-import WidgetArticle from './widget/WidgetArticle';
+import WidgetArticleList from './widget/WidgetArticleList';
 import WidgetUser from './widget/WidgetUser';
 import WidgetRole from './widget/WidgetRole';
 import UserGreetings from './UserGreetings';
 import getSuperAdminStatus from '@/dep/core/getSuperAdminStatus';
 import DashboardUser from './DashboardUser';
+import WidgetCategory from './widget/WidgetCategory';
+import WidgetArticle from './widget/WidgetArticle';
+import WidgetDropdown from './widget/WidgetDropdown';
 
 function DashboardSuperAdmin() {
   return (
     <>
       {' '}
-      <div className="hidden lg:grid grid-cols-6 grid-rows-4 gap-4 w-full h-full">
-        <div className="bg-white col-span-2 row-span-2 p-4 rounded-lg flex flex-col">
-          <div className="flex items-center justify-between">
-            <div>
-              <Users size={48} />
-              <h1 className="text-gray-500 text-sm font-semibold">User Stats </h1>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
+        <div className="bg-white shadow-lg rounded-md flex items-center justify-between p-3 font-medium group">
           <WidgetUser />
         </div>
-        <div className="bg-white col-span-2 row-span-2 col-start-3 p-4 rounded-lg flex flex-col">
-          <div className="flex items-center justify-between">
-            <div>
-              <Tag size={48} />
-              <h1 className="text-gray-500 text-sm font-semibold">Role Stats </h1>
-            </div>
-          </div>
+        <div className="bg-white shadow-lg rounded-md flex items-center justify-between p-3 font-medium group">
           <WidgetRole />
         </div>
-        <div className="bg-white col-span-2 row-span-4 col-start-5 p-4 rounded-lg flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-l font-semibold">Recent Activity </h1>
-            <MoreHorizontal size={24} color="gray" />
-          </div>
-          <WidgetActivityLog />
+        <div className="bg-white shadow-lg rounded-md flex items-center justify-between p-3 font-medium group">
+          <WidgetCategory />
         </div>
-        <div className="bg-white col-span-4 row-span-2 row-start-3 p-4 rounded-lg flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="hidden lg:flex text-l font-semibold">Recent Article</h1>
-            <h1 className="flex lg:hidden text-l font-semibold">Article</h1>
-            <MoreHorizontal size={24} color="gray" />
-          </div>
+        <div className="bg-white shadow-lg rounded-md flex items-center justify-between p-3 font-medium group">
           <WidgetArticle />
         </div>
       </div>
-      <div className="lg:hidden grid grid-cols-2 grid-rows-4 gap-2 lg:rounded h-full">
-        <div className="bg-white rounded-lg">1</div>
-        <div className="bg-white rounded-lg">2</div>
-        <div className="col-span-2 row-span-2 bg-white rounded-lg">
-          {' '}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-2">
+        <div className="bg-white p-4 shadow-lg lg:col-span-3 rounded-lg flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <h1 className="hidden lg:flex text-l font-semibold">Recent Article</h1>
-            <h1 className="flex lg:hidden text-l font-semibold ml-4 p-4">Article</h1>
-            <MoreHorizontal size={24} color="gray" />
+            <h1 className="flex lg:hidden text-l font-semibold">Article</h1>
+            <WidgetDropdown viewListLink="/article" />
           </div>
-          <WidgetArticle />
-
+          <WidgetArticleList />
         </div>
-        <div className="col-span-2 row-span-2 row-start-4 bg-white rounded-lg">4</div>
+        <div className="bg-white p-4 shadow-lg lg:col-span-2 rounded-lg flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-l font-semibold">Recent Activity </h1>
+            <WidgetDropdown viewListLink="/activity-log" />
+          </div>
+          <div className="overflow-y-auto">
+            <div className="max-h-screen-md">
+              <WidgetActivityLog />
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );
@@ -81,55 +69,40 @@ function DashboardAdmin() {
   return (
     <>
       {' '}
-      <div className="hidden lg:grid grid-cols-6 grid-rows-4 gap-4 w-full h-full">
-        <div className="bg-white col-span-2 row-span-2 p-4 rounded-lg flex flex-col">
-          <div className="flex items-center justify-between">
-            <div>
-              <Users size={48} />
-              <h1 className="text-gray-500 text-sm font-semibold">User Stats </h1>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
+        <div className="bg-white shadow-lg rounded-md flex items-center justify-between p-3 font-medium group">
           <WidgetUser />
         </div>
-        <div className="bg-white col-span-2 row-span-2 col-start-3 p-4 rounded-lg flex flex-col">
-          <div className="flex items-center justify-between">
-            <div>
-              <Tag size={48} />
-              <h1 className="text-gray-500 text-sm font-semibold">Role Stats </h1>
-            </div>
-          </div>
+        <div className="bg-white shadow-lg rounded-md flex items-center justify-between p-3 font-medium group">
           <WidgetRole />
         </div>
-        <div className="bg-white col-span-2 row-span-4 col-start-5 p-4 rounded-lg flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-l font-semibold">Recent Activity </h1>
-            <MoreHorizontal size={24} color="gray" />
-          </div>
-          <WidgetActivityLog />
+        <div className="bg-white shadow-lg rounded-md flex items-center justify-between p-3 font-medium group">
+          <WidgetCategory />
         </div>
-        <div className="bg-white col-span-4 row-span-2 row-start-3 p-4 rounded-lg flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="hidden lg:flex text-l font-semibold">Recent Article</h1>
-            <h1 className="flex lg:hidden text-l font-semibold">Article</h1>
-            <MoreHorizontal size={24} color="gray" />
-          </div>
+        <div className="bg-white shadow-lg rounded-md flex items-center justify-between p-3 font-medium group">
           <WidgetArticle />
         </div>
       </div>
-      <div className="lg:hidden grid grid-cols-2 grid-rows-4 gap-2 lg:rounded h-full">
-        <div className="bg-white rounded-lg">1</div>
-        <div className="bg-white rounded-lg">2</div>
-        <div className="col-span-2 row-span-2 bg-white rounded-lg">
-          {' '}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-2">
+        <div className="bg-white p-4 shadow-lg lg:col-span-3 rounded-lg flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <h1 className="hidden lg:flex text-l font-semibold">Recent Article</h1>
-            <h1 className="flex lg:hidden text-l font-semibold ml-4 p-4">Article</h1>
-            <MoreHorizontal size={24} color="gray" />
+            <h1 className="flex lg:hidden text-l font-semibold">Article</h1>
+            <WidgetDropdown viewListLink="/article" />
           </div>
-          <WidgetArticle />
-
+          <WidgetArticleList />
         </div>
-        <div className="col-span-2 row-span-2 row-start-4 bg-white rounded-lg">4</div>
+        <div className="bg-white p-4 shadow-lg lg:col-span-2 rounded-lg flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-l font-semibold">Recent Activity </h1>
+            <WidgetDropdown viewListLink="/activity-log" />
+          </div>
+          <div className="overflow-y-auto">
+            <div className="max-h-screen-md">
+              <WidgetActivityLog />
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  Pencil, UserCog2, Loader2, MoreHorizontal,
+  Pencil, UserCog2, Loader2, MoreHorizontal, Users,
 } from 'lucide-react';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
 import { URLParamsBuilder, HandleSortParams } from '@/dep/others/HandleParams';
@@ -30,7 +30,30 @@ function WidgetUser() {
   }, []);
 
   return (
-    <div className="grid grid-cols-2 grid-rows-3 gap-1 h-full mt-2">
+    <>
+
+      <div className="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:scale-110">
+        <Users size={30} />
+      </div>
+
+      <div className="text-right">
+
+        {userStats ? (
+          <>
+            <p className="text-2xl">
+              {userStats.TotalRow}
+            </p>
+            <p className="text-sm">Users</p>
+          </>
+        ) : (
+          <div className="flex items-center">
+            <MoreHorizontal color="gray" className="animate-pulse mr-2" />
+          </div>
+        )}
+
+      </div>
+      {/*
+<div className="grid grid-cols-2 grid-rows-3 gap-1 h-full mt-2">
       <div className=" p-2 col-span-2 text-2xl font-semibold flex flex-col-reverse">
         {userStats ? (
           <span>
@@ -91,7 +114,8 @@ function WidgetUser() {
         </Button>
 
       </div>
-    </div>
+    </div> */}
+    </>
   );
 }
 

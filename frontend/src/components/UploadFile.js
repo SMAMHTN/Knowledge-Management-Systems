@@ -67,11 +67,11 @@ function UploadFile({ categoryID, FileAdd }) {
           <p className="text-xs mt-1 mb-4">
             Upload a File from your device. Image should be a .jpg, .jpeg, .png file. Notes: to use the uploaded File on this article, you need to click the upload button.
           </p>
-          <p>
+          {/* <p>
             Current State :
             {' '}
             {currentState}
-          </p>
+          </p> */}
         </div>
       </div>
     </div>

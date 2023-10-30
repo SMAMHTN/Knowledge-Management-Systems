@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import ArticleEditor from '@/dep/grapesjs/ArticleEditor';
 import { Separator } from '@/components/SmComponent';
 import UploadDoc from '@/components/UploadDoc';
@@ -10,8 +11,10 @@ import { Button } from '@/components/ui/button';
 import { URLParamsBuilder } from '@/dep/others/HandleParams';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import ListFile from '@/components/ListFromArray';
+import { alertAdd } from '@/components/Feature';
 
 function articleEditing({ params }) {
+  const router = useRouter();
   const [data, setData] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [docList, setDocList] = useState([]);
@@ -57,6 +60,18 @@ function articleEditing({ params }) {
     fetchData();
   }, [params.id]);
 
+  const handlePublish = async (e) => {
+    e.preventDefault();
+    const updatedData = {
+      ArticleID: parseInt(params.id, 10),
+    };
+
+    const response = await KmsAPI('PUT', 'article/solr', updatedData);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    alertAdd(response);
+    router.push('/article');
+  };
+
   return (
     <section className="h-screen flex flex-col flex-auto">
       <div className="flex flex-col">
@@ -87,10 +102,10 @@ function articleEditing({ params }) {
         <Button
           type="button"
           className="rounded bg-blue-500 hover:bg-blue-600 text-white my-4 w-full md:w-36"
+          onClick={handlePublish}
         >
-          <Link href={URLParamsBuilder('/article')}>
-            Publish
-          </Link>
+          {/* <Link href={URLParamsBuilder('/article')} /> */}
+          Publish
         </Button>
       </div>
 
