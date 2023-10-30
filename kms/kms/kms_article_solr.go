@@ -115,7 +115,7 @@ func IndexArticle(c echo.Context) error {
 		res.Data = "ORIGINAL ARTICLE NOT FOUND"
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	_, user, _ := Check_Admin_Permission_API(c)
+	permission, user, _ := Check_Admin_Permission_API(c)
 	role_id, err := dependency.InterfaceToInt(user["RoleID"])
 	if err != nil {
 		Logger.Error(err.Error())
@@ -131,7 +131,6 @@ func IndexArticle(c echo.Context) error {
 		res.Data = err
 		return c.JSON(http.StatusForbidden, res)
 	}
-	permission, _, _ := Check_Admin_Permission_API(c)
 	if TrueCreate || TrueUpdate || permission {
 		resulta, err := oriu.ConvForSolr()
 		if err != nil {
@@ -161,6 +160,28 @@ func IndexArticle(c echo.Context) error {
 	} else {
 		res.StatusCode = http.StatusForbidden
 		res.Data = "YOU DONT HAVE PERMISSION TO DELETE THIS ARTICLE"
+		return c.JSON(http.StatusForbidden, res)
+	}
+}
+
+func ReloadAllIndexArticle(c echo.Context) error {
+	var err error
+	var res Response
+	permission, _, _ := Check_Admin_Permission_API(c)
+	if permission {
+		err = SolrReloadAllIndex(c)
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+		res.StatusCode = http.StatusOK
+		res.Data = "All Article has been Re-Indexed"
+		return c.JSON(http.StatusOK, res)
+	} else {
+		res.StatusCode = http.StatusForbidden
+		res.Data = "YOU DONT HAVE PERMISSION TO Re-Index All Article"
 		return c.JSON(http.StatusForbidden, res)
 	}
 }

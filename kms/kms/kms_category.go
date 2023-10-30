@@ -220,23 +220,6 @@ func ShowCategory(c echo.Context) error {
 	}
 }
 
-func GetAnyCUDPermissionAPI(c echo.Context) error {
-	var err error
-	res := Response{}
-	AnyCUDPermission, err := GetAnyCUDPermission(c)
-	if err != nil {
-		if err != nil {
-			Logger.Error(err.Error())
-			res.StatusCode = http.StatusInternalServerError
-			res.Data = err
-			return c.JSON(http.StatusInternalServerError, res)
-		}
-	}
-	res.StatusCode = http.StatusOK
-	res.Data = AnyCUDPermission
-	return c.JSON(http.StatusOK, res)
-}
-
 func AddCategory(c echo.Context) error {
 	permission, _, _ := Check_Admin_Permission_API(c)
 	var err error

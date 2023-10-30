@@ -1,12 +1,8 @@
 package kms
 
 import (
-	"bytes"
 	"dependency"
-	"errors"
-	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 
@@ -103,119 +99,6 @@ func CheckServerRun(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-func SolrCall(apimethod string, SolrLinkPath string, data interface{}) ([]byte, *http.Response, error) {
-	a, b, c := dependency.SolrCallUpdate(apimethod, Conf.Solr_link+SolrLinkPath, Conf.Solr_username, Conf.Solr_password, data)
-	return a, b, c
-}
-
-func SolrCallUpdate(apimethod string, data interface{}) ([]byte, *http.Response, error) {
-	params := url.Values{}
-	params.Set("commitWithin", "1000")
-	params.Set("overwrite", "true")
-	// params.Set("wt", "json")
-	a, b, c := dependency.SolrCallUpdate(apimethod, Conf.Solr_link+SolrV2AddURL+"?"+params.Encode(), Conf.Solr_username, Conf.Solr_password, data)
-	return a, b, c
-}
-
-func SolrCallUpdateHard(apimethod string, data interface{}) ([]byte, *http.Response, error) {
-	a, b, c := dependency.SolrCallUpdate(apimethod, Conf.Solr_link+SolrV2AddURL, Conf.Solr_username, Conf.Solr_password, data)
-	return a, b, c
-}
-
-func SolrCallQuery(c echo.Context, q string, query string, search string, page int, num int, show string) (res []byte, header *http.Response, err error) {
-	var qSolr string
-	permission, user, _ := Check_Admin_Permission_API(c)
-	if permission {
-		qSolr = "IsActive:1"
-	} else {
-		role_id, err := dependency.InterfaceToInt(user["RoleID"])
-		if err != nil {
-			return nil, nil, err
-		}
-		CategoryIDList, err := GetReadCategoryList(c, role_id)
-		if err != nil {
-			return nil, nil, err
-		}
-		if len(CategoryIDList) == 0 {
-			return nil, nil, errors.New("category list empty")
-		}
-		qSolr = "(IsActive:1"
-		qSolr = qSolr + " AND CategoryID:("
-		for _, SingleCategoryID := range CategoryIDList {
-			qSolr += strconv.Itoa(SingleCategoryID) + " OR "
-		}
-		qSolr = qSolr[:len(qSolr)-4] + "))"
-	}
-	if q != "" {
-		qSolr += " AND " + q
-	}
-	if search != "" {
-		qSolr += " AND searchbar:" + search
-	}
-
-	params := url.Values{}
-	if num != 0 {
-		params.Set("rows", strconv.Itoa(num))
-	}
-	if page != 0 {
-		start := (page - 1) * num
-		params.Set("start", strconv.Itoa(start))
-	}
-	params.Set("indent", "true")
-	params.Set("q.op", "AND")
-	params.Set("q", qSolr)
-	params.Set("indent", "false")
-	if show != "" {
-		params.Set("fl", show)
-	} else {
-		params.Set("fl", "ArticleID,OwnerID,OwnerUsername,OwnerName,LastEditedByID,LastEditedByUsername,LastEditedByName,LastEditedTime,Tag,Title,CategoryID,CategoryName,CategoryParent,CategoryDescription,Article,FileID,DocID,IsActive")
-	}
-	if query != "" {
-		res, header, err = dependency.SolrCallQuery(Conf.Solr_link+SolrV2SelectAddURL+"?"+params.Encode()+"&"+query, Conf.Solr_username, Conf.Solr_password)
-	} else {
-		res, header, err = dependency.SolrCallQuery(Conf.Solr_link+SolrV2SelectAddURL+"?"+params.Encode(), Conf.Solr_username, Conf.Solr_password)
-	}
-	return res, header, err
-}
-
-func DeleteSolrDocument(id string) error {
-	// Create JSON request body
-	requestBody := []byte(fmt.Sprintf(`{"delete":{"id":"%s"}}`, id))
-
-	// Create HTTP request with basic authentication
-	params := url.Values{}
-	params.Set("commitWithin", "1000")
-	params.Set("overwrite", "true")
-	params.Set("wt", "json")
-	req, err := http.NewRequest("POST", Conf.Solr_link+Solrv2DeleteAddURL+"?"+params.Encode(), bytes.NewBuffer(requestBody))
-	if err != nil {
-		return err
-	}
-	req.SetBasicAuth(Conf.Solr_username, Conf.Solr_password)
-	req.Header.Set("Content-Type", "application/json")
-
-	// Send HTTP request
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	// body, err := io.ReadAll(resp.Body)
-	// fmt.Println(string(body))
-	// if err != nil {
-	// 	return err
-	// }
-
-	// Check Solr's response status code
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("solr server returned non-200 status code: %d", resp.StatusCode)
-	}
-
-	return nil
-}
-
 func Test_api() {
 	e := echo.New()
 
@@ -297,6 +180,8 @@ func Test_api() {
 	e.PUT("/articlegrapesjs", UpdateArticleGrapesjs, basicAuthMiddleware, LogMiddleware)
 	e.POST("/article/solr", IndexArticle, basicAuthMiddleware, LogMiddleware)
 	e.PUT("/article/solr", IndexArticle, basicAuthMiddleware, LogMiddleware)
+	e.PUT("/article/solr/reindex", ReloadAllIndexArticle, basicAuthMiddleware, LogMiddleware)
+	e.POST("/article/solr/reindex", ReloadAllIndexArticle, basicAuthMiddleware, LogMiddleware)
 	e.GET("/article", ShowArticle, basicAuthMiddleware, LogMiddleware)
 	e.POST("/article", AddArticle, basicAuthMiddleware, LogMiddleware)
 	e.PUT("/article", EditArticle, basicAuthMiddleware, LogMiddleware)

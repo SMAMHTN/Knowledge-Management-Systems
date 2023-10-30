@@ -516,6 +516,23 @@ func GetAnyCUDPermission(c echo.Context) (AnyCUDPermission bool, err error) {
 	return AnyCUDPermission, nil
 }
 
+func GetAnyCUDPermissionAPI(c echo.Context) error {
+	var err error
+	res := Response{}
+	AnyCUDPermission, err := GetAnyCUDPermission(c)
+	if err != nil {
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+	}
+	res.StatusCode = http.StatusOK
+	res.Data = AnyCUDPermission
+	return c.JSON(http.StatusOK, res)
+}
+
 func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err error) {
 	_, userpass, _ := c.Request().BasicAuth()
 	err = nil
@@ -550,7 +567,7 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 		if val.PRead != 0 {
 			if !slices.Contains(CategoryIDList, val.CategoryID) {
 				CategoryTMP := Category{CategoryID: val.CategoryID}
-				CategoryParentTMP, err := CategoryTMP.ListAllCategoryParent()
+				CategoryParentTMP, err := CategoryTMP.ListAllCategoryChild()
 				if err != nil {
 					return CategoryIDList, err
 				}
@@ -560,7 +577,7 @@ func GetReadCategoryList(c echo.Context, RoleID int) (CategoryIDList []int, err 
 	}
 	if !slices.Contains(CategoryIDList, 1) {
 		CategoryTMP := Category{CategoryID: 1}
-		CategoryParentTMP, err := CategoryTMP.ListAllCategoryParent()
+		CategoryParentTMP, err := CategoryTMP.ListAllCategoryChild()
 		if err != nil {
 			return CategoryIDList, err
 		}
