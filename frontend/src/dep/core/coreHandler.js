@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { readConf } from '../others/confHandler';
 // eslint-disable-next-line import/named
 import { generateCoreCred } from '../others/generateCred';
+import { KmsAPIGET } from '../kms/kmsHandler';
 
 // const LoginDynamicpath = '/';
 
@@ -225,7 +226,8 @@ export async function Login(Username, Password) {
       });
     }
     await SetThemeCookies();
-    const response3 = await CoreAPIGET('cudpermission');
+    const response3 = await KmsAPIGET('cudpermission');
+    console.log(response3);
     cookies().set({
       name: 'cudpermission',
       value: response3.body.Data,
