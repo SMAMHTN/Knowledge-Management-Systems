@@ -33,6 +33,12 @@ export async function Logout() {
     sameSite: 'lax',
     path: '/',
   });
+  cookies().set({
+    name: 'cudpermission',
+    value: '',
+    sameSite: 'lax',
+    path: '/',
+  });
   return true;
 }
 
@@ -219,6 +225,13 @@ export async function Login(Username, Password) {
       });
     }
     await SetThemeCookies();
+    const response3 = await CoreAPIGET('cudpermission');
+    cookies().set({
+      name: 'cudpermission',
+      value: response3.body.Data,
+      sameSite: 'lax',
+      path: '/',
+    });
     return true;
   }
   await SetThemeCookies();
