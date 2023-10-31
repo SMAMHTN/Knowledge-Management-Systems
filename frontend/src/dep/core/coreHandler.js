@@ -175,7 +175,7 @@ export async function CoreAPIBlob(method, path, CategoryID, File) {
   }
 }
 
-async function SetThemeCookies() {
+export async function SetThemeCookies() {
   const response = await CoreAPIGET('loginuser');
   const response2 = await CoreAPIGET('setting');
   const ThemeID = (response.status !== 401) ? response.body.Data.AppthemeID : response2.body.Data.AppthemeID;
