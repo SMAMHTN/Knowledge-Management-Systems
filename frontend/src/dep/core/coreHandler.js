@@ -40,6 +40,12 @@ export async function Logout() {
     sameSite: 'lax',
     path: '/',
   });
+  cookies().set({
+    name: 'cpermission',
+    value: '',
+    sameSite: 'lax',
+    path: '/',
+  });
   return true;
 }
 
@@ -227,10 +233,16 @@ export async function Login(Username, Password) {
     }
     await SetThemeCookies();
     const response3 = await KmsAPIGET('cudpermission');
-    console.log(response3);
     cookies().set({
       name: 'cudpermission',
       value: response3.body.Data,
+      sameSite: 'lax',
+      path: '/',
+    });
+    const response4 = await KmsAPIGET('cpermission');
+    cookies().set({
+      name: 'cpermission',
+      value: response4.body.Data,
       sameSite: 'lax',
       path: '/',
     });

@@ -159,6 +159,7 @@ func Test_api() {
 	e.GET("/listpermission", ListPermission, basicAuthMiddleware, LogMiddleware)
 	e.GET("/listpermissionid", ListPermissionID, basicAuthMiddleware, LogMiddleware)
 	e.GET("/cudpermission", GetAnyCUDPermissionAPI, basicAuthMiddleware, LogMiddleware)
+	e.GET("/cpermission", GetAnyCPermissionAPI, basicAuthMiddleware, LogMiddleware)
 	e.GET("/permission", ShowPermission, basicAuthMiddleware, LogMiddleware)
 	e.POST("/permission", AddPermission, basicAuthMiddleware, LogMiddleware)
 	e.PUT("/permission", EditPermission, basicAuthMiddleware, LogMiddleware)
