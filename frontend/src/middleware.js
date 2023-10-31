@@ -1,4 +1,6 @@
+/* eslint-disable import/prefer-default-export */
 import { NextResponse } from 'next/server';
+import { SetThemeCookies } from './dep/core/coreHandler';
 
 export function middleware(req) {
   const { pathname } = req.nextUrl;
@@ -15,9 +17,13 @@ export function middleware(req) {
 
     const username = req.cookies.get('username');
     const password = req.cookies.get('password');
+    const theme = req.cookies.get('theme');
     if (!req.cookies.has('username') || !req.cookies.has('password') || username.value === '' || password.value === '') {
       const url = new URL('/', req.url);
       return NextResponse.redirect(url);
+    }
+    if (!req.cookies.has('theme') || theme.value === '') {
+      SetThemeCookies().then();
     }
   }
   return res;
