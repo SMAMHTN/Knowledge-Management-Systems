@@ -112,6 +112,7 @@ func ListArticle(c echo.Context) error {
 				res.Data = err
 				return c.JSON(http.StatusInternalServerError, res)
 			}
+			CategoryPermissionList = append(CategoryPermissionList, CategoryPermissionSingle)
 		}
 		var wherequery []dependency.WhereType
 		if limit.Query != "" {
