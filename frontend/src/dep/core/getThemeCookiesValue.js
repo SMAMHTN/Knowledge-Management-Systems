@@ -7,9 +7,11 @@ function getThemeCookiesValue() {
     return JSON.parse(ThemeValue);
   } catch (error) {
     // An error occurred, so set the theme cookies using SetThemeCookies
-    SetThemeCookies(); // Assuming SetThemeCookies is defined and sets the theme cookies
-    const ThemeValue = getCookie('theme');
-    return JSON.parse(ThemeValue);
+    return SetThemeCookies()
+      .then(() => {
+        const ThemeValue = getCookie('theme');
+        return JSON.parse(ThemeValue);
+      });
   }
 }
 
