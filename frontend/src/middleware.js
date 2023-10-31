@@ -7,6 +7,10 @@ export function middleware(req) {
   const protectedPaths = ['settings', 'dashboard', 'article', 'user', 'category', 'roles', 'permission'];
   const isPathProtected = protectedPaths?.some((path) => pathname.includes(path));
   const res = NextResponse.next();
+  const theme = req.cookies.get('theme');
+  if (!req.cookies.has('theme') || theme.value === '') {
+    SetThemeCookies().then();
+  }
 
   if (isPathProtected) {
     // let AlreadyLogin;
@@ -17,13 +21,9 @@ export function middleware(req) {
 
     const username = req.cookies.get('username');
     const password = req.cookies.get('password');
-    const theme = req.cookies.get('theme');
     if (!req.cookies.has('username') || !req.cookies.has('password') || username.value === '' || password.value === '') {
       const url = new URL('/', req.url);
       return NextResponse.redirect(url);
-    }
-    if (!req.cookies.has('theme') || theme.value === '') {
-      SetThemeCookies().then();
     }
   }
   return res;
