@@ -53,9 +53,9 @@ export const userSetting = {
 };
 
 export const post = {
-  id: 'post',
-  title: 'post',
-  link: '/post',
+  id: 'article',
+  title: 'article',
+  link: '/article',
 };
 
 const defaultExport = userSetting;

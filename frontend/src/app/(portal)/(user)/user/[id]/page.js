@@ -90,7 +90,7 @@ function UserDetails({ params }) {
         Address: formData.Address,
         Phone: formData.Phone,
         RoleID: selectedRole.value,
-        AppthemeID: SelectedTheme.value,
+        AppthemeID: selectedTheme.value,
         Note: formData.Note,
         IsSuperAdmin: formData.IsSuperAdmin,
         IsActive: formData.IsActive,

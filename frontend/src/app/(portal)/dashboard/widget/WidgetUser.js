@@ -17,11 +17,9 @@ function WidgetUser() {
   useEffect(() => {
     async function fetchData() {
       try {
-        console.log(userStats);
         const log = await CoreAPIGET(URLParamsBuilder('listuser', null, 1, null, newSortParams));
         setLatestUser(log.body.Data);
         setUserStats(log.body.Info);
-        console.log(userStats);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }

@@ -72,14 +72,14 @@ function DashboardUser() {
             </form>
 
           </div>
-          <Button
+          {/* <Button
             className="rounded bg-blue-500 text-white my-auto w-14 ml-auto lg:w-36 hover:bg-blue-600 mr-2"
           >
             <Link href="/article/edit/">
               <p className="hidden lg:flex">Add New Article</p>
               <p className=" lg:hidden text-xl">+</p>
             </Link>
-          </Button>
+          </Button> */}
         </div>
         <div className="bg-white rounded-md p-4 h-fit w-full">
           {search ? (

@@ -193,7 +193,7 @@ function AdminMenu() {
   );
 }
 
-function UserMenu() {
+function UserMenuCUD() {
   return (
     <ul className="flex flex-col py-4 space-y-1">
       <li>
@@ -222,7 +222,25 @@ function UserMenu() {
           </span>
         </Link>
       </li>
-      <li />
+    </ul>
+  );
+}
+function UserMenuR() {
+  return (
+    <ul className="flex flex-col py-4 space-y-1">
+      <li>
+        <Link
+          href={dashboard.link}
+          className="relative flex flex-row hover:underline items-center h-11 text-bold font-medium border-b"
+        >
+          <span className="inline-flex justify-center items-center ml-4">
+            <Home />
+          </span>
+          <span className="ml-2 text-sm tracking-wide truncate">
+            {dashboard.title}
+          </span>
+        </Link>
+      </li>
     </ul>
   );
 }
@@ -236,8 +254,10 @@ function Sidebar({ initialTime }) {
       setMenuComponent(<SuperAdminMenu />);
     } else if (userStatus === 2) {
       setMenuComponent(<AdminMenu />);
+    } else if (userStatus === 3) {
+      setMenuComponent(<UserMenuCUD />);
     } else {
-      setMenuComponent(<UserMenu />);
+      setMenuComponent(<UserMenuR />);
     }
   }, [userStatus]);
 

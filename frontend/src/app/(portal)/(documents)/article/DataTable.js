@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowUpDown, ChevronDown, MoreHorizontal, Check, X, Search,
 } from 'lucide-react';
+import { getCookie } from 'cookies-next';
 import {
   Select,
   SelectContent,
@@ -78,7 +79,6 @@ export default function DataTable() {
       }
       response = await KmsAPIGET(URLParamsBuilder('listarticle', page, num, queriesencoded, sortencoded));
       setPageInfo(response.body.Info);
-      console.log(pageInfo);
       setData(response.body.Data);
       console.log(response);
     } catch (error) {
@@ -232,19 +232,21 @@ export default function DataTable() {
                 >
                   Copy ID
                 </DropdownMenuItem>
-                <DropdownMenuItem className="hover:underline hover:cursor-pointer" onClick={() => handleNavigate(items.ArticleID)}>View</DropdownMenuItem>
-                <DropdownMenuItem
-                  className="hover:underline  hover:cursor-pointer hover:text-red-600"
-                  onClick={() => {
-                    setDeletingArticleID(items.ArticleID);
-                    setDeleteMessage(
-                      `Are you sure you would like to delete "${items.Title}" Article? This action cannot be undone.`,
-                    );
-                    setIsDeleteModalOpen(true);
-                  }}
-                >
-                  Delete
-                </DropdownMenuItem>
+                {items.Update === true ? (<DropdownMenuItem className="hover:underline hover:cursor-pointer" onClick={() => handleNavigate(items.ArticleID)}>View</DropdownMenuItem>) : null}
+                {items.Delete === true ? (
+                  <DropdownMenuItem
+                    className="hover:underline  hover:cursor-pointer hover:text-red-600"
+                    onClick={() => {
+                      setDeletingArticleID(items.ArticleID);
+                      setDeleteMessage(
+                        `Are you sure you would like to delete "${items.Title}" Article? This action cannot be undone.`,
+                      );
+                      setIsDeleteModalOpen(true);
+                    }}
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                ) : null}
               </DropdownMenuContent>
             </DropdownMenu>
             <DeleteModal
@@ -334,7 +336,8 @@ export default function DataTable() {
     }]));
     setQueries(newQ);
   };
-
+  const cPerm = getCookie('cpermission');
+  console.log('-----------------------------', cPerm);
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
@@ -352,14 +355,16 @@ export default function DataTable() {
         </Button>
         <div className=" ml-auto item-justify-end inline-flex">
           {/* <AddArticle fetchData={fetchData} /> */}
-          <Button
-            type="button"
-            className=" bg-gray-100 ml-2  hover:bg-gray-300 border-white border"
-          >
-            <Link href={URLParamsBuilder('/article/edit')}>
-              +
-            </Link>
-          </Button>
+          {cPerm === 'true' ? (
+            <Button
+              type="button"
+              className=" bg-gray-100 ml-2  hover:bg-gray-300 border-white border"
+            >
+              <Link href={URLParamsBuilder('/article/edit')}>
+                +
+              </Link>
+            </Button>
+          ) : null}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className=" ml-2 bg-gray-100 hover:bg-gray-300 border-white border">

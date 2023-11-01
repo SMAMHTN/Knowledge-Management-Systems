@@ -181,6 +181,10 @@ export async function SetThemeCookies() {
   const ThemeID = (response.status !== 401) ? response.body.Data.AppthemeID : response2.body.Data.AppthemeID;
   const responseTheme = await CoreAPIGET(`theme?AppthemeID=${ThemeID}`);
   const themevaluestring = JSON.stringify(responseTheme.body.Data.AppthemeValue);
+  // const encodedurl = encodeURI(themevaluestring);
+  // const base64EncodedValueTheme = btoa(themevaluestring);
+  // console.log('-------------------------------------------------------------------------------------');
+  // console.log(base64EncodedValueTheme);
   cookies().set({
     name: 'theme',
     value: themevaluestring,

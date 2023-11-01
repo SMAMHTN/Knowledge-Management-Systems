@@ -22,7 +22,6 @@ function WidgetArticleList() {
     async function fetchData() {
       try {
         const article = await KmsAPIGET(URLParamsBuilder('listarticle', 1, 4, null, newSortParams));
-        console.log(article);
         setArticleData(article.body.Data);
       } catch (error) {
         console.error('Error fetching user data:', error);
