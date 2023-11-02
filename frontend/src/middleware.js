@@ -8,9 +8,16 @@ export function middleware(req) {
   const isPathProtected = protectedPaths?.some((path) => pathname.includes(path));
   const res = NextResponse.next();
   const theme = req.cookies.get('theme');
+  // console.log("----------------------------------------------");
+  // console.log(theme);
+  // console.log(req.cookies.has('theme'));
   if (!req.cookies.has('theme') || theme.value === '') {
+    console.log('Passed here');
     SetThemeCookies().then();
   }
+  const theme2 = req.cookies.get('theme');
+
+  res.cookies.set('theme', theme2.value);
 
   if (isPathProtected) {
     // let AlreadyLogin;
@@ -28,3 +35,7 @@ export function middleware(req) {
   }
   return res;
 }
+
+// export const config = {
+//   matcher: ['/settings', '/dashboard', '/article', '/user', '/category', '/roles', '/permission','/settings', '/dashboard/:path*', '/article/:path*', '/user/:path*', '/category/:path*', '/roles/:path*', '/permission/:path*'],
+// };
