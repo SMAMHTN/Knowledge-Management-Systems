@@ -58,7 +58,7 @@ services:
     depends_on:
       core:
         condition: service_healthy
-      kms:
+      kms:  
         condition: service_healthy
     ports:
       - "3000:3000"
