@@ -23,7 +23,7 @@ async function getThemeCookiesValueAsync() {
     //   sameSite: 'lax',
     //   path: '/',
     // });
-    return JSON.parse(themevaluestring);
+    return JSON.parse(responseTheme.body.Data.AppthemeValue);
   }
 }
 
