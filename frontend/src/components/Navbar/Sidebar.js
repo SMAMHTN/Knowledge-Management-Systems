@@ -17,6 +17,8 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import getSuperAdminStatus from '@/dep/core/getSuperAdminStatus';
+import getThemeCookiesValueAsync from '@/dep/core/getThemeCookiesValueAsync';
+import getThemeCookiesValue from '@/dep/core/getThemeCookiesValue';
 // if nilai 1 2 99 buat misahin menunya antara sa, admin, user, admin gaada artucle, user cuma ada artikel
 function SuperAdminMenu() {
   return (
@@ -248,7 +250,7 @@ function UserMenuR() {
 function Sidebar({ initialTime }) {
   const userStatus = getSuperAdminStatus();
   const [menuComponent, setMenuComponent] = useState(null);
-
+  const theme = JSON.parse(getThemeCookiesValue());
   useEffect(() => {
     if (userStatus === 1) {
       setMenuComponent(<SuperAdminMenu />);
@@ -262,7 +264,7 @@ function Sidebar({ initialTime }) {
   }, [userStatus]);
 
   return (
-    <div className="fixed hidden md:flex flex-col top-14 left-0 w-14 md:w-64 bg-neutral-50 text-black h-full z-10">
+    <div className="fixed hidden md:flex flex-col top-14 left-0 w-14 md:w-64 bg-neutral-50 text-black h-full z-10 border-r" style={{ backgroundColor: theme.secondary_color }}>
       <div className="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow mr-2">
         {menuComponent}
       </div>

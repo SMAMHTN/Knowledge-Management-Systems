@@ -25,17 +25,12 @@ import WidgetDropdown from './widget/WidgetDropdown';
 import getThemeCookiesValue from '@/dep/core/getThemeCookiesValue';
 
 function DashboardSuperAdmin() {
-  // const theme = ThemeDecoder();
-
-  // console.log('-----------------------before-----------------------------');
-
-  // console.log(theme);
   const theme = JSON.parse(getThemeCookiesValue());
   return (
     <>
       {' '}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
-        {theme && (
+        {/* {theme && (
         <div>
           <h1 style={{ color: theme.primary_color }}>
             Primary Color Text
@@ -44,7 +39,7 @@ function DashboardSuperAdmin() {
           </h1>
           <h1 style={{ color: theme.secondary_color }}>Secondary Color Text</h1>
         </div>
-        )}
+        )} */}
         <div className="bg-white shadow-lg rounded-md flex items-center justify-between p-3 font-medium group">
           <WidgetUser />
         </div>

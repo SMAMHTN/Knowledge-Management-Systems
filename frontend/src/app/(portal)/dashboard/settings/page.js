@@ -188,6 +188,13 @@ function UserSettings() {
               </td>
             </tr>
             <tr>
+              <td>
+                {' '}
+                <p className=" text-gray-600 text-xs w-full">The new themes will be applied the next time you log in.</p>
+              </td>
+
+            </tr>
+            <tr>
               <td className="p-2">
                 <ProfileImage maxWidth="50px" maxHeight="50px" />
               </td>
@@ -251,7 +258,7 @@ function UserSettings() {
                 </td>
               </tr>
             ))}
-            <tr className="border-y border-black">
+            <tr>
               <td className="p-2">
                 <div>
                   Theme:
@@ -282,23 +289,24 @@ function UserSettings() {
                     <button onClick={handleCancelClick} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">
                       Cancel
                     </button>
-                    <button
-                      onClick={handleSaveClick}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
-                    >
+                    <button onClick={handleSaveClick} className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">
                       Save
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => setEditing('apptheme')}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
-                  >
+                  <button onClick={() => setEditing('apptheme')} className="bg-blue-500 hover.bg-blue-600 text-white px-2 py-1 rounded">
                     Edit
                   </button>
-
                 )}
               </td>
+            </tr>
+            <tr>
+              <td>&nbsp;</td>
+              <td>
+                {' '}
+                <p className=" text-gray-600 text-xs w-full">The new themes will be applied the next time you log in.</p>
+              </td>
+
             </tr>
             <tr>
               <td className="p-2">

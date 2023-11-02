@@ -1,11 +1,13 @@
 import UserProfileDropdown from './UserProfileDropdown';
 import Sidebar from './Sidebar';
 import ShowLogo, { CompanyName } from './ShowLogo';
+import getThemeCookiesValueAsync from '@/dep/core/getThemeCookiesValueAsync';
 
-function Navbar() {
+async function Navbar() {
+  const theme = await getThemeCookiesValueAsync();
   return (
     <>
-      <nav className="fixed z-20 h-14 w-full items-center justify-between bg-white border-b border-gray-100 shadow px-4 text-sm hidden md:flex">
+      <nav className="fixed z-20 h-14 w-full items-center justify-between bg-white border-b border-gray-100 shadow px-4 text-sm hidden md:flex" style={{ backgroundColor: theme.secondary_color }}>
         <div className="flex cursor-pointer items-center gap-2 ">
           <ShowLogo maxWidth="40px" maxHeight="40px" />
           <CompanyName />
