@@ -73,8 +73,9 @@ func init() {
 	for i := 0; i < v.NumField(); i++ {
 		fieldName := t.Field(i).Name
 		fieldValue := v.Field(i).Interface()
-
-		fmt.Printf("%s: %v\n", fieldName, fieldValue)
+		if fieldValue != nil {
+			fmt.Printf("%s: %v\n", fieldName, fieldValue)
+		}
 	}
 	Logger, err = dependency.InitZapLog(Conf, Conf.Error_Log_location, Conf.Warn_Log_location, Conf.Info_Log_Location)
 	if err != nil {
