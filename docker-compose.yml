@@ -9,19 +9,20 @@ services:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MARIADB_ROOT_PASSWORD}"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 100
   core:
-    build: ghcr.io/smam-tech/core:v1
+    image: ghcr.io/smam-tech/core:v1
     depends_on:
       core-db:
         condition: service_healthy
     volumes:
       - ./core/config/appconf/core_conf.json:/core/config/appconf/core_conf.json:rw
+      - ./core/log/:/core/log/:rw
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6565/checkserverrun"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 100
     ports:
       - "6565:6565"
   kms-db:
@@ -33,7 +34,7 @@ services:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MARIADB_ROOT_PASSWORD}"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 100
   kms:
     image: ghcr.io/smam-tech/kms:v1
     depends_on:
@@ -42,19 +43,19 @@ services:
       core:
         condition: service_healthy
     volumes:
-      - ./kms/config/appconf/core_conf.json:/kms/config/appconf/core_conf.json:rw
+      - ./kms/config/appconf/:/kms/config/appconf/:rw
+      - ./kms/log/:/kms/log/:rw
+      - ./kms/filestore/:/kms/filestore/:rw
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5656/checkserverrun"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 100
     ports:
       - "5656:5656"
   frontend:
     image: ghcr.io/smam-tech/frontend:v1
     depends_on:
-      kms-db:
-        condition: service_healthy
       core:
         condition: service_healthy
       kms:

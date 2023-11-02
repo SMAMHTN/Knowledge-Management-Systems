@@ -1,12 +1,15 @@
 {
-    "app_name": "core",
-    "app_port": 6565,
-    "app_password": "aldim",
-    "db_link": "core-db",
-    "db_username": "root",
-    "db_password": "aldim",
-    "disable_error_log": false,
-    "activate_warn_log": true,
-    "activate_info_log": true,
-    "activate_terminal_log": true
+  "app_name": "core",
+  "app_port": 6565,
+  "app_password": "aldim",
+  "db_link": "core-db",
+  "db_username": "root",
+  "db_password": "aldim",
+  "disable_error_log": false,
+  "error_log_location": "/core/log/Info.log",
+  "activate_warn_log": true,
+  "warn_log_location": "/core/log/Warn.log",
+  "activate_info_log": true,
+  "info_log_location": "/core/log/Info.log",
+  "activate_terminal_log": true
 }

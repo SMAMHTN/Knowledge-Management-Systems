@@ -14,7 +14,10 @@
   "filestore": "/kms/filestore/",
   "max_upload": "10G",
   "disable_error_log": false,
+  "error_log_location":"/kms/log/Info.log",
   "activate_warn_log": true,
+  "warn_log_location":"/kms/log/Warn.log",
   "activate_info_log": true,
+  "info_log_location":"/kms/log/Info.log",
   "activate_terminal_log": true
 }

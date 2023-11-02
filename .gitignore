@@ -1,1 +1,3 @@
-core/LogCore.log
+*.log
+kms/filestore/*
+solr/logs/*
