@@ -10,7 +10,7 @@ import { generateKmsCred } from '../others/generateCred';
 // const LoginDynamicpath = '/login';
 
 export async function CookiesGenerateKMSCred() {
-  const conf = readConf('frontend_conf.json');
+  const conf = readConf();
   const cookieStore = cookies();
   let un; let
     pwd;
@@ -31,7 +31,7 @@ export async function CookiesGenerateKMSCred() {
 }
 
 export async function KmsAPI(method, path, data) {
-  const conf = readConf('frontend_conf.json');
+  const conf = readConf();
   const cookieStore = cookies();
   let un; let
     pwd;
@@ -66,7 +66,7 @@ export async function KmsAPI(method, path, data) {
 }
 
 export async function KmsAPIGET(path) {
-  const conf = readConf('frontend_conf.json');
+  const conf = readConf();
   const cookieStore = cookies();
   let un; let
     pwd;
@@ -98,7 +98,7 @@ export async function KmsAPIGET(path) {
 }
 
 export async function KmsAPIBlob(method, path, formData) {
-  const conf = readConf('frontend_conf.json');
+  const conf = readConf();
   const cookieStore = cookies();
   let un; let
     pwd;

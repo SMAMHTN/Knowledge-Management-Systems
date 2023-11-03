@@ -1,7 +1,7 @@
 import { readConf } from './confHandler';
 
 function generateCoreCred(username, password) {
-  const conf = readConf('frontend_conf.json');
+  const conf = readConf();
   const credentials = Buffer.from(
     `${conf.core_password}:${username}&&${password}`,
   ).toString('base64');
@@ -9,7 +9,7 @@ function generateCoreCred(username, password) {
 }
 
 function generateKmsCred(username, password) {
-  const conf = readConf('frontend_conf.json');
+  const conf = readConf();
   const credentials = Buffer.from(
     `${conf.kms_password}:${username}&&${password}`,
   ).toString('base64');
