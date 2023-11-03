@@ -37,6 +37,8 @@ export function URLParamsBuilder(url, page, num, query, sort) {
   if (queryParams.length > 0) {
     apiEndpoint += `?${queryParams.join('&')}`;
   }
+  console.log("apiEndpoint");
+  console.log(apiEndpoint);
 
   return apiEndpoint;
 }

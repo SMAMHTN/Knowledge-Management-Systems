@@ -73,14 +73,19 @@ func init() {
 	for i := 0; i < v.NumField(); i++ {
 		fieldName := t.Field(i).Name
 		fieldValue := v.Field(i).Interface()
-
-		fmt.Printf("%s: %v\n", fieldName, fieldValue)
+		fmt.Println(fieldValue)
+		if fieldValue != nil {
+			fmt.Printf("%s: %v\n", fieldName, fieldValue)
+		}
 	}
 	Logger, err = dependency.InitZapLog(Conf, Conf.Error_Log_location, Conf.Warn_Log_location, Conf.Info_Log_Location)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("READING FILE CONF DONE\n---------------------------------------")
-	Check_DB_Exist()
+	err = Check_DB_Exist()
+	if err != nil {
+		Logger.Panic(err.Error())
+	}
 	// db.Execute_sql_file("core.sql", Appname)
 }

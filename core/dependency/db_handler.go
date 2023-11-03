@@ -49,6 +49,42 @@ var (
 	SpecialAllowedLogic    = [...]string{}
 )
 
+func (limit *QueryType) AddWhere(data []WhereType) (err error) {
+	var wherequery []WhereType
+	if limit.Query != "" {
+		err = json.Unmarshal([]byte(limit.Query), &wherequery)
+		if err != nil {
+			err = errors.New("query field json read error : " + err.Error())
+			return err
+		}
+	}
+	wherequery = append(wherequery, data...)
+	a, err := json.Marshal(wherequery)
+	if err != nil {
+		return err
+	}
+	limit.Query = string(a)
+	return nil
+}
+
+func (limit *QueryType) AddSort(data []SortType) (err error) {
+	var sortquery []SortType
+	if limit.Sort != "" {
+		err = json.Unmarshal([]byte(limit.Sort), &sortquery)
+		if err != nil {
+			err = errors.New("query field json read error : " + err.Error())
+			return err
+		}
+	}
+	sortquery = append(sortquery, data...)
+	a, err := json.Marshal(sortquery)
+	if err != nil {
+		return err
+	}
+	limit.Sort = string(a)
+	return nil
+}
+
 func Db_Connect(conf Configuration, dbname string) (database *sql.DB, err error) {
 	if dbname == "" {
 		dbname = conf.Appname

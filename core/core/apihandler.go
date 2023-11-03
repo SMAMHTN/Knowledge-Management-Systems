@@ -160,7 +160,7 @@ func Test_api() {
 	e.POST("/history", AddHistory, basicAuthMiddleware, LogMiddleware)
 	e.GET("/listtheme", ListTheme, basicAuthMiddleware, LogMiddleware)
 	e.GET("/listthemeid", ListThemeID, basicAuthMiddleware, LogMiddleware)
-	e.GET("/theme", ShowTheme, basicAuthMiddleware, LogMiddleware)
+	e.GET("/theme", ShowTheme, LogMiddleware)
 	e.POST("/theme", AddTheme, basicAuthMiddleware, LogMiddleware)
 	e.PUT("/theme", EditTheme, basicAuthMiddleware, LogMiddleware)
 	e.DELETE("/theme", DeleteTheme, basicAuthMiddleware, LogMiddleware)
