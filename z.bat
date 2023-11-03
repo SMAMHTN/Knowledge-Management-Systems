@@ -2,7 +2,7 @@
 set RETRY_COUNT=100
 
 :build
-docker build --no-cache -t ghcr.io/smam-tech/frontend:v2 .\frontend
+docker build --no-cache -t ghcr.io/smam-tech/frontend:v1 .\frontend
 
 if %errorlevel% neq 0 (
     set /a RETRY_COUNT-=1

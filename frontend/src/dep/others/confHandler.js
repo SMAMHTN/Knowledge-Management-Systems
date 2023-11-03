@@ -33,12 +33,9 @@ export function readConf() {
   const potentialPaths = [ConfFile, '/frontend/frontend_conf.json', parent + ConfFile];
 
   for (const path of potentialPaths) {
-    try {
-      fs.accessSync(path);
+    if (isFileAccessible(path)) {
       ConfFile = path; // Update ConfFile with the valid path
       break; // Exit the loop since a valid path is found
-    } catch (err) {
-      console.log('Unable to use : ' + path);
     }
   }
 
@@ -55,6 +52,15 @@ export function readConf() {
   }
 
   return configuration;
+}
+
+function isFileAccessible(filePath) {
+  try {
+    fs.accessSync(filePath);
+    return true; // File is accessible
+  } catch (err) {
+      return false; // File does not exist
+  }
 }
 
 module.exports = {
