@@ -250,6 +250,9 @@ func (data *QueryType) QueryMaker(AnotherTable func([]SortType, []WhereType) ([]
 		info.TotalShow = count % data.Num
 		info.UpperLimit = Lowerlimit0 + info.TotalShow
 		info.LowerLimit = Lowerlimit0 + 1
+		if info.TotalShow == 0 {
+			info.TotalShow = data.Num
+		}
 		if data.Num == 1 {
 			info.TotalShow = data.Num
 			info.UpperLimit = count
