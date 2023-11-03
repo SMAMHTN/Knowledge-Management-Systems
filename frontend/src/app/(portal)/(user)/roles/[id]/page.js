@@ -98,7 +98,7 @@ function UserDetails({ params }) {
                   <input
                     {...field}
                     type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
                     placeholder="Public"
                   />
                   <p className="text-xs mt-1">
@@ -127,7 +127,7 @@ function UserDetails({ params }) {
                   <textarea
                     {...field}
                     type="textarea"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md shadow"
                     placeholder="Designed for public"
                   />
                   <p className="text-xs mt-1">
@@ -141,7 +141,7 @@ function UserDetails({ params }) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded bg-blue-500 text-white w-full md:w-36"
+            className="rounded bg-blue-500 text-white w-full md:w-36 shadow"
           >
             Update Role
           </Button>

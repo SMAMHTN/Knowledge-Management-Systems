@@ -182,9 +182,6 @@ function ArticleDetail({ params }) {
 
       const response = await KmsAPI('PUT', 'article', updatedData);
       const indexing = await KmsAPI('PUT', 'article/solr', indexingID);
-      // console.log('----indexing-----------------------------------');
-      // console.log(indexing);
-      // console.log('----response-----------------------------------');
       console.log(response);
       await new Promise((resolve) => setTimeout(resolve, 300));
       alertUpdate(response);
@@ -216,7 +213,7 @@ function ArticleDetail({ params }) {
                   <input
                     {...field}
                     type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
                     placeholder="Public"
                   />
                   <p className="text-xs mt-1">
@@ -248,7 +245,7 @@ function ArticleDetail({ params }) {
                   <textarea
                     {...field}
                     type="textarea"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md shadow"
                     placeholder="Designed for public"
                   />
                   <p className="text-xs mt-1">
@@ -282,11 +279,11 @@ function ArticleDetail({ params }) {
           <div className="mb-4 mt-20">
             <label className="block font-semibold mb-1">Edit Article Content</label>
             <ArticleEditor ArticleID={data.ArticleID} />
-            <p>
+            {/* <p>
               click here to see how to make an article
               {' '}
               <span className="text-blue-500 underline">links here</span>
-            </p>
+            </p> */}
           </div>
           <div className="mb-4">
             <label className="block font-semibold mb-1">Upload Document</label>
@@ -299,7 +296,7 @@ function ArticleDetail({ params }) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded bg-blue-500 text-white w-full md:w-36 my-2 mb-4"
+            className="rounded bg-blue-500 text-white w-full md:w-36 my-2 mb-4 shadow"
           >
             {isSubmitting ? (<Loader2 className="animate-spin mr-2" size={16} />) : null}
             {isSubmitting ? ('Publishing') : ('Publish')}

@@ -148,11 +148,11 @@ function articleEditing({ params }) {
         <div className="mb-4">
           <label className="block font-semibold mb-1">Edit Article Content</label>
           <ArticleEditor ArticleID={data.ArticleID} />
-          <p>
+          {/* <p>
             click here to see how to make an article
             {' '}
             <span className="text-blue-500 underline">links here</span>
-          </p>
+          </p> */}
         </div>
         <div className="mb-4">
           <label className="block font-semibold mb-1">Upload Document</label>
@@ -164,7 +164,7 @@ function articleEditing({ params }) {
         </div>
         <Button
           type="button"
-          className="rounded bg-blue-500 hover:bg-blue-600 text-white my-4 w-full md:w-36"
+          className="rounded bg-blue-500 hover:bg-blue-600 text-white my-4 w-full md:w-36 shadow"
           onClick={handlePublish}
         >
           {/* <Link href={URLParamsBuilder('/article')} /> */}

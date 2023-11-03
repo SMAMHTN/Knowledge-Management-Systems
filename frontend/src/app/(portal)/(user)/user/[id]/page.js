@@ -107,13 +107,14 @@ function UserDetails({ params }) {
   };
 
   return (
-    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4 ">
       <div className="flex flex-col w-full">
         <h2 className="text-2xl font-semibold mb-1">Edit User</h2>
         <p className="text-xs mb-4">
           Customize and manage your user details.
         </p>
         <Separator className="mb-4" />
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label className="block font-medium mb-1">
@@ -128,7 +129,7 @@ function UserDetails({ params }) {
                   <input
                     {...field}
                     type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
                     placeholder="JohnDoe"
                   />
                   <p className="text-xs mt-1">
@@ -153,7 +154,7 @@ function UserDetails({ params }) {
                   <input
                     {...field}
                     type="password"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md shadow"
                     placeholder="*******"
                   />
                   <p className="text-xs mt-1">
@@ -177,7 +178,7 @@ function UserDetails({ params }) {
                   <input
                     {...field}
                     type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
                     placeholder="John Doe"
                   />
                   <p className="text-xs mt-1">
@@ -201,7 +202,7 @@ function UserDetails({ params }) {
                   <input
                     {...field}
                     type="email"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md shadow"
                     placeholder="johndoe@mail.com"
                   />
                   {errors.Email && (<ErrorMessage error={errors.Email.message} />)}
@@ -219,7 +220,7 @@ function UserDetails({ params }) {
                   <input
                     {...field}
                     type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md shadow"
                     placeholder="Bekasi, West Java, Indonesia"
                   />
                   {errors.Address && (<ErrorMessage error={errors.Address.message} />)}
@@ -237,7 +238,7 @@ function UserDetails({ params }) {
                   <input
                     {...field}
                     type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400  md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
                     placeholder="081234567891"
                   />
                   <p className="text-xs mt-1">
@@ -275,7 +276,7 @@ function UserDetails({ params }) {
                   <textarea
                     {...field}
                     type="textarea"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md shadow"
                     placeholder="John Doe is a farmer, he likes grass as his breakfast"
                   />
                   <p className="text-xs mt-1">
@@ -297,7 +298,7 @@ function UserDetails({ params }) {
                       {...field}
                       type="checkbox"
                       checked={field.value}
-                      className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
+                      className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4 shadow"
                     />
                     <span className="text-sm sm:text-base">Super Admin</span>
                   </div>
@@ -309,12 +310,12 @@ function UserDetails({ params }) {
                 name="IsActive"
                 control={control}
                 render={({ field }) => (
-                  <div className="flex items-center my-2 md:my-0">
+                  <div className="flex items-center my-2 md:my-0 ">
                     <input
                       {...field}
                       type="checkbox"
                       checked={field.value}
-                      className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
+                      className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4 shadow"
                     />
                     <span className="text-sm sm:text-base">Active</span>
                   </div>
@@ -325,7 +326,7 @@ function UserDetails({ params }) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded bg-blue-500 text-white w-full md:w-36"
+            className="rounded bg-blue-500 hover:bg-blue-600 text-white w-full md:w-36 mb-4 shadow"
           >
             Update User
           </Button>

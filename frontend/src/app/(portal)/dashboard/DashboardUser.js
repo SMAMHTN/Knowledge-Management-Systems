@@ -24,15 +24,10 @@ function DashboardUser() {
       const article = await KmsAPIGET(apiEndpoint);
       const a = JSON.parse(article.body.Data);
       setPosts(a.response.docs);
-      console.log(article);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
   };
-
-  useEffect(() => {
-    console.log('SearchQuery:', searchQuery);
-  }, [searchQuery]);
 
   useEffect(() => {
     const searchencoded = encodeURIComponent(search);
@@ -53,18 +48,18 @@ function DashboardUser() {
     <section className="w-full">
       <div className="flex flex-col w-full">
         <div className=" mb-6 grid grid-cols-5 justify-between">
-          <div className="rounded-l col-span-4 shadow-3xl">
-            <form onSubmit={handleSearch} className="flex py-2 mr-2 md:px-4">
+          <div className="rounded-l col-span-4">
+            <form onSubmit={handleSearch} className="flex mr-2 md:px-4">
               <input
                 type="text"
                 placeholder="Search Document here..."
-                className=" w-full text-[14px] outline-none px-4 py-2 shadow-md rounded-tl rounded-bl"
+                className=" w-full text-[14px] outline-none px-4 py-2 shadow rounded-tl rounded-bl"
                 onChange={(e) => setSearchQuery(e.target.value)}
                 defaultValue={search}
               />
               <button
                 type="submit"
-                className=" text-light text-white shadow-md rounded-tr rounded-br bg-blue-500 hover:bg-blue-600 px-2 w-14  md:w-auto md:px-4"
+                className=" text-light text-white shadow rounded-tr rounded-br bg-blue-500 hover:bg-blue-600 px-2 w-14  md:w-auto md:px-4"
               >
                 <p className="hidden lg:flex">Search</p>
                 <Search className=" lg:hidden items-center" />
@@ -81,7 +76,7 @@ function DashboardUser() {
             </Link>
           </Button> */}
         </div>
-        <div className="bg-white rounded-md p-4 h-fit w-full">
+        <div className="bg-white rounded-md p-4 h-fit w-full shadow">
           {search ? (
             <h1 className="text-l font-medium py-4">
               Search Results for:
@@ -93,33 +88,35 @@ function DashboardUser() {
           )}
           {' '}
           <ul>
-            {Array.isArray(posts) && posts.map((post) => (
-              <li key={post.ArticleID} className="text-sm mt-2">
-                <div className="w-fit">
-                  {' '}
-                  <Link href={`/post/${post.ArticleID}`}>
-                    <p className="text-blue-500 hover:underline text-xl">
-                      {' '}
-                      {post.Title}
-                    </p>
-                  </Link>
-                </div>
-                <div>
-                  <TimeText timestamp={post.LastEditedTime} />
-                  {' '}
-                  by
-                  {' '}
-                  {post.OwnerName}
-                </div>
-                <div className=" mt-1 overflow-hidden">
-                  <p className="text-sm w-5/6 h-10 text-gray-700">
-                    {post.Article}
-
-                  </p>
-                  <p />
-                </div>
+            {Array.isArray(posts) && posts.length > 0 ? (
+              posts.map((post) => (
+                <li key={post.ArticleID} className="text-sm mt-2">
+                  <div className="w-fit">
+                    <Link href={`/post/${post.ArticleID}`}>
+                      <p className="text-blue-500 hover:underline text-xl">
+                        {post.Title}
+                      </p>
+                    </Link>
+                  </div>
+                  <div>
+                    <TimeText timestamp={post.LastEditedTime} />
+                    {' '}
+                    by
+                    {' '}
+                    {post.OwnerName}
+                  </div>
+                  <div className=" mt-1 overflow-hidden">
+                    <p className="text-sm w-5/6 h-10 text-gray-700">{post.Article}</p>
+                    <p />
+                  </div>
+                </li>
+              ))
+            ) : (
+              <li className="text-sm text-gray-700 mt-20 mb-48">
+                <span className="font-bold">No articles were found</span>
+                . It is possible that you do not have the necessary permissions, the articles have not been indexed yet, or there are no articles that match your search criteria.
               </li>
-            ))}
+            )}
           </ul>
 
         </div>

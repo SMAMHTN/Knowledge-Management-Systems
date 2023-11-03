@@ -15,7 +15,8 @@ export default async function Layout({ children }) {
   const theme = await getThemeCookiesValueAsync();
 
   return (
-    <div className="min-h-screen flex flex-col flex-auto antialiased flex-shrink-0 bg-gray-500" style={{ backgroundColor: theme.primary_color }}>
+    <div className="h-max flex flex-col flex-auto antialiased flex-shrink-0 bg-gray-500" style={{ backgroundColor: theme.primary_color }}>
+      <div className="fixed top-0 left-0 w-screen h-screen bg-blue-500 -z-10" style={{ backgroundColor: theme.primary_color }} />
       <Nav />
       <div className="h-full mx-2 md:mx-5 mt-16 p-4 left-0 left md:left-72 md:ml-72 mb-72">
         <main>{children}</main>

@@ -80,7 +80,6 @@ export default function DataTable() {
       response = await KmsAPIGET(URLParamsBuilder('listarticle', page, num, queriesencoded, sortencoded));
       setPageInfo(response.body.Info);
       setData(response.body.Data);
-      console.log(response);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -337,7 +336,6 @@ export default function DataTable() {
     setQueries(newQ);
   };
   const cPerm = getCookie('cpermission');
-  console.log('-----------------------------', cPerm);
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
@@ -345,9 +343,9 @@ export default function DataTable() {
           placeholder="Filter Article Title..."
           onChange={handleFilterChange}
           ref={filterRef}
-          className="max-w-sm bg-gray-100"
+          className="max-w-sm bg-gray-100 shadow"
         />
-        <Button variant="outline" className=" px-2 ml-2 bg-gray-100  hover:bg-gray-300">
+        <Button variant="outline" className=" px-2 ml-2 bg-gray-100  hover:bg-gray-300 shadow">
           <Link href={URLParamsBuilder('/article', 1, itemsPerPage, queries, sortParams)}>
             <Search className="hidden lg:flex" size={24} />
             <Search className="flex lg:hidden" size={20} />
@@ -358,7 +356,7 @@ export default function DataTable() {
           {cPerm === 'true' ? (
             <Button
               type="button"
-              className=" bg-gray-100 ml-2  hover:bg-gray-300 border-white border"
+              className=" bg-gray-100 ml-2  hover:bg-gray-300 border-white border shadow"
             >
               <Link href={URLParamsBuilder('/article/edit')}>
                 +
@@ -367,7 +365,7 @@ export default function DataTable() {
           ) : null}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className=" ml-2 bg-gray-100 hover:bg-gray-300 border-white border">
+              <Button variant="outline" className=" ml-2 bg-gray-100 hover:bg-gray-300 border-white border shadow">
                 Show
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
@@ -390,7 +388,7 @@ export default function DataTable() {
           </DropdownMenu>
         </div>
       </div>
-      <div className="rounded-md border bg-gray-100 py-2">
+      <div className="rounded-md border bg-gray-100 py-2 shadow">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -479,7 +477,7 @@ export default function DataTable() {
                 router.push(URLParamsBuilder('', 1, itemsPerPage, queries, sortParams));
               }}
             >
-              <SelectTrigger className="h-8 w-[70px] bg-gray-50">
+              <SelectTrigger className="h-8 w-[70px] bg-gray-50 shadow">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent side="top">

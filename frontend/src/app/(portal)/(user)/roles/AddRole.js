@@ -72,7 +72,7 @@ function AddRole({ fetchData }) {
       <Button
         type="button"
         onClick={openModal}
-        className=" bg-gray-100 ml-2 hover:bg-gray-300 border-white border "
+        className=" bg-gray-100 ml-2 hover:bg-gray-300 shadow"
       >
         +
       </Button>
@@ -161,7 +161,7 @@ function AddRole({ fetchData }) {
             <div className="place-content-end mt-10 flex">
               <Button
                 type="button"
-                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36 shadow"
                 onClick={handleClose}
               >
                 Cancel
@@ -169,7 +169,7 @@ function AddRole({ fetchData }) {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="rounded bg-blue-500 text-white w-full md:w-36"
+                className="rounded bg-blue-500 text-white w-full md:w-36 shadow"
               >
                 Add
               </Button>

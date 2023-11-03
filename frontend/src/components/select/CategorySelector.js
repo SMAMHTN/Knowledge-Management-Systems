@@ -20,7 +20,7 @@ function CategorySelector({ onChange, value }) {
   };
   return (
     <AsyncSelect
-      className="md:max-w-md"
+      className="md:max-w-md shadow"
       cacheOptions
       defaultOptions
       loadOptions={loadCategories}

@@ -78,7 +78,6 @@ export default function DataTable() {
       }
       response = await CoreAPIGET(URLParamsBuilder('listrole', page, num, queriesencoded, sortencoded));
       setPageInfo(response.body.Info);
-      console.log(pageInfo);
       setData(response.body.Data);
       console.log(response);
     } catch (error) {
@@ -298,9 +297,9 @@ export default function DataTable() {
           placeholder="Filter Roles Name..."
           onChange={handleFilterChange}
           ref={filterRef}
-          className="max-w-sm bg-gray-100"
+          className="max-w-sm bg-gray-100 shadow"
         />
-        <Button variant="outline" className=" px-2 ml-2 bg-gray-100  hover:bg-gray-300">
+        <Button variant="outline" className=" px-2 ml-2 bg-gray-100  hover:bg-gray-300 shadow">
           <Link href={URLParamsBuilder('/roles', 1, itemsPerPage, queries, sortParams)}>
             <Search className="hidden lg:flex" size={24} />
             <Search className="flex lg:hidden" size={20} />
@@ -310,12 +309,12 @@ export default function DataTable() {
           <AddRole fetchData={fetchData} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className=" ml-2 bg-gray-100  hover:bg-gray-300">
+              <Button variant="outline" className=" ml-2 bg-gray-100  hover:bg-gray-300 shadow">
                 Show
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-gray-100">
+            <DropdownMenuContent align="end" className="bg-gray-100 shadow">
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
@@ -333,7 +332,7 @@ export default function DataTable() {
           </DropdownMenu>
         </div>
       </div>
-      <div className="rounded-md border bg-gray-100 py-2">
+      <div className="rounded-md border bg-gray-100 py-2 shadow">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

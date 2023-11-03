@@ -333,9 +333,9 @@ export default function DataTable() {
           placeholder="Filter Permission ID..."
           onChange={handleFilterChange}
           ref={filterRef}
-          className="max-w-sm bg-gray-100"
+          className="max-w-sm bg-gray-100 shadow"
         />
-        <Button variant="outline" className=" px-2 ml-2 bg-gray-100  hover:bg-gray-300">
+        <Button variant="outline" className=" px-2 ml-2 bg-gray-100  hover:bg-gray-300 shadow">
           <Link href={URLParamsBuilder('/permission', 1, itemsPerPage, queries, sortParams)}>
             <Search className="hidden lg:flex" size={24} />
             <Search className="flex lg:hidden" size={20} />
@@ -345,7 +345,7 @@ export default function DataTable() {
           <AddPermission fetchData={fetchData} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className=" ml-2 bg-gray-100 hover:bg-gray-300">
+              <Button variant="outline" className=" ml-2 bg-gray-100 hover:bg-gray-300 shadow">
                 Show
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
@@ -368,7 +368,7 @@ export default function DataTable() {
           </DropdownMenu>
         </div>
       </div>
-      <div className="rounded-md border bg-gray-100 py-2">
+      <div className="rounded-md border bg-gray-100 py-2 shadow">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

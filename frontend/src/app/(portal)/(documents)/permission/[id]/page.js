@@ -49,7 +49,6 @@ function PermissionDetail({ params }) {
       try {
         const response = await KmsAPIGET(`permission?PermissionID=${params.id}`);
         setData(response.body.Data);
-        console.log(response);
         Object.keys(response.body.Data).forEach((key) => {
           setValue(key, response.body.Data[key]);
         });
@@ -121,7 +120,7 @@ function PermissionDetail({ params }) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label className="block font-medium mb-1">
-              Category ID
+              Category
               <RequiredFieldIndicator />
             </label>
             <CategorySelector onChange={handleCategoryChange} value={selectedCategory} />
@@ -131,7 +130,7 @@ function PermissionDetail({ params }) {
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">
-              Role ID
+              Role
               <RequiredFieldIndicator />
             </label>
             <RoleSelector onChange={handleRoleChange} value={selectedRole} />
@@ -152,7 +151,7 @@ function PermissionDetail({ params }) {
                         {...field}
                         type="checkbox"
                         checked={field.value}
-                        className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
+                        className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4 shadow"
                       />
                       <span className="text-sm sm:text-base">Create</span>
                     </div>
@@ -169,7 +168,7 @@ function PermissionDetail({ params }) {
                         {...field}
                         type="checkbox"
                         checked={field.value}
-                        className="mr-2 text-blue-500  w-6 h-6 md:w-4 md:h-4"
+                        className="mr-2 text-blue-500  w-6 h-6 md:w-4 md:h-4 shadow"
                       />
                       <span className="text-sm sm:text-base">Read</span>
                     </div>
@@ -186,7 +185,7 @@ function PermissionDetail({ params }) {
                         {...field}
                         type="checkbox"
                         checked={field.value}
-                        className="mr-2 text-blue-500  w-6 h-6 md:w-4 md:h-4"
+                        className="mr-2 text-blue-500  w-6 h-6 md:w-4 md:h-4 shadow"
                       />
                       <span className="text-sm sm:text-base">Update</span>
                     </div>
@@ -203,7 +202,7 @@ function PermissionDetail({ params }) {
                         {...field}
                         type="checkbox"
                         checked={field.value}
-                        className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
+                        className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4 shadow"
                       />
                       <span className="text-sm sm:text-base">Delete</span>
                     </div>
@@ -222,7 +221,7 @@ function PermissionDetail({ params }) {
                   <input
                     type="text"
                     {...field}
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
                     placeholder="*, php, py, -exe"
                   />
                   <p className="text-xs mt-1">
@@ -247,7 +246,7 @@ function PermissionDetail({ params }) {
                   <input
                     type="text"
                     {...field}
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
                     placeholder="*, doc, docx, -pdf"
                   />
                   <p className="text-xs mt-1">
@@ -265,7 +264,7 @@ function PermissionDetail({ params }) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded bg-blue-500 text-white w-full md:w-36"
+            className="rounded bg-blue-500 text-white w-full md:w-36 shadow"
           >
             Update Permission
           </Button>

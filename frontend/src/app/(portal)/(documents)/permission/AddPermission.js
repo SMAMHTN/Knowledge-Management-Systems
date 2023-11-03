@@ -97,7 +97,7 @@ function AddPermission({ fetchData }) {
 
   return (
     <div>
-      <Button type="button" onClick={openModal} className=" bg-gray-100 ml-2 hover:bg-gray-300 border border-white">
+      <Button type="button" onClick={openModal} className=" bg-gray-100 ml-2 hover:bg-gray-300 shadow">
         +
       </Button>
       {/* Overlay */}
@@ -136,7 +136,7 @@ function AddPermission({ fetchData }) {
             </div>
             <div className="mb-4">
               <label className="block font-medium mb-1">
-                Role ID
+                Role
                 <RequiredFieldIndicator />
               </label>
               <RoleSelector onChange={handleRoleChange} value={selectedRole} />

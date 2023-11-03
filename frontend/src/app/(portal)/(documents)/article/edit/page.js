@@ -93,7 +93,7 @@ function AddArticle() {
                   <input
                     {...field}
                     type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
                     placeholder="Public"
                   />
                   <p className="text-xs mt-1">
@@ -125,7 +125,7 @@ function AddArticle() {
                   <textarea
                     {...field}
                     type="textarea"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md shadow"
                     placeholder="Designed for public"
                   />
                   <p className="text-xs mt-1">
@@ -149,7 +149,7 @@ function AddArticle() {
                     {...field}
                     type="checkbox"
                     checked={field.value}
-                    className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
+                    className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4 shadow"
                   />
                   <span className="text-sm sm:text-base">Active</span>
                 </div>
@@ -159,7 +159,7 @@ function AddArticle() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded bg-blue-500 hover:bg-blue-600 text-white mt-2 w-full md:w-36"
+            className="rounded bg-blue-500 hover:bg-blue-600 text-white mt-2 w-full md:w-36 shadow"
           >
             Next
           </Button>

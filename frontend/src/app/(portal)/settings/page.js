@@ -155,13 +155,13 @@ function SystemSetting() {
       <div className="flex flex-col w-full">
         <h2 className="text-2xl font-semibold mb-1">System Settings</h2>
         <p className="text-xs mb-4">
-          Customize and manage your Company Profile and system settings.
+          Customize and manage your Organization Profile and system settings.
         </p>
         <Separator className="mb-4" />
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label className="block font-medium mb-1">
-              Company Name
+              Organization Name
               <RequiredFieldIndicator />
             </label>
             <Controller
@@ -185,7 +185,7 @@ function SystemSetting() {
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">
-              Company Address
+              Address
               <RequiredFieldIndicator />
             </label>
             <Controller

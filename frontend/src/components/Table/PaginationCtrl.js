@@ -43,7 +43,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
       <div className="flex items-center space-x-2">
         <Button
           variant="outline"
-          className="hidden h-8 w-8 p-0 md:flex  bg-gray-50"
+          className="hidden h-8 w-8 p-0 md:flex  bg-gray-50 shadow"
           disabled={currentPage === 1}
           onClick={handleFirstPageClick}
         >
@@ -52,7 +52,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
         </Button>
         <Button
           variant="outline"
-          className="hidden h-8 w-8 p-0 md:flex  bg-gray-50"
+          className="hidden h-8 w-8 p-0 md:flex  bg-gray-50 shadow"
           disabled={currentPage === 1}
           onClick={handlePrevClick}
         >
@@ -61,7 +61,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
         </Button>
         <Button
           variant="outline"
-          className="hidden h-8 w-8 p-0 md:flex  bg-gray-50"
+          className="hidden h-8 w-8 p-0 md:flex  bg-gray-50 shadow"
           disabled={currentPage === correctedTotalPage}
           onClick={handleNextClick}
         >
@@ -70,7 +70,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
         </Button>
         <Button
           variant="outline"
-          className="hidden h-8 w-8 p-0 md:flex  bg-gray-50"
+          className="hidden h-8 w-8 p-0 md:flex  bg-gray-50 shadow"
           disabled={currentPage === correctedTotalPage}
           onClick={handleLastPageClick}
         >
@@ -81,7 +81,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
       <div className="fixed bottom-2 left-2 items-center md:hidden space-x-2">
         <Button
           variant="outline"
-          className=" h-8 w-8 p-0  bg-gray-50"
+          className=" h-8 w-8 p-0  bg-gray-50 shadow"
           disabled={currentPage === 1}
           onClick={handleFirstPageClick}
         >
@@ -90,7 +90,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
         </Button>
         <Button
           variant="outline"
-          className=" h-8 w-8 p-0 bg-gray-50"
+          className=" h-8 w-8 p-0 bg-gray-50 shadow"
           disabled={currentPage === 1}
           onClick={handlePrevClick}
         >
@@ -99,7 +99,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
         </Button>
         <Button
           variant="outline"
-          className=" h-8 w-8 p-0  bg-gray-50"
+          className=" h-8 w-8 p-0  bg-gray-50 shadow"
           disabled={currentPage === correctedTotalPage}
           onClick={handleNextClick}
         >
@@ -108,7 +108,7 @@ function Pagination({ currentPage, totalPage, onPageChange }) {
         </Button>
         <Button
           variant="outline"
-          className=" h-8 w-8 p-0 bg-gray-50"
+          className=" h-8 w-8 p-0 bg-gray-50 shadow"
           disabled={currentPage === correctedTotalPage}
           onClick={handleLastPageClick}
         >

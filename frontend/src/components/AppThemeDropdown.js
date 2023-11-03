@@ -70,6 +70,8 @@ function ThemeApp({
               display: 'inline-block',
               verticalAlign: 'middle',
               marginLeft: '4px',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
             }}
           />
         </div>
@@ -83,6 +85,8 @@ function ThemeApp({
               display: 'inline-block',
               verticalAlign: 'middle',
               marginLeft: '4px',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
             }}
           />
         </div>

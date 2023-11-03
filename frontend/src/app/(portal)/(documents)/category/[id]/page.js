@@ -89,7 +89,7 @@ function CategoryDetail({ params }) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label className="block font-medium mb-1">
-              Category Name
+              Category
               <RequiredFieldIndicator />
             </label>
             <Controller
@@ -100,7 +100,7 @@ function CategoryDetail({ params }) {
                   <input
                     {...field}
                     type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
                     placeholder="Parent"
                   />
                   <p className="text-xs mt-1">
@@ -131,7 +131,7 @@ function CategoryDetail({ params }) {
                   <textarea
                     {...field}
                     type="textarea"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y md:max-w-md shadow"
                     placeholder="This is a Parent category that does...."
                   />
                   <p className="text-xs mt-1">
@@ -145,7 +145,7 @@ function CategoryDetail({ params }) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded bg-blue-500 text-white w-full md:w-36"
+            className="rounded bg-blue-500 text-white w-full md:w-36 shadow"
           >
             Update Category
           </Button>
