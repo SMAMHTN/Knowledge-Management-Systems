@@ -356,7 +356,7 @@ export default function DataTable() {
           {cPerm === 'true' ? (
             <Button
               type="button"
-              className=" bg-gray-100 ml-2  hover:bg-gray-300 border-white border shadow"
+              className=" bg-gray-100 ml-2  hover:bg-gray-300 shadow"
             >
               <Link href={URLParamsBuilder('/article/edit')}>
                 +
@@ -365,7 +365,7 @@ export default function DataTable() {
           ) : null}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className=" ml-2 bg-gray-100 hover:bg-gray-300 border-white border shadow">
+              <Button variant="outline" className=" ml-2 bg-gray-100 hover:bg-gray-300 shadow">
                 Show
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>

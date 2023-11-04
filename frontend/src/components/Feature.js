@@ -173,7 +173,7 @@ export function DeleteModal({
           <div className="place-content-end mt-10 flex">
             <Button
               type="button"
-              className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36"
+              className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36 shadow"
               onClick={onClose}
             >
               Cancel
@@ -181,7 +181,7 @@ export function DeleteModal({
             <Button
               type="submit"
               onClick={onDelete}
-              className="rounded bg-red-500 hover:bg-red-600 text-white w-full md:w-36"
+              className="rounded bg-red-500 hover:bg-red-600 text-white w-full md:w-36 shadow"
             >
               Delete
             </Button>

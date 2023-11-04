@@ -9,8 +9,6 @@ function UploadFile({ categoryID, FileAdd }) {
   const fileInputRef = useRef(null);
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    console.log(file);
-    console.log(typeof (file));
     setSelectedFile(file);
     setCurrentState(2);
   };
@@ -19,10 +17,8 @@ function UploadFile({ categoryID, FileAdd }) {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    console.log('Upload button clicked in UploadFile');
     try {
       const FileSent = selectedFile;
-      console.log('before sending API');
       const formData = new FormData();
       formData.append('CategoryID', categoryIdValue);
       formData.append('File', FileSent);
@@ -64,7 +60,7 @@ function UploadFile({ categoryID, FileAdd }) {
           </Button>
         </div>
         <div className="col-span-5 row-start-2">
-          <p className="text-xs mt-1 mb-4 max-w-lg">
+          <p className="text-xs mb-4 max-w-lg">
             Upload a File from your device. Image should be a .jpg, .jpeg, .png file. Notes: to use the uploaded File on this article, you need to click the upload button.
           </p>
           {/* <p>

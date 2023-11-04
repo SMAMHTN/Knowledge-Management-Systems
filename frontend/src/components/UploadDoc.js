@@ -10,8 +10,6 @@ function UploadDoc({ categoryID, DocAdd }) {
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    console.log(file);
-    console.log(typeof (file));
     setCurrentState(2);
     setSelectedFile(file);
   };
@@ -19,10 +17,8 @@ function UploadDoc({ categoryID, DocAdd }) {
   const categoryIdValue = categoryID;
   const handleUpload = async (e) => {
     e.preventDefault();
-    console.log('Upload button clicked in UploadDoc');
     try {
       const FileSent = selectedFile;
-      console.log('before sending API');
       const formData = new FormData();
       formData.append('CategoryID', categoryIdValue);
       formData.append('File', FileSent);
@@ -64,7 +60,7 @@ function UploadDoc({ categoryID, DocAdd }) {
           </Button>
         </div>
         <div className="col-span-5 row-start-2">
-          <p className="text-xs mt-1 mb-4 max-w-lg">
+          <p className="text-xs mb-4 max-w-lg">
             Upload a document from your device. Image should be a .jpg, .jpeg, .png file. Notes: to use the uploaded document on this article, you need to click the upload button.
           </p>
           {/* <p>

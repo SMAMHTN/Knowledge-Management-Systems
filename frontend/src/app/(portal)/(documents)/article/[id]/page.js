@@ -7,7 +7,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Loader2 } from 'lucide-react';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
-import { alertUpdate } from '@/components/Feature';
+import { alertUpdate, alertDelete, alertAdd } from '@/components/Feature';
 import UploadDoc from '@/components/UploadDoc';
 import UploadFile from '@/components/UploadFile';
 import ArticleEditor from '@/dep/grapesjs/ArticleEditor';
@@ -80,6 +80,7 @@ function ArticleDetail({ params }) {
 
       // Update the state with the new file list (excluding the deleted file)
       const responseFile = await KmsAPIGET(URLParamsBuilder('listfile', 1, 99999999, HandleQueryParams('FileID', 'IN', 'AND', updatedFileIDs, null)));
+      alertDelete(responseFile);
       setFileList(responseFile.body.Data);
     }
   };
@@ -100,6 +101,7 @@ function ArticleDetail({ params }) {
 
       // Update the state with the new doc list
       const responseDoc = await KmsAPIGET(URLParamsBuilder('listdoc', 1, 99999999, HandleQueryParams('DocID', 'IN', 'AND', updatedDocIDs), null));
+
       setDocList(responseDoc.body.Data);
     }
   };
@@ -120,6 +122,7 @@ function ArticleDetail({ params }) {
 
       // Update the state with the new doc list (excluding the deleted document)
       const responseDoc = await KmsAPIGET(URLParamsBuilder('listdoc', 1, 99999999, HandleQueryParams('DocID', 'IN', 'AND', updatedDocIDs), null));
+      alertDelete(responseDoc);
       setDocList(responseDoc.body.Data);
     }
   };
@@ -288,10 +291,10 @@ function ArticleDetail({ params }) {
           <div className="mb-4">
             <label className="block font-semibold mb-1">Upload Document</label>
             <UploadDoc categoryID={data.CategoryID} DocAdd={AddDoc} />
-            <ListDoc idArray={docList} path="/api/doc/" />
+            <ListDoc idArray={docList} path="/api/doc/" DocDel={DeleteDoc} />
             <label className="block font-semibold mb-1">Upload File</label>
             <UploadFile categoryID={data.CategoryID} FileAdd={AddFile} />
-            <ListFile idArray={fileList} path="/api/file/" />
+            <ListFile idArray={fileList} path="/api/file/" FileDel={DeleteFile} />
           </div>
           <Button
             type="submit"
