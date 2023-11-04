@@ -7,7 +7,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Loader2 } from 'lucide-react';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
-import { alertUpdate, alertDelete, alertAdd } from '@/components/Feature';
+import { alertUpdate, alertDelete } from '@/components/Feature';
 import UploadDoc from '@/components/UploadDoc';
 import UploadFile from '@/components/UploadFile';
 import ArticleEditor from '@/dep/grapesjs/ArticleEditor';
@@ -279,7 +279,7 @@ function ArticleDetail({ params }) {
               )}
             />
           </div>
-          <div className="mb-4 mt-20">
+          <div className="my-4">
             <label className="block font-semibold mb-1">Edit Article Content</label>
             <ArticleEditor ArticleID={data.ArticleID} />
             {/* <p>

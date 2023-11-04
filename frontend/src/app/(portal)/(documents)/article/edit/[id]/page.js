@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { URLParamsBuilder, HandleQueryParams } from '@/dep/others/HandleParams';
 import { KmsAPI, KmsAPIGET } from '@/dep/kms/kmsHandler';
 import { ListFile, ListDoc } from '@/components/ListFromArray';
-import { alertAdd } from '@/components/Feature';
+import { alertAdd, alertDelete } from '@/components/Feature';
 
 function articleEditing({ params }) {
   const router = useRouter();
@@ -54,42 +54,31 @@ function articleEditing({ params }) {
 
       // Update the state with the new file list (excluding the deleted file)
       const responseFile = await KmsAPIGET(URLParamsBuilder('listfile', 1, 99999999, HandleQueryParams('FileID', 'IN', 'AND', updatedFileIDs, null)));
+      alertDelete(responseFile);
       setFileList(responseFile.body.Data);
     }
   };
 
   const AddDoc = async (value) => {
-    // Extract DocID from the object and convert it to an array of integers
     const docIDs = docList.map((doc) => doc.DocID);
 
-    // Check if the DocID is not already in the array
     if (!docIDs.includes(value)) {
-      // Add the DocID to the array
-      console.log(value);
-      console.log(docIDs);
       const updatedDocIDs = [...docIDs, value];
       KmsAPI('PUT', 'article', {
         ArticleID: data.ArticleID,
         DocID: updatedDocIDs,
         IsActive: data.IsActive,
       });
-      console.log('---------------------------------------------------------------------');
-      console.log(value);
-      console.log(updatedDocIDs);
 
-      // Update the state with the new doc list
       const responseDoc = await KmsAPIGET(URLParamsBuilder('listdoc', 1, 99999999, HandleQueryParams('DocID', 'IN', 'AND', updatedDocIDs), null));
       setDocList(responseDoc.body.Data);
     }
   };
 
   const DeleteDoc = async (value) => {
-    // Extract DocID from the object and convert it to an array of integers
     const docIDs = docList.map((doc) => doc.DocID);
 
-    // Check if the DocID is in the array
     if (docIDs.includes(value)) {
-      // Remove the DocID from the array
       const updatedDocIDs = docIDs.filter((id) => id !== value);
       KmsAPI('PUT', 'article', {
         ArticleID: data.ArticleID,
@@ -97,8 +86,8 @@ function articleEditing({ params }) {
         IsActive: data.IsActive,
       });
 
-      // Update the state with the new doc list (excluding the deleted document)
       const responseDoc = await KmsAPIGET(URLParamsBuilder('listdoc', 1, 99999999, HandleQueryParams('DocID', 'IN', 'AND', updatedDocIDs), null));
+      alertDelete(responseDoc);
       setDocList(responseDoc.body.Data);
     }
   };
@@ -157,10 +146,10 @@ function articleEditing({ params }) {
         <div className="mb-4">
           <label className="block font-semibold mb-1">Upload Document</label>
           <UploadDoc categoryID={data.CategoryID} DocAdd={AddDoc} />
-          <ListDoc idArray={docList} path="/api/doc/" />
+          <ListDoc idArray={docList} path="/api/doc/" DocDel={DeleteDoc} />
           <label className="block font-semibold mb-1">Upload File</label>
           <UploadFile categoryID={data.CategoryID} FileAdd={AddFile} />
-          <ListFile idArray={fileList} path="/api/file/" />
+          <ListFile idArray={fileList} path="/api/file/" FileDel={DeleteFile} />
         </div>
         <Button
           type="button"
