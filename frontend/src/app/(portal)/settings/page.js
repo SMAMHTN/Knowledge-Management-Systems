@@ -172,7 +172,7 @@ function SystemSetting() {
                   <input
                     type="text"
                     {...field}
-                    className=" text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    className=" text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
                     placeholder="Company Name Inc."
                   />
                   <p className="text-xs mt-1">
@@ -196,7 +196,7 @@ function SystemSetting() {
                   <input
                     type="text"
                     {...field}
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
+                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
                     placeholder="Bandung, West Java, Indonesia"
                   />
                   <p className="text-xs mt-1">
@@ -231,7 +231,7 @@ function SystemSetting() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded bg-blue-500 text-white w-full md:w-36"
+            className="rounded bg-blue-500 text-white w-full md:w-36 shadow"
           >
             Update Settings
           </Button>
