@@ -114,17 +114,6 @@ func ListArticle(c echo.Context) error {
 			}
 			CategoryPermissionList = append(CategoryPermissionList, CategoryPermissionSingle)
 		}
-		var wherequery []dependency.WhereType
-		if limit.Query != "" {
-			err = json.Unmarshal([]byte(limit.Query), &wherequery)
-			if err != nil {
-				err = errors.New("query field json read error : " + err.Error())
-				Logger.Error(err.Error())
-				res.StatusCode = http.StatusInternalServerError
-				res.Data = err
-				return c.JSON(http.StatusInternalServerError, res)
-			}
-		}
 		var convertedAllowedCategoryList []interface{}
 		for _, v := range AllowedCategoryList {
 			convertedAllowedCategoryList = append(convertedAllowedCategoryList, v)
@@ -135,15 +124,13 @@ func ListArticle(c echo.Context) error {
 			Logic:    "AND",
 			Values:   convertedAllowedCategoryList,
 		}
-		wherequery = append(wherequery, singlewherequery)
-		a, err := json.Marshal(wherequery)
+		err = limit.AddWhere([]dependency.WhereType{singlewherequery})
 		if err != nil {
 			Logger.Error(err.Error())
 			res.StatusCode = http.StatusInternalServerError
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
-		limit.Query = string(a)
 		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_article")
 		if err != nil {
 			Logger.Warn(err.Error())

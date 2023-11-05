@@ -10,8 +10,6 @@ function UploadDoc({ categoryID, DocAdd }) {
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    console.log(file);
-    console.log(typeof (file));
     setCurrentState(2);
     setSelectedFile(file);
   };
@@ -19,10 +17,8 @@ function UploadDoc({ categoryID, DocAdd }) {
   const categoryIdValue = categoryID;
   const handleUpload = async (e) => {
     e.preventDefault();
-    console.log('Upload button clicked in UploadDoc');
     try {
       const FileSent = selectedFile;
-      console.log('before sending API');
       const formData = new FormData();
       formData.append('CategoryID', categoryIdValue);
       formData.append('File', FileSent);
@@ -48,7 +44,7 @@ function UploadDoc({ categoryID, DocAdd }) {
         <div className="col-span-3">
           <input
             ref={fileInputRef}
-            className="block px-2 py-2 w-full md:w-3/4 text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+            className="block px-2 py-2 w-full md:w-3/4 text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 shadow"
             accept="*/*"
             type="file"
             onChange={handleFileChange}
@@ -58,13 +54,13 @@ function UploadDoc({ categoryID, DocAdd }) {
           <Button
             type="button"
             onClick={handleUpload}
-            className="rounded bg-blue-500 text-white w-full md:w-36"
+            className="rounded bg-blue-500 text-white w-full md:w-36 shadow"
           >
             Upload Document
           </Button>
         </div>
         <div className="col-span-5 row-start-2">
-          <p className="text-xs mt-1 mb-4">
+          <p className="text-xs mb-4 max-w-lg">
             Upload a document from your device. Image should be a .jpg, .jpeg, .png file. Notes: to use the uploaded document on this article, you need to click the upload button.
           </p>
           {/* <p>

@@ -61,7 +61,7 @@ function ThemeApp({
       </div>
       <div className="grid grid-cols-4 md:grid-cols-6">
         <div className="mb-4">
-          <label className="block font-normal mb-1">Primary</label>
+          <label className="block text-xs mb-1">Background</label>
           <span
             style={{
               backgroundColor: selectedThemeColors.primary,
@@ -70,11 +70,13 @@ function ThemeApp({
               display: 'inline-block',
               verticalAlign: 'middle',
               marginLeft: '4px',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
             }}
           />
         </div>
         <div className="mb-4">
-          <label className="block font-normal mb-1">Secondary</label>
+          <label className="block text-xs mb-1">Navigation bar</label>
           <span
             style={{
               backgroundColor: selectedThemeColors.secondary,
@@ -83,6 +85,8 @@ function ThemeApp({
               display: 'inline-block',
               verticalAlign: 'middle',
               marginLeft: '4px',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
             }}
           />
         </div>

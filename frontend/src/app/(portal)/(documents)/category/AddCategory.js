@@ -72,7 +72,7 @@ function AddCategory({ fetchData }) {
       <Button
         type="button"
         onClick={openModal}
-        className=" bg-gray-100 ml-2 hover:bg-gray-300 border-white border"
+        className=" bg-gray-100 ml-2 hover:bg-gray-300 shadow"
       >
         +
       </Button>
@@ -103,7 +103,7 @@ function AddCategory({ fetchData }) {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-6">
               <label className="block font-medium mb-1">
-                Category Name
+                Category
                 <RequiredFieldIndicator />
               </label>
               <Controller

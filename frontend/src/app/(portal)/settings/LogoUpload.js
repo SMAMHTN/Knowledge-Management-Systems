@@ -12,13 +12,17 @@ function LogoUpload({ onUpload }) {
   const handleUpload = (e) => {
     e.preventDefault();
     console.log('Upload button clicked in LogoUpload');
+    console.log(selectedFile);
     if (selectedFile) {
+      console.log('pass if else');
       // Convert the selected image to base64 here
       const reader = new FileReader();
       reader.onload = () => {
         const base64String = reader.result.split(',')[1];
         // Call the provided onUpload function with the base64 string
         if (onUpload && typeof onUpload === 'function') {
+          console.log('pass 2nd if else');
+          console.log(base64String);
           onUpload(base64String);
         } else {
           console.error('onUpload is not a valid function.');

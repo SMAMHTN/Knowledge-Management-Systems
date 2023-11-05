@@ -9,46 +9,6 @@ import { KmsAPIGET } from '../kms/kmsHandler';
 
 // const LoginDynamicpath = '/';
 
-export async function Logout() {
-  cookies().set({
-    name: 'username',
-    value: '',
-    sameSite: 'lax',
-    path: '/',
-  });
-  cookies().set({
-    name: 'password',
-    value: '',
-    sameSite: 'lax',
-    path: '/',
-  });
-  cookies().set({
-    name: 'adminstatus',
-    value: '',
-    sameSite: 'lax',
-    path: '/',
-  });
-  cookies().set({
-    name: 'theme',
-    value: '',
-    sameSite: 'lax',
-    path: '/',
-  });
-  cookies().set({
-    name: 'cudpermission',
-    value: '',
-    sameSite: 'lax',
-    path: '/',
-  });
-  cookies().set({
-    name: 'cpermission',
-    value: '',
-    sameSite: 'lax',
-    path: '/',
-  });
-  return true;
-}
-
 export async function CoreAPI(method, path, data) {
   const conf = readConf();
   const cookieStore = cookies();
@@ -191,6 +151,47 @@ export async function SetThemeCookies() {
     sameSite: 'lax',
     path: '/',
   });
+  return true;
+}
+
+export async function Logout() {
+  cookies().set({
+    name: 'username',
+    value: '',
+    sameSite: 'lax',
+    path: '/',
+  });
+  cookies().set({
+    name: 'password',
+    value: '',
+    sameSite: 'lax',
+    path: '/',
+  });
+  cookies().set({
+    name: 'adminstatus',
+    value: '',
+    sameSite: 'lax',
+    path: '/',
+  });
+  cookies().set({
+    name: 'theme',
+    value: '',
+    sameSite: 'lax',
+    path: '/',
+  });
+  cookies().set({
+    name: 'cudpermission',
+    value: '',
+    sameSite: 'lax',
+    path: '/',
+  });
+  cookies().set({
+    name: 'cpermission',
+    value: '',
+    sameSite: 'lax',
+    path: '/',
+  });
+  await SetThemeCookies();
   return true;
 }
 

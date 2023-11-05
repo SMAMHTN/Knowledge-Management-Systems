@@ -63,8 +63,8 @@ function UserProfile({ maxWidth, maxHeight }) {
       );
     }
     return (
-      <div className="flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-800">
-        <span className="text-gray-500 dark:text-gray-400 text-sm">No Photo</span>
+      <div className="flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-800 border-lg">
+        <span className="text-gray-500 dark:text-gray-400 text-xs">No Photo</span>
       </div>
     );
   };
@@ -85,7 +85,7 @@ function UserProfile({ maxWidth, maxHeight }) {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-white rounded " align="end" forceMount>
+      <DropdownMenuContent className="w-56 bg-white rounded-md" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           {userData ? (
             <div className="flex flex-col space-y-1">

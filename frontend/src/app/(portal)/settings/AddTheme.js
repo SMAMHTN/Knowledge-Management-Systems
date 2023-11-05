@@ -129,7 +129,7 @@ function AddTheme({ fetchThemes }) {
             <div className="grid grid-cols-2 gap-2">
 
               <div className="mb-4">
-                <label className="block font-normal mb-1">Primary</label>
+                <label className="block font-normal mb-1">Background</label>
                 <input
                   type="color"
                   value={primaryColor}
@@ -137,7 +137,7 @@ function AddTheme({ fetchThemes }) {
                 />
               </div>
               <div className="mb-4">
-                <label className="block font-normal mb-1">Secondary</label>
+                <label className="block font-normal mb-1">Navigation bar</label>
                 <input
                   type="color"
                   value={secondaryColor}
@@ -148,7 +148,7 @@ function AddTheme({ fetchThemes }) {
             <div className="place-content-end mt-10 flex">
               <Button
                 type="button"
-                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36 shadow"
                 onClick={handleClose}
               >
                 Cancel
@@ -156,7 +156,7 @@ function AddTheme({ fetchThemes }) {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="rounded bg-blue-500 text-white w-full md:w-36"
+                className="rounded bg-blue-500 text-white w-full md:w-36 shadow"
               >
                 Add Theme
               </Button>

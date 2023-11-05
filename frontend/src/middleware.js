@@ -16,8 +16,9 @@ export function middleware(req) {
     SetThemeCookies().then();
   }
   const theme2 = req.cookies.get('theme');
-
-  res.cookies.set('theme', theme2.value);
+  if (typeof (theme2) === 'string') {
+    res.cookies.set('theme', theme2.value);
+  }
 
   if (isPathProtected) {
     // let AlreadyLogin;

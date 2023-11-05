@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Newspaper, Home } from 'lucide-react';
+import {
+  Newspaper, Home, User, Files, Settings,
+} from 'lucide-react';
 import DateTimeTrue from '@/components/Navbar/DateTime.js';
 import {
   menuUser, menuDoc, dashboard, systemSetting, post,
@@ -42,7 +44,7 @@ function SuperAdminMenu() {
             <AccordionTrigger className="w-full text-left h-11 flex items-center">
               <div className="flex items-center ml-4">
                 <span className="inline-flex justify-center items-center mt-1">
-                  {userIcon}
+                  <User />
                 </span>
                 <span className="ml-2 text-sm tracking-wide truncate">
                   Users
@@ -60,7 +62,6 @@ function SuperAdminMenu() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-
       </li>
       <li>
         <Accordion type="single" collapsible>
@@ -95,7 +96,7 @@ function SuperAdminMenu() {
           className="relative flex flex-row hover:underline items-center h-11 text-bold font-medium"
         >
           <span className="inline-flex justify-center items-center ml-4">
-            {settingsIcon}
+            <Settings />
           </span>
           <span className="ml-2 text-sm tracking-wide truncate">
             {systemSetting.title}
@@ -129,7 +130,7 @@ function AdminMenu() {
             <AccordionTrigger className="w-full text-left h-11 flex items-center">
               <div className="flex items-center ml-4">
                 <span className="inline-flex justify-center items-center mt-1">
-                  {userIcon}
+                  <User />
                 </span>
                 <span className="ml-2 text-sm tracking-wide truncate">
                   Users
@@ -155,7 +156,7 @@ function AdminMenu() {
             <AccordionTrigger className="w-full text-left h-11 flex items-center">
               <div className="flex items-center ml-4">
                 <span className="inline-flex justify-center items-center mt-1">
-                  {docIcon}
+                  <Files />
                 </span>
 
                 <span className="ml-2 text-sm tracking-wide truncate">
@@ -182,7 +183,7 @@ function AdminMenu() {
           className="relative flex flex-row hover:underline items-center h-11 text-bold font-medium"
         >
           <span className="inline-flex justify-center items-center ml-4">
-            {settingsIcon}
+            <Settings />
           </span>
           <span className="ml-2 text-sm tracking-wide truncate">
             {systemSetting.title}

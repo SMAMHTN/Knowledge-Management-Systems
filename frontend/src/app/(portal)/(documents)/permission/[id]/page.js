@@ -49,7 +49,6 @@ function PermissionDetail({ params }) {
       try {
         const response = await KmsAPIGET(`permission?PermissionID=${params.id}`);
         setData(response.body.Data);
-        console.log(response);
         Object.keys(response.body.Data).forEach((key) => {
           setValue(key, response.body.Data[key]);
         });
@@ -111,165 +110,171 @@ function PermissionDetail({ params }) {
   };
 
   return (
-    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+    <section className="h-fit flex flex-auto w-full">
       <div className="flex flex-col w-full">
-        <h2 className="text-2xl font-semibold mb-1"> Edit Permission</h2>
-        <p className="text-xs mb-4 ">
-          Customize and manage your Permission details
-        </p>
-        <Separator className="mb-4" />
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">
-              Category ID
-              <RequiredFieldIndicator />
-            </label>
-            <CategorySelector onChange={handleCategoryChange} value={selectedCategory} />
-            <p className="text-xs mt-1">
-              Select Category. Required.
-            </p>
-          </div>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">
-              Role ID
-              <RequiredFieldIndicator />
-            </label>
-            <RoleSelector onChange={handleRoleChange} value={selectedRole} />
-            <p className="text-xs mt-1">
-              Select Role. Required.
-            </p>
-          </div>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">Action Permissions</label>
-            <div className="grid grid-cols-2 gap-2 md:w-1/2 w-full">
-              <div>
+        <div className="bg-white w-full rounded-md shadow px-4 py-2 mb-2">
+          <h2 className="text-2xl font-semibold mb-1"> Edit Permission</h2>
+          <p className="text-xs mb-1 ">
+            Customize and manage your Permission details
+          </p>
+          <Separator />
+        </div>
+        <div className="bg-white rounded-md shadow p-4">
+          <div className=" md:w-4/5 lg:w-3/4">
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="mb-4">
+                <label className="block font-medium mb-1">
+                  Category
+                  <RequiredFieldIndicator />
+                </label>
+                <CategorySelector onChange={handleCategoryChange} value={selectedCategory} />
+                <p className="text-xs mt-1">
+                  Select Category. Required.
+                </p>
+              </div>
+              <div className="mb-4">
+                <label className="block font-medium mb-1">
+                  Role
+                  <RequiredFieldIndicator />
+                </label>
+                <RoleSelector onChange={handleRoleChange} value={selectedRole} />
+                <p className="text-xs mt-1">
+                  Select Role. Required.
+                </p>
+              </div>
+              <div className="mb-4">
+                <label className="block font-medium mb-1">Action Permissions</label>
+                <div className="grid grid-cols-2 gap-2 md:w-1/2 w-full">
+                  <div>
+                    <Controller
+                      name="Create"
+                      control={control}
+                      render={({ field }) => (
+                        <div className="flex items-center my-2 md:my-0">
+                          <input
+                            {...field}
+                            type="checkbox"
+                            checked={field.value}
+                            className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4 shadow"
+                          />
+                          <span className="text-sm sm:text-base">Create</span>
+                        </div>
+                      )}
+                    />
+                  </div>
+                  <div>
+                    <Controller
+                      name="Read"
+                      control={control}
+                      render={({ field }) => (
+                        <div className="flex items-center my-2 md:my-0">
+                          <input
+                            {...field}
+                            type="checkbox"
+                            checked={field.value}
+                            className="mr-2 text-blue-500  w-6 h-6 md:w-4 md:h-4 shadow"
+                          />
+                          <span className="text-sm sm:text-base">Read</span>
+                        </div>
+                      )}
+                    />
+                  </div>
+                  <div>
+                    <Controller
+                      name="Update"
+                      control={control}
+                      render={({ field }) => (
+                        <div className="flex items-center my-2 md:my-0">
+                          <input
+                            {...field}
+                            type="checkbox"
+                            checked={field.value}
+                            className="mr-2 text-blue-500  w-6 h-6 md:w-4 md:h-4 shadow"
+                          />
+                          <span className="text-sm sm:text-base">Update</span>
+                        </div>
+                      )}
+                    />
+                  </div>
+                  <div>
+                    <Controller
+                      name="Delete"
+                      control={control}
+                      render={({ field }) => (
+                        <div className="flex items-center my-2 md:my-0">
+                          <input
+                            {...field}
+                            type="checkbox"
+                            checked={field.value}
+                            className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4 shadow"
+                          />
+                          <span className="text-sm sm:text-base">Delete</span>
+                        </div>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="mb-4">
+                <label className="block font-medium mb-1">File Type</label>
                 <Controller
-                  name="Create"
+                  name="FileType"
                   control={control}
                   render={({ field }) => (
-                    <div className="flex items-center my-2 md:my-0">
+                    <>
                       <input
+                        type="text"
                         {...field}
-                        type="checkbox"
-                        checked={field.value}
-                        className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
+                        className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
+                        placeholder="*, php, py, -exe"
                       />
-                      <span className="text-sm sm:text-base">Create</span>
-                    </div>
+                      <p className="text-xs mt-1">
+                        Format : * for accept all, - to exclude.
+                        <br />
+                        example : *, -exe means all allowed except .exe files.
+                        <br />
+                        example : php, -py accept .php and exclude .py, and exclude all file type.
+                      </p>
+                      {errors.FileType && (<ErrorMessage error={errors.FileType.message} />)}
+                    </>
                   )}
                 />
               </div>
-              <div>
+              <div className="mb-4">
+                <label className="block font-medium mb-1">Document Type</label>
                 <Controller
-                  name="Read"
+                  name="DocType"
                   control={control}
                   render={({ field }) => (
-                    <div className="flex items-center my-2 md:my-0">
+                    <>
                       <input
+                        type="text"
                         {...field}
-                        type="checkbox"
-                        checked={field.value}
-                        className="mr-2 text-blue-500  w-6 h-6 md:w-4 md:h-4"
+                        className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
+                        placeholder="*, doc, docx, -pdf"
                       />
-                      <span className="text-sm sm:text-base">Read</span>
-                    </div>
+                      <p className="text-xs mt-1">
+                        Format : * for accept all, - to exclude.
+                        <br />
+                        example : *, -doc means all allowed except .doc document type.
+                        <br />
+                        example : doc, pdf, -docx means accepting .doc, .pdf and exclude .docx, and exclude all document type.
+                      </p>
+                      {errors.DocType && (<ErrorMessage error={errors.DocType.message} />)}
+                    </>
                   )}
                 />
               </div>
-              <div>
-                <Controller
-                  name="Update"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="flex items-center my-2 md:my-0">
-                      <input
-                        {...field}
-                        type="checkbox"
-                        checked={field.value}
-                        className="mr-2 text-blue-500  w-6 h-6 md:w-4 md:h-4"
-                      />
-                      <span className="text-sm sm:text-base">Update</span>
-                    </div>
-                  )}
-                />
-              </div>
-              <div>
-                <Controller
-                  name="Delete"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="flex items-center my-2 md:my-0">
-                      <input
-                        {...field}
-                        type="checkbox"
-                        checked={field.value}
-                        className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4"
-                      />
-                      <span className="text-sm sm:text-base">Delete</span>
-                    </div>
-                  )}
-                />
-              </div>
-            </div>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="rounded bg-blue-500 text-white w-full md:w-36 shadow"
+              >
+                Update Permission
+              </Button>
+            </form>
           </div>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">File Type</label>
-            <Controller
-              name="FileType"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    type="text"
-                    {...field}
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-                    placeholder="*, php, py, -exe"
-                  />
-                  <p className="text-xs mt-1">
-                    Format : * for accept all, - to exclude.
-                    <br />
-                    example : *, -exe means all allowed except .exe files.
-                    <br />
-                    example : php, -py accept .php and exclude .py, and exclude all file type.
-                  </p>
-                  {errors.FileType && (<ErrorMessage error={errors.FileType.message} />)}
-                </>
-              )}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">Document Type</label>
-            <Controller
-              name="DocType"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    type="text"
-                    {...field}
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-                    placeholder="*, doc, docx, -pdf"
-                  />
-                  <p className="text-xs mt-1">
-                    Format : * for accept all, - to exclude.
-                    <br />
-                    example : *, -doc means all allowed except .doc document type.
-                    <br />
-                    example : doc, pdf, -docx means accepting .doc, .pdf and exclude .docx, and exclude all document type.
-                  </p>
-                  {errors.DocType && (<ErrorMessage error={errors.DocType.message} />)}
-                </>
-              )}
-            />
-          </div>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded bg-blue-500 text-white w-full md:w-36"
-          >
-            Update Permission
-          </Button>
-        </form>
+        </div>
       </div>
 
     </section>

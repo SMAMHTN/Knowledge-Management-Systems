@@ -92,7 +92,7 @@ function AddUser({ fetchData }) {
       <Button
         type="button"
         onClick={openModal}
-        className=" bg-gray-100 hover:bg-gray-300 border-white border ml-2"
+        className=" bg-gray-100 hover:bg-gray-300 ml-2 shadow"
       >
         +
       </Button>
@@ -333,7 +333,7 @@ function AddUser({ fetchData }) {
             <div className="place-content-end mt-10 flex">
               <Button
                 type="button"
-                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36"
+                className="bg-gray-500 hover:bg-gray-400 border border-gray-200 text-white px-4 py-2 rounded mr-2 w-full md:w-36 shadow"
                 onClick={handleClose}
               >
                 Cancel
@@ -341,7 +341,7 @@ function AddUser({ fetchData }) {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="rounded bg-blue-500 text-white w-full md:w-36"
+                className="rounded bg-blue-500 text-white w-full md:w-36 shadow"
               >
                 Add User
               </Button>

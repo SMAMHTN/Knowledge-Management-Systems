@@ -20,7 +20,7 @@ function RoleSelector({ onChange, value }) {
   };
   return (
     <AsyncSelect
-      className="md:max-w-md"
+      className="md:max-w-md shadow"
       id="RoleSelector"
       cacheOptions
       defaultOptions

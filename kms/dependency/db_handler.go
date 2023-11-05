@@ -49,6 +49,42 @@ var (
 	SpecialAllowedLogic    = [...]string{}
 )
 
+func (limit *QueryType) AddWhere(data []WhereType) (err error) {
+	var wherequery []WhereType
+	if limit.Query != "" {
+		err = json.Unmarshal([]byte(limit.Query), &wherequery)
+		if err != nil {
+			err = errors.New("query field json read error : " + err.Error())
+			return err
+		}
+	}
+	wherequery = append(wherequery, data...)
+	a, err := json.Marshal(wherequery)
+	if err != nil {
+		return err
+	}
+	limit.Query = string(a)
+	return nil
+}
+
+func (limit *QueryType) AddSort(data []SortType) (err error) {
+	var sortquery []SortType
+	if limit.Sort != "" {
+		err = json.Unmarshal([]byte(limit.Sort), &sortquery)
+		if err != nil {
+			err = errors.New("query field json read error : " + err.Error())
+			return err
+		}
+	}
+	sortquery = append(sortquery, data...)
+	a, err := json.Marshal(sortquery)
+	if err != nil {
+		return err
+	}
+	limit.Sort = string(a)
+	return nil
+}
+
 func Db_Connect(conf Configuration, dbname string) (database *sql.DB, err error) {
 	if dbname == "" {
 		dbname = conf.Appname
@@ -214,6 +250,9 @@ func (data *QueryType) QueryMaker(AnotherTable func([]SortType, []WhereType) ([]
 		info.TotalShow = count % data.Num
 		info.UpperLimit = Lowerlimit0 + info.TotalShow
 		info.LowerLimit = Lowerlimit0 + 1
+		if info.TotalShow == 0 {
+			info.TotalShow = data.Num
+		}
 		if data.Num == 1 {
 			info.TotalShow = data.Num
 			info.UpperLimit = count
@@ -257,8 +296,12 @@ func SortQueryMaker(queryinit string, valuesinit []interface{}, sortquery []Sort
 				query += fmt.Sprintf("%s %s ?", condition.Field, condition.Operator)
 				values = append(values, condition.Values[0])
 			case "IN", "NOT IN":
-				query += fmt.Sprintf("%s %s (?%s)", condition.Field, condition.Operator, strings.Repeat(", ?", len(condition.Values)-1))
-				values = append(values, condition.Values...)
+				if len(condition.Values) > 0 {
+					query += fmt.Sprintf("%s %s (?%s)", condition.Field, condition.Operator, strings.Repeat(", ?", len(condition.Values)-1))
+					values = append(values, condition.Values...)
+				} else {
+					query += fmt.Sprintf("%s %s ()", condition.Field, condition.Operator)
+				}
 			case "BETWEEN", "NOT BETWEEN":
 				query += fmt.Sprintf("%s %s ? AND ?", condition.Field, condition.Operator)
 				values = append(values, condition.Values[0], condition.Values[1])

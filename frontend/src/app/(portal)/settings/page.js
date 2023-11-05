@@ -13,11 +13,11 @@ import AddTheme from './AddTheme';
 import LogoUpload from './LogoUpload';
 import TimezoneDropdown from '@/components/TimezoneDropdown';
 import { Separator, ErrorMessage, RequiredFieldIndicator } from '@/components/SmComponent';
-
 import { Button } from '@/components/ui/button';
 
 function SystemSetting() {
   const router = useRouter();
+
   const {
     control, setValue, handleSubmit, formState: { errors, isSubmitting },
   } = useForm({
@@ -114,7 +114,7 @@ function SystemSetting() {
     });
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data2) => {
     try {
       const { error } = settingsSchema.validate(data);
 
@@ -126,9 +126,9 @@ function SystemSetting() {
       const selectedThemeId = parseInt(selectedTheme);
 
       const updatedData = {
-        CompanyName: data.CompanyName,
+        CompanyName: data2.CompanyName,
         CompanyLogo: data.CompanyLogo,
-        CompanyAddress: data.CompanyAddress,
+        CompanyAddress: data2.CompanyAddress,
         TimeZone: initialTimezone,
         AppthemeID: selectedThemeId,
       };
@@ -146,98 +146,108 @@ function SystemSetting() {
   };
 
   const handleLogoUpload = (base64String) => {
+    const newdata = data;
     // console.log('Handling logo upload in SystemSetting:', base64String);
-    setData({ ...data, CompanyLogo: base64String });
+    console.log('another file');
+    console.log(base64String);
+    newdata.CompanyLogo = base64String;
+    setData(newdata);
   };
 
   return (
-    <section className="h-screen flex flex-auto w-full md:w-4/5 lg:w-3/4">
+    <section className="h-fit flex flex-auto w-full">
       <div className="flex flex-col w-full">
-        <h2 className="text-2xl font-semibold mb-1">System Settings</h2>
-        <p className="text-xs mb-4">
-          Customize and manage your Company Profile and system settings.
-        </p>
-        <Separator className="mb-4" />
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">
-              Company Name
-              <RequiredFieldIndicator />
-            </label>
-            <Controller
-              name="CompanyName"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    type="text"
-                    {...field}
-                    className=" text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-                    placeholder="Company Name Inc."
-                  />
-                  <p className="text-xs mt-1">
-                    Min 2 characters & Max 50 characters. Required.
-                  </p>
-                  {errors.CompanyName && (<ErrorMessage error={errors.CompanyName.message} />)}
-                </>
-              )}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">
-              Company Address
-              <RequiredFieldIndicator />
-            </label>
-            <Controller
-              name="CompanyAddress"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    type="text"
-                    {...field}
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md"
-                    placeholder="Bandung, West Java, Indonesia"
-                  />
-                  <p className="text-xs mt-1">
-                    Min 2 characters & Max 50 characters. Required.
-                  </p>
-                  {errors.CompanyAddress && (<ErrorMessage error={errors.CompanyAddress.message} />)}
-                </>
-              )}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">Logo</label>
-            <LogoUpload onUpload={handleLogoUpload} />
-          </div>
+        <div className="bg-white w-full rounded-md shadow px-4 py-2 mb-2">
+          <h2 className="text-2xl font-semibold mb-1">System Settings</h2>
+          <p className="text-xs mb-1">
+            Customize and manage your Organization Profile and system settings.
+          </p>
+          <Separator />
+        </div>
+        <div className="bg-white rounded-md shadow p-4">
+          <div className="md:w-4/5 lg:w-3/4">
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="mb-4">
+                <label className="block font-medium mb-1">
+                  Organization Name
+                  <RequiredFieldIndicator />
+                </label>
+                <Controller
+                  name="CompanyName"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <input
+                        type="text"
+                        {...field}
+                        className=" text-sm sm:text-base placeholder-gray-500 px-2 py-1 rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
+                        placeholder="Company Name Inc."
+                      />
+                      <p className="text-xs mt-1">
+                        Min 2 characters & Max 50 characters. Required.
+                      </p>
+                      {errors.CompanyName && (<ErrorMessage error={errors.CompanyName.message} />)}
+                    </>
+                  )}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-medium mb-1">
+                  Address
+                  <RequiredFieldIndicator />
+                </label>
+                <Controller
+                  name="CompanyAddress"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <input
+                        type="text"
+                        {...field}
+                        className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
+                        placeholder="Bandung, West Java, Indonesia"
+                      />
+                      <p className="text-xs mt-1">
+                        Min 2 characters & Max 50 characters. Required.
+                      </p>
+                      {errors.CompanyAddress && (<ErrorMessage error={errors.CompanyAddress.message} />)}
+                    </>
+                  )}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-medium mb-1">Logo</label>
+                <LogoUpload onUpload={handleLogoUpload} />
+              </div>
 
-          <div className="mb-4">
-            <label className="block font-medium mb-1">Timezone</label>
-            <TimezoneDropdown
-              selectedTimezone={data.TimeZone || initialTimezone}
-              onTimezoneChange={handleTimezoneChange}
-            />
-            <p className="text-xs mt-1">
-              Choose your preferred timezone from the list above.
-            </p>
+              <div className="mb-4">
+                <label className="block font-medium mb-1">Timezone</label>
+                <TimezoneDropdown
+                  selectedTimezone={data.TimeZone || initialTimezone}
+                  onTimezoneChange={handleTimezoneChange}
+                />
+                <p className="text-xs mt-1">
+                  Choose your preferred timezone from the list above.
+                </p>
+              </div>
+              <ThemeApp
+                themeOptions={themeOptions}
+                selectedTheme={selectedTheme}
+                handleThemeSelection={handleThemeSelection}
+                selectedThemeColors={selectedThemeColors}
+              />
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="rounded bg-blue-500 text-white w-full md:w-36 shadow"
+              >
+                Update Settings
+              </Button>
+            </form>
+            <div className="mb-4" />
+            <AddTheme fetchThemes={fetchThemes} />
           </div>
-          <ThemeApp
-            themeOptions={themeOptions}
-            selectedTheme={selectedTheme}
-            handleThemeSelection={handleThemeSelection}
-            selectedThemeColors={selectedThemeColors}
-          />
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded bg-blue-500 text-white w-full md:w-36"
-          >
-            Update Settings
-          </Button>
-        </form>
-        <div className="mb-4" />
-        <AddTheme fetchThemes={fetchThemes} />
+        </div>
       </div>
     </section>
   );

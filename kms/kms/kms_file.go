@@ -12,8 +12,9 @@ import (
 )
 
 func ListFile(c echo.Context) error {
-
 	permission, _, _ := Check_Admin_Permission_API(c)
+	var LimitQuery string
+	var ValuesQuery []interface{}
 	res := ResponseList{}
 	limit := new(dependency.QueryType)
 	err := c.Bind(limit)
@@ -23,25 +24,43 @@ func ListFile(c echo.Context) error {
 		res.Data = err.Error()
 		return c.JSON(http.StatusBadRequest, res)
 	}
-	if permission {
-		var LimitQuery string
-		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_file")
+	if !permission {
+		AllowedCategoryList, err := GetCurrentUserReadCategoryList(c)
 		if err != nil {
-			Logger.Warn(err.Error())
-			res.StatusCode = http.StatusBadRequest
-			res.Data = err.Error()
-			return c.JSON(http.StatusBadRequest, res)
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
 		}
-		FileList, _ := ReadFile(LimitQuery, ValuesQuery)
-		res.StatusCode = http.StatusOK
-		res.Data = FileList
-		return c.JSON(http.StatusOK, res)
-	} else {
-		res.StatusCode = http.StatusForbidden
-		res.Data = "ONLY SUPERADMIN HAVE THIS PERMISSION"
-		return c.JSON(http.StatusForbidden, res)
+		var convertedAllowedCategoryList []interface{}
+		for _, v := range AllowedCategoryList {
+			convertedAllowedCategoryList = append(convertedAllowedCategoryList, v)
+		}
+		singlewherequery := dependency.WhereType{
+			Field:    "CategoryID",
+			Operator: "IN",
+			Logic:    "AND",
+			Values:   convertedAllowedCategoryList,
+		}
+		err = limit.AddWhere([]dependency.WhereType{singlewherequery})
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = err
+			return c.JSON(http.StatusInternalServerError, res)
+		}
 	}
+	LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_file")
+	if err != nil {
+		Logger.Warn(err.Error())
+		res.StatusCode = http.StatusBadRequest
+		res.Data = err.Error()
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	FileList, _ := ReadFile(LimitQuery, ValuesQuery)
+	res.StatusCode = http.StatusOK
+	res.Data = FileList
+	return c.JSON(http.StatusOK, res)
 }
 
 func ListFileID(c echo.Context) error {
