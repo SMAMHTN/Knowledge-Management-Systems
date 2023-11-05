@@ -10,7 +10,7 @@ import { KmsAPIGET } from '../kms/kmsHandler';
 // const LoginDynamicpath = '/';
 
 export async function CoreAPI(method, path, data) {
-  const conf = readConf('frontend_conf.json');
+  const conf = readConf();
   const cookieStore = cookies();
   let un;
   let pwd;
@@ -45,7 +45,7 @@ export async function CoreAPI(method, path, data) {
 }
 
 export async function CoreAPIGET(path) {
-  const conf = readConf('frontend_conf.json');
+  const conf = readConf();
   const cookieStore = cookies();
   let un; let pwd;
   un = cookieStore.get('username')?.value;
@@ -76,7 +76,7 @@ export async function CoreAPIGET(path) {
 }
 
 export async function CoreAPIBlob(method, path, CategoryID, File) {
-  const conf = readConf('frontend_conf.json');
+  const conf = readConf();
   const cookieStore = cookies();
   let un; let
     pwd;
@@ -196,7 +196,7 @@ export async function Logout() {
 }
 
 export async function Login(Username, Password) {
-  const conf = readConf('frontend_conf.json');
+  const conf = readConf();
   const credentials = generateCoreCred(Username, Password);
   const response = await fetch(`${conf.core_link}loginuser`, {
     method: 'GET',
@@ -266,7 +266,7 @@ export async function getUserData() {
 }
 
 export async function isLogin() {
-  const conf = readConf('frontend_conf.json');
+  const conf = readConf();
   const cookieStore = cookies();
   let un; let pwd;
   un = cookieStore.get('username')?.value;

@@ -73,7 +73,6 @@ func init() {
 	for i := 0; i < v.NumField(); i++ {
 		fieldName := t.Field(i).Name
 		fieldValue := v.Field(i).Interface()
-		fmt.Println(fieldValue)
 		if fieldValue != nil {
 			fmt.Printf("%s: %v\n", fieldName, fieldValue)
 		}

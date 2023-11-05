@@ -27,24 +27,22 @@ function getParentPath() {
   return fixPath(parent);
 }
 
-export function readConf(ConfFile) {
-  try {
-    fs.accessSync(ConfFile);
-  } catch (err) {
-    const parent = getParentPath();
-    const path = parent + ConfFile;
-    try {
-      fs.accessSync(path);
-      ConfFile = path;
-    } catch (err) {
-      throw new URIError("Conf file not found");
+export function readConf() {
+  let ConfFile = 'frontend_conf.json';
+  const parent = getParentPath();
+  const potentialPaths = [ConfFile, '/frontend/frontend_conf.json', parent + ConfFile];
+
+  for (const path of potentialPaths) {
+    if (isFileAccessible(path)) {
+      ConfFile = path; // Update ConfFile with the valid path
+      break; // Exit the loop since a valid path is found
     }
   }
 
   const fileData = fs.readFileSync(ConfFile, "utf8");
   const configuration = JSON.parse(fileData);
 
-  for (const key in configuration) {
+  for ( const key in configuration) {
     if (configuration.hasOwnProperty(key) && key.endsWith("_link")) {
       const value = configuration[key];
       if (typeof value === "string" && value[value.length - 1] !== "/") {
@@ -54,6 +52,15 @@ export function readConf(ConfFile) {
   }
 
   return configuration;
+}
+
+function isFileAccessible(filePath) {
+  try {
+    fs.accessSync(filePath);
+    return true; // File is accessible
+  } catch (err) {
+      return false; // File does not exist
+  }
 }
 
 module.exports = {

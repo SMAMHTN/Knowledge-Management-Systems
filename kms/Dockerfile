@@ -3,5 +3,7 @@ FROM golang:1.20rc3-bullseye
 WORKDIR /kms
 #Workdir set as core
 COPY . .
+RUN go mod download
+RUN go build -o core-app
 EXPOSE 5656
-CMD go run .
+CMD ["./core-app"]
