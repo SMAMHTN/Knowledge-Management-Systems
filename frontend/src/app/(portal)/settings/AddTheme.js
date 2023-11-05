@@ -129,7 +129,7 @@ function AddTheme({ fetchThemes }) {
             <div className="grid grid-cols-2 gap-2">
 
               <div className="mb-4">
-                <label className="block font-normal mb-1">Primary</label>
+                <label className="block font-normal mb-1">Background</label>
                 <input
                   type="color"
                   value={primaryColor}
@@ -137,7 +137,7 @@ function AddTheme({ fetchThemes }) {
                 />
               </div>
               <div className="mb-4">
-                <label className="block font-normal mb-1">Secondary</label>
+                <label className="block font-normal mb-1">Navigation bar</label>
                 <input
                   type="color"
                   value={secondaryColor}

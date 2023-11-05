@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { Login, CoreAPIGET } from '../../dep/core/coreHandler';
 import ShowLogo from '@/components/Navbar/ShowLogo';
 import { alertLogin } from '@/components/Feature';
+import getThemeCookiesValue from '@/dep/core/getThemeCookiesValue';
 
 export default function Page() {
   const [username, setUsername] = useState('');
@@ -16,7 +17,7 @@ export default function Page() {
   const [nextlink, setNextlink] = useState('/');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
+  const theme = JSON.parse(getThemeCookiesValue());
   const handleLogin = async (event) => {
     event.preventDefault();
     setUsernameError('');
@@ -55,7 +56,7 @@ export default function Page() {
   };
   return (
     <>
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-300 mx-2">
+      <div className="min-h-screen flex flex-col items-center justify-center " style={{ backgroundColor: theme.secondary_color }}>
         <div className="flex flex-col bg-white shadow-md px-4 md:px-8 py-8 rounded-lg w-full max-w-md">
           <div className="grid grid-cols-2">
             <div className="col-span-1">

@@ -13,11 +13,11 @@ import AddTheme from './AddTheme';
 import LogoUpload from './LogoUpload';
 import TimezoneDropdown from '@/components/TimezoneDropdown';
 import { Separator, ErrorMessage, RequiredFieldIndicator } from '@/components/SmComponent';
-
 import { Button } from '@/components/ui/button';
 
 function SystemSetting() {
   const router = useRouter();
+
   const {
     control, setValue, handleSubmit, formState: { errors, isSubmitting },
   } = useForm({
@@ -114,9 +114,7 @@ function SystemSetting() {
     });
   };
 
-  const onSubmit = async () => {
-    console.log('sent company logo');
-    console.log(data);
+  const onSubmit = async (data2) => {
     try {
       const { error } = settingsSchema.validate(data);
 
@@ -128,13 +126,12 @@ function SystemSetting() {
       const selectedThemeId = parseInt(selectedTheme);
 
       const updatedData = {
-        CompanyName: data.CompanyName,
+        CompanyName: data2.CompanyName,
         CompanyLogo: data.CompanyLogo,
-        CompanyAddress: data.CompanyAddress,
+        CompanyAddress: data2.CompanyAddress,
         TimeZone: initialTimezone,
         AppthemeID: selectedThemeId,
       };
-      console.log(data.CompanyLogo);
       const response = await CoreAPI('PUT', 'setting', updatedData);
       if (response.status === 200) {
         fetchData();
@@ -149,7 +146,7 @@ function SystemSetting() {
   };
 
   const handleLogoUpload = (base64String) => {
-    let newdata = data;
+    const newdata = data;
     // console.log('Handling logo upload in SystemSetting:', base64String);
     console.log('another file');
     console.log(base64String);
