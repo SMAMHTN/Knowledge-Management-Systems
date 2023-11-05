@@ -1,8 +1,12 @@
 import { getCookie } from 'cookies-next';
 
 function getThemeCookiesValue() {
-  const ThemeValue = getCookie('theme');
-  return JSON.parse(ThemeValue);
+  try {
+    const ThemeValue = getCookie('theme');
+    return JSON.parse(ThemeValue);
+  } catch (err) {
+    return getThemeCookiesValue();
+  }
 }
 
 export default getThemeCookiesValue;
