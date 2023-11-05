@@ -56,7 +56,7 @@ export default function Page() {
   };
   return (
     <>
-      <div className="min-h-screen flex flex-col items-center justify-center " style={{ backgroundColor: theme.secondary_color }}>
+      <div className="min-h-screen flex flex-col items-center justify-center " style={{ backgroundColor: theme.primary_color }}>
         <div className="flex flex-col bg-white shadow-md px-4 md:px-8 py-8 rounded-lg w-full max-w-md">
           <div className="grid grid-cols-2">
             <div className="col-span-1">
