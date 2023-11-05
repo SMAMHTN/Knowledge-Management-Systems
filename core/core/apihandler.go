@@ -164,6 +164,7 @@ func Test_api() {
 	e.POST("/theme", AddTheme, basicAuthMiddleware, LogMiddleware)
 	e.PUT("/theme", EditTheme, basicAuthMiddleware, LogMiddleware)
 	e.DELETE("/theme", DeleteTheme, basicAuthMiddleware, LogMiddleware)
+	e.GET("/logo", ShowCompanyLogo, LogMiddleware)
 	e.GET("/setting", ShowSetting, LogMiddleware)
 	e.PUT("/setting", EditSetting, basicAuthMiddleware, LogMiddleware)
 	e.GET("/checkserverrun", CheckServerRun, LogMiddleware)

@@ -33,17 +33,17 @@ func Check_DB_Exist() error {
 		if err != nil {
 			return err
 		}
-		addphoto := User{UserID: 1}
-		err = addphoto.Read()
-		if err != nil {
-			return err
-		}
-		image, err := dependency.FilepathToByteArray("Aldi Mulyawan.jpg")
-		if err != nil {
-			return err
-		}
-		addphoto.UserPhoto = image
-		addphoto.Update()
+		// addphoto := User{UserID: 1}
+		// err = addphoto.Read()
+		// if err != nil {
+		// 	return err
+		// }
+		// image, err := dependency.FilepathToByteArray("Aldi Mulyawan.jpg")
+		// if err != nil {
+		// 	return err
+		// }
+		// addphoto.UserPhoto = image
+		// addphoto.Update()
 	}
 	return nil
 }

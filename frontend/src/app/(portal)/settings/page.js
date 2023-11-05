@@ -114,7 +114,9 @@ function SystemSetting() {
     });
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async () => {
+    console.log('sent company logo');
+    console.log(data);
     try {
       const { error } = settingsSchema.validate(data);
 
@@ -132,6 +134,7 @@ function SystemSetting() {
         TimeZone: initialTimezone,
         AppthemeID: selectedThemeId,
       };
+      console.log(data.CompanyLogo);
       const response = await CoreAPI('PUT', 'setting', updatedData);
       if (response.status === 200) {
         fetchData();
@@ -146,8 +149,12 @@ function SystemSetting() {
   };
 
   const handleLogoUpload = (base64String) => {
+    let newdata = data;
     // console.log('Handling logo upload in SystemSetting:', base64String);
-    setData({ ...data, CompanyLogo: base64String });
+    console.log('another file');
+    console.log(base64String);
+    newdata.CompanyLogo = base64String;
+    setData(newdata);
   };
 
   return (

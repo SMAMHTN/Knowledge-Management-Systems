@@ -2,6 +2,8 @@ package core
 
 import (
 	"dependency"
+	"encoding/base64"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -28,6 +30,24 @@ func ShowSetting(c echo.Context) error {
 	res.StatusCode = http.StatusOK
 	res.Data = uAPI
 	return c.JSON(http.StatusOK, res)
+}
+
+func ShowCompanyLogo(c echo.Context) error {
+	res := Response{}
+	u := new(Setting)
+	u.CompanyID = 1
+	u.Read()
+	fmt.Println(dependency.BytesToBase64(u.CompanyLogo))
+	imageData, err := base64.StdEncoding.DecodeString(dependency.BytesToBase64(u.CompanyLogo))
+	if err != nil {
+		if err != nil {
+			Logger.Error(err.Error())
+			res.StatusCode = http.StatusInternalServerError
+			res.Data = "Error Decoding Image, please change company image : " + err.Error()
+			return c.JSON(http.StatusInternalServerError, res)
+		}
+	}
+	return c.Blob(http.StatusOK, "image", imageData)
 }
 
 func ExtractTimeZoneAPI(c echo.Context) error {
