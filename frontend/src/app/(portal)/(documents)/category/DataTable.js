@@ -284,7 +284,7 @@ export default function DataTable() {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-white rounded-md shadow py-2 px-4">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter Roles Name..."

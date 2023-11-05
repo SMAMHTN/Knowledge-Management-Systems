@@ -25,21 +25,10 @@ import WidgetDropdown from './widget/WidgetDropdown';
 import getThemeCookiesValue from '@/dep/core/getThemeCookiesValue';
 
 function DashboardSuperAdmin() {
-  const theme = JSON.parse(getThemeCookiesValue());
   return (
     <>
       {' '}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
-        {/* {theme && (
-        <div>
-          <h1 style={{ color: theme.primary_color }}>
-            Primary Color Text
-            {' '}
-            {console.log('---------------------theme coloooooooooooooooooooooor ---------------------------------', theme.primary_color)}
-          </h1>
-          <h1 style={{ color: theme.secondary_color }}>Secondary Color Text</h1>
-        </div>
-        )} */}
         <div className="bg-white shadow-lg rounded-md flex items-center justify-between p-3 font-medium group">
           <WidgetUser />
         </div>
@@ -135,48 +124,11 @@ function Home() {
   }, [userStatus]);
 
   return (
-    <section className="w-full">
-      <div className=" flex flex-auto w-full h-screen">
+    <section className="w-full mb-10">
+      <div className=" flex flex-auto w-full h-fit">
         <div className="flex flex-col w-full">
-
           <UserGreetings />
-
-          <Separator className="mb-4" />
-          <div className="space-y-4 mb-4">
-
-            <div className="rounded-l shadow-3xl">
-              {/* <form className="flex py-2 px-2 md:px-20 mb-14">
-              <span className="flex bg-white border-r-0 border rounded-tl rounded-bl pl-2 pr-3 shadow-md">{ searchIcon }</span>
-              <input
-                type="text"
-                placeholder=" Search Document here..."
-                className=" w-full text-[14px] outline-none pr-2 py-2 shadow-md"
-              />
-              <button
-                type="submit"
-                className=" text-light text-white shadow-md rounded-tr rounded-br bg-blue-500 hover:bg-blue-600 px-2 md:px-4"
-              >
-                Search
-              </button>
-            </form> */}
-            </div>
-            {/* {userData && (
-          <>
-            <Link href="/settings" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-              Settings
-            </Link>
-            <Link href="/documents" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-              Management Dokumen
-            </Link>
-            <Link href="/management-s-admin" className="block bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">
-              Management S.Admin
-            </Link>
-          </>
-          )} */}
-
-          </div>
           {menuComponent}
-
         </div>
 
       </div>

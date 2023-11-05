@@ -2,43 +2,68 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 import { Login, CoreAPIGET } from '../../dep/core/coreHandler';
 import ShowLogo from '@/components/Navbar/ShowLogo';
+import { alertLogin } from '@/components/Feature';
 
 export default function Page() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [message, setMessage] = useState('');
   const [nextlink, setNextlink] = useState('/');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async () => {
-    try {
-      const response = await Login(username, password);
-      console.log(response);
-      if (response === true) {
-        const response2 = await CoreAPIGET('loginuser');
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    setUsernameError('');
+    setPasswordError('');
 
-        router.push('/dashboard/');
-        setMessage('Login successful!');
-      } else {
-        setMessage('Login failed!');
-      }
-    } catch (error) {
-      setMessage('An error occurred during login.');
+    if (!username) {
+      setUsernameError('Username is required');
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+    }
+
+    if (username && password) {
+      setLoading(true);
+      setTimeout(async () => {
+        try {
+          const response = await Login(username, password);
+          if (response === true) {
+            const response2 = await CoreAPIGET('loginuser');
+
+            setTimeout(() => {
+              router.push('/dashboard/');
+              setMessage('Login successful!');
+            }, 1000);
+          } else {
+            alertLogin(response);
+          }
+        } catch (error) {
+          setMessage('An error occurred during login.');
+        } finally {
+          setLoading(false);
+        }
+      }, 1000);
     }
   };
   return (
     <>
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-300">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-300 mx-2">
         <div className="flex flex-col bg-white shadow-md px-4 md:px-8 py-8 rounded-lg w-full max-w-md">
-          <div className="grid grid-cols-1 md:grid-cols-2">
-            <div className="md:col-span-1">
+          <div className="grid grid-cols-2">
+            <div className="col-span-1">
               <div id="logo" className="flex flex-col mb-6 pr-2 mx-auto items-end">
                 <ShowLogo maxWidth="40px" maxHeight="40px" className="" />
               </div>
             </div>
-            <div className="md:col-span-1">
+            <div className="col-span-1">
               <div className="font-medium self-center text-xl sm:text-2xl text-gray-800">
                 |
                 {' '}
@@ -50,7 +75,7 @@ export default function Page() {
           </div>
 
           <div className="mt-10">
-            <form action={handleLogin}>
+            <form onSubmit={handleLogin}>
               <div className="flex flex-col mb-6">
                 <div className="relative">
                   <input
@@ -61,7 +86,9 @@ export default function Page() {
                     className="text-sm sm:text-base placeholder-gray-500 pl-4 pr-4 rounded-md border border-gray-400 w-full py-2 focus:outline-none focus:border-blue-400"
                     placeholder="Username"
                   />
+                  {usernameError && <p className="text-red-600 text-xs absolute">{usernameError}</p>}
                 </div>
+
               </div>
               <div className="flex flex-col mb-6">
                 <div className="relative">
@@ -73,16 +100,22 @@ export default function Page() {
                     className="text-sm sm:text-base placeholder-gray-500 pl-4 pr-4 rounded-md border border-gray-400 w-full py-2 focus:outline-none focus:border-blue-400"
                     placeholder="Password"
                   />
+                  {usernameError && <p className="text-red-600 text-xs absolute">{passwordError}</p>}
                 </div>
+
               </div>
 
               <div className="flex w-full mt-10">
                 <button
                   type="submit"
-                  href={nextlink}
-                  className="flex items-center justify-center focus:outline-none text-white text-sm sm:text-base bg-blue-600 hover:bg-blue-700 rounded-md py-2 w-full transition duration-150 ease-in"
+                  className="flex items-center justify-center focus:outline-none text-white text-sm sm:text-base bg-blue-600 hover-bg-blue-700 rounded-md py-2 w-full transition duration-150 ease-in"
+                  disabled={loading}
                 >
-                  <span className="mr-2 ">Login</span>
+                  {loading ? (
+                    <Loader2 className="animate-spin h-5 w-5 text-white mr-2 my-0.5" size={30} />
+                  ) : (
+                    <span>Login</span>
+                  )}
                 </button>
               </div>
             </form>

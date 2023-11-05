@@ -47,36 +47,29 @@ function DashboardUser() {
   return (
     <section className="w-full">
       <div className="flex flex-col w-full">
-        <div className=" mb-6 grid grid-cols-5 justify-between">
-          <div className="rounded-l col-span-4">
-            <form onSubmit={handleSearch} className="flex mr-2 md:px-4">
-              <input
-                type="text"
-                placeholder="Search Document here..."
-                className=" w-full text-[14px] outline-none px-4 py-2 shadow rounded-tl rounded-bl"
-                onChange={(e) => setSearchQuery(e.target.value)}
-                defaultValue={search}
-              />
-              <button
-                type="submit"
-                className=" text-light text-white shadow rounded-tr rounded-br bg-blue-500 hover:bg-blue-600 px-2 w-14  md:w-auto md:px-4"
-              >
-                <p className="hidden lg:flex">Search</p>
-                <Search className=" lg:hidden items-center" />
-              </button>
-            </form>
 
-          </div>
-          {/* <Button
-            className="rounded bg-blue-500 text-white my-auto w-14 ml-auto lg:w-36 hover:bg-blue-600 mr-2"
-          >
-            <Link href="/article/edit/">
-              <p className="hidden lg:flex">Add New Article</p>
-              <p className=" lg:hidden text-xl">+</p>
-            </Link>
-          </Button> */}
-        </div>
         <div className="bg-white rounded-md p-4 h-fit w-full shadow">
+          <div className=" mb-6 grid grid-cols-5 justify-between">
+            <div className="rounded-l col-span-4">
+              <form onSubmit={handleSearch} className="flex mr-2 shadow-lg border border-gray-200">
+                <input
+                  type="text"
+                  placeholder="Search Document here..."
+                  className=" w-full text-[14px] outline-none px-4 py-2 shadow rounded-tl rounded-bl"
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  defaultValue={search}
+                />
+                <button
+                  type="submit"
+                  className=" text-light text-white shadow rounded-tr rounded-br bg-blue-500 hover:bg-blue-600 px-2 w-14  md:w-auto md:px-4"
+                >
+                  <p className="hidden lg:flex">Search</p>
+                  <Search className=" lg:hidden items-center" />
+                </button>
+              </form>
+
+            </div>
+          </div>
           {search ? (
             <h1 className="text-l font-medium py-4">
               Search Results for:
@@ -120,7 +113,6 @@ function DashboardUser() {
           </ul>
 
         </div>
-
       </div>
     </section>
   );

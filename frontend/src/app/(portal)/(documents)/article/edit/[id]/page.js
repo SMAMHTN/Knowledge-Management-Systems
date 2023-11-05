@@ -127,40 +127,45 @@ function articleEditing({ params }) {
   };
 
   return (
-    <section className="h-screen flex flex-col flex-auto">
-      <div className="flex flex-col">
-        <h2 className="text-2xl font-semibold mb-1">Add New Article</h2>
-        <p className="text-xs mb-4">
-          Change the content of your article and upload files and documents.
-        </p>
-        <Separator className="mb-4" />
-        <div className="mb-4">
-          <label className="block font-semibold mb-1">Edit Article Content</label>
-          <ArticleEditor ArticleID={data.ArticleID} />
-          {/* <p>
+    <section className="h-fit flex flex-col flex-auto w-full">
+      <div className="flex flex-col w-full">
+        <div className="bg-white w-full rounded-md shadow px-4 py-2 mb-2">
+          <h2 className="text-2xl font-semibold mb-1">Add New Article</h2>
+          <p className="text-xs mb-4">
+            Change the content of your article and upload files and documents.
+          </p>
+          <Separator className="mb-4" />
+        </div>
+        <div className="bg-white rounded-md shadow p-4">
+          <div className="md:w-4/5 lg:w-3/4">
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Edit Article Content</label>
+              <ArticleEditor ArticleID={data.ArticleID} />
+              {/* <p>
             click here to see how to make an article
             {' '}
             <span className="text-blue-500 underline">links here</span>
           </p> */}
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Upload Document</label>
+              <UploadDoc categoryID={data.CategoryID} DocAdd={AddDoc} />
+              <ListDoc idArray={docList} path="/api/doc/" DocDel={DeleteDoc} />
+              <label className="block font-semibold mb-1">Upload File</label>
+              <UploadFile categoryID={data.CategoryID} FileAdd={AddFile} />
+              <ListFile idArray={fileList} path="/api/file/" FileDel={DeleteFile} />
+            </div>
+            <Button
+              type="button"
+              className="rounded bg-blue-500 hover:bg-blue-600 text-white my-4 w-full md:w-36 shadow"
+              onClick={handlePublish}
+            >
+              {/* <Link href={URLParamsBuilder('/article')} /> */}
+              Publish
+            </Button>
+          </div>
         </div>
-        <div className="mb-4">
-          <label className="block font-semibold mb-1">Upload Document</label>
-          <UploadDoc categoryID={data.CategoryID} DocAdd={AddDoc} />
-          <ListDoc idArray={docList} path="/api/doc/" DocDel={DeleteDoc} />
-          <label className="block font-semibold mb-1">Upload File</label>
-          <UploadFile categoryID={data.CategoryID} FileAdd={AddFile} />
-          <ListFile idArray={fileList} path="/api/file/" FileDel={DeleteFile} />
-        </div>
-        <Button
-          type="button"
-          className="rounded bg-blue-500 hover:bg-blue-600 text-white my-4 w-full md:w-36 shadow"
-          onClick={handlePublish}
-        >
-          {/* <Link href={URLParamsBuilder('/article')} /> */}
-          Publish
-        </Button>
       </div>
-
     </section>
   );
 }

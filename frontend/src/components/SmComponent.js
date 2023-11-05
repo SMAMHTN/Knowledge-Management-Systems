@@ -15,5 +15,5 @@ export function ErrorMessage({ error }) {
 }
 
 export function Separator() {
-  return <hr className="w-full border-t border-gray-300 mb-4" />;
+  return <hr className="w-full border-t border-gray-300 mb-2" />;
 }

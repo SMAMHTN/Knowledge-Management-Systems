@@ -72,98 +72,104 @@ function AddArticle() {
   };
 
   return (
-    <section className="h-screen flex flex-col flex-auto">
+    <section className="h-fit flex flex-col flex-auto">
       <div className="flex flex-col">
-        <h2 className="text-2xl font-semibold mb-1">Add New Article</h2>
-        <p className="text-xs mb-4">
-          Customize and manage your Article details.
-        </p>
-        <Separator className="mb-4" />
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">
-              Article Title
-              <RequiredFieldIndicator />
-            </label>
-            <Controller
-              name="Title"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <input
-                    {...field}
-                    type="text"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
-                    placeholder="Public"
-                  />
-                  <p className="text-xs mt-1">
-                    Min 2 characters & Max 50 characters. Required.
-                  </p>
-                  {errors.Title && (<ErrorMessage error={errors.Title.message} />)}
-                </>
-              )}
-            />
+        <div className="bg-white w-full rounded-md shadow px-4 py-2 mb-2">
+          <h2 className="text-2xl font-semibold mb-1">Add New Article</h2>
+          <p className="text-xs mb-11">
+            Customize and manage your Article details.
+          </p>
+          <Separator />
+        </div>
+        <div className="bg-white rounded-md shadow p-4">
+          <div className="md:w-4/5 lg:w-3/4">
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="mb-4">
+                <label className="block font-medium mb-1">
+                  Article Title
+                  <RequiredFieldIndicator />
+                </label>
+                <Controller
+                  name="Title"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <input
+                        {...field}
+                        type="text"
+                        className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
+                        placeholder="Public"
+                      />
+                      <p className="text-xs mt-1">
+                        Min 2 characters & Max 50 characters. Required.
+                      </p>
+                      {errors.Title && (<ErrorMessage error={errors.Title.message} />)}
+                    </>
+                  )}
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block font-medium mb-1">
+                  Category
+                  {' '}
+                  <RequiredFieldIndicator />
+                </label>
+                <CategorySelector onChange={handleCategoryChange} value={selectedCategory} />
+                <p className="text-xs mt-1">
+                  Select category. Required.
+                </p>
+              </div>
+              <div className="mb-4">
+                <label className="block font-medium mb-1">Tags</label>
+                <Controller
+                  name="Tag"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <textarea
+                        {...field}
+                        type="textarea"
+                        className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md shadow"
+                        placeholder="Designed for public"
+                      />
+                      <p className="text-xs mt-1">
+                        Write with commas to separate new tags
+                      </p>
+                      <p className="text-xs mt-1">
+                        Example : 2021, Money, Advice
+                      </p>
+                      {errors.Tag && (<ErrorMessage error={errors.Tag.message} />)}
+                    </>
+                  )}
+                />
+              </div>
+              <div>
+                <Controller
+                  name="IsActive"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex items-center my-2 md:my-0">
+                      <input
+                        {...field}
+                        type="checkbox"
+                        checked={field.value}
+                        className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4 shadow"
+                      />
+                      <span className="text-sm sm:text-base">Active</span>
+                    </div>
+                  )}
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="rounded bg-blue-500 hover:bg-blue-600 text-white mt-2 w-full md:w-36 shadow"
+              >
+                Next
+              </Button>
+            </form>
           </div>
-          <div className="mb-6">
-            <label className="block font-medium mb-1">
-              Category
-              {' '}
-              <RequiredFieldIndicator />
-            </label>
-            <CategorySelector onChange={handleCategoryChange} value={selectedCategory} />
-            <p className="text-xs mt-1">
-              Select category. Required.
-            </p>
-          </div>
-          <div className="mb-4">
-            <label className="block font-medium mb-1">Tags</label>
-            <Controller
-              name="Tag"
-              control={control}
-              render={({ field }) => (
-                <>
-                  <textarea
-                    {...field}
-                    type="textarea"
-                    className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md shadow"
-                    placeholder="Designed for public"
-                  />
-                  <p className="text-xs mt-1">
-                    Write with commas to separate new tags
-                  </p>
-                  <p className="text-xs mt-1">
-                    Example : 2021, Money, Advice
-                  </p>
-                  {errors.Tag && (<ErrorMessage error={errors.Tag.message} />)}
-                </>
-              )}
-            />
-          </div>
-          <div>
-            <Controller
-              name="IsActive"
-              control={control}
-              render={({ field }) => (
-                <div className="flex items-center my-2 md:my-0">
-                  <input
-                    {...field}
-                    type="checkbox"
-                    checked={field.value}
-                    className="mr-2 text-blue-500 w-6 h-6 md:w-4 md:h-4 shadow"
-                  />
-                  <span className="text-sm sm:text-base">Active</span>
-                </div>
-              )}
-            />
-          </div>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded bg-blue-500 hover:bg-blue-600 text-white mt-2 w-full md:w-36 shadow"
-          >
-            Next
-          </Button>
-        </form>
+        </div>
       </div>
     </section>
   );

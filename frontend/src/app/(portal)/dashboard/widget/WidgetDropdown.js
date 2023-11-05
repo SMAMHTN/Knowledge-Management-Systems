@@ -34,7 +34,7 @@ function WidgetDropdown({ viewListLink }) {
           className="hover:underline hover:cursor-pointer"
           onClick={handleViewListClick} // Call the function on click
         >
-          View list
+          View detail
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -142,6 +142,13 @@ export const alertUpdate = (response) => {
   }
 };
 
+export const alertLogin = (response) => {
+  const respons = response;
+
+  if (respons === false) {
+    error('Username and or password is wrong');
+  }
+};
 // delete confirmation popup
 export function DeleteModal({
   isOpen, onClose, onDelete, message,

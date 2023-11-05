@@ -6,8 +6,8 @@ import { CoreAPI, CoreAPIGET, getUserData } from '@/dep/core/coreHandler';
 import { alertUpdate } from '@/components/Feature';
 import LogoUpload from '@/app/(portal)/settings/LogoUpload';
 import ProfileImage from '@/components/Navbar/ShowUserPhoto';
-import { Separator } from '@/components/SmComponent';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/SmComponent';
 
 function UserSettings() {
   const [data, setData] = useState({});
@@ -98,19 +98,21 @@ function UserSettings() {
     setData({ ...data, UserPhoto: base64String });
   };
   return (
-    <section className="h-screen flex flex-auto w-full">
+    <section className="h-fit flex flex-auto w-full">
       <div className="flex flex-col w-full">
-        <h2 className="text-2xl font-semibold mb-2">Profile settings</h2>
-        <p className="text-xs mb-4">
-          Customize and manage your profile details.
-        </p>
-        <Separator className="mb-4" />
+        <div className="bg-white rounded-md shadow  px-4 py-2 mb-2">
+          <h2 className="text-2xl font-semibold mb-1">Profile settings</h2>
+          <p className="text-xs mb-1">
+            Customize and manage your profile details.
+          </p>
+          <Separator />
+        </div>
         {/* Small Viewport Table (Without Left Column) */}
-        <table className="w-full block sm:hidden ">
+        <table className="w-full block sm:hidden bg-white rounded-md shadow">
           <tbody>
             {initialSettings.map((setting, index) => (
-              <tr key={index} className="border-y border-black">
-                <td className="p-2 w-2/4">
+              <tr key={index} className="border-y border-gray-300">
+                <td className="p-4 w-2/4">
                   {/* Middle column */}
                   {editing === index ? (
                     <Input
@@ -123,7 +125,7 @@ function UserSettings() {
                     setting.value
                   )}
                 </td>
-                <td className="p-2">
+                <td className="p-4">
                   {editing === index ? (
                     <div className="flex items-center space-x-2">
                       <button onClick={handleCancelClick} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-1 py-1 rounded">
@@ -144,8 +146,8 @@ function UserSettings() {
                 </td>
               </tr>
             ))}
-            <tr className="border-y border-black">
-              <td className="p-2">
+            <tr className="">
+              <td className="p-4">
                 {editing === 'apptheme' ? (
                   // Dropdown for editing AppthemeID
                   <select
@@ -164,15 +166,15 @@ function UserSettings() {
                   getAppthemeName(data.AppthemeID)
                 )}
               </td>
-              <td className="p-2">
+              <td className="p-4">
                 {editing === 'apptheme' ? (
-                  <div className="flex items-center space-x-2">
-                    <button onClick={handleCancelClick} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-1 py-1 rounded">
+                  <div className="flex items-end justify-end space-x-2">
+                    <button onClick={handleCancelClick} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-1 py-1 rounded align-end">
                       <X />
                     </button>
                     <button
                       onClick={handleSaveClick}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded align-end"
                     >
                       Save
                     </button>
@@ -180,7 +182,7 @@ function UserSettings() {
                 ) : (
                   <button
                     onClick={() => setEditing('apptheme')}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded align-end"
                   >
                     Edit
                   </button>
@@ -190,20 +192,20 @@ function UserSettings() {
             <tr>
               <td>
                 {' '}
-                <p className=" text-gray-600 text-xs w-full">The new themes will be applied the next time you log in.</p>
+                <p className=" text-gray-600 text-xs w-full p-4">The new themes will be applied the next time you log in.</p>
               </td>
 
             </tr>
             <tr>
-              <td className="p-2">
+              <td className="p-4">
                 <ProfileImage maxWidth="50px" maxHeight="50px" />
               </td>
             </tr>
             <tr>
-              <td className="p-2"><LogoUpload onUpload={handleLogoUpload} /></td>
+              <td className="p-4"><LogoUpload onUpload={handleLogoUpload} /></td>
             </tr>
             <tr>
-              <td className="p-2">
+              <td className="p-4">
                 <button
                   onClick={handleSaveClick}
                   className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
@@ -216,16 +218,16 @@ function UserSettings() {
         </table>
 
         {/* Medium and Larger Viewport Table (With Full Information) */}
-        <table className="w-full hidden sm:table">
+        <table className="w-full hidden sm:table bg-white rounded-md shadow p-4">
           <tbody>
             {initialSettings.map((setting, index) => (
-              <tr key={index} className="border-y border-black">
-                <td className="p-2 w-2/4">
+              <tr key={index} className="border-y border-gray-300">
+                <td className="p-4 w-2/4">
                   {/* The left column */}
                   {setting.field}
                 </td>
                 {/* Middle column */}
-                <td className="p-2 w-2/4">
+                <td className="p-4 w-2/4">
                   {editing === index ? (
                     <Input
                       type="text"
@@ -237,7 +239,7 @@ function UserSettings() {
                     setting.value
                   )}
                 </td>
-                <td className="p-2">
+                <td className="p-4">
                   {editing === index ? (
                     <div className="flex items-center space-x-2 items-end ">
                       <button onClick={handleCancelClick} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">
@@ -259,12 +261,12 @@ function UserSettings() {
               </tr>
             ))}
             <tr>
-              <td className="p-2">
+              <td className="p-4">
                 <div>
                   Theme:
                 </div>
               </td>
-              <td className="p-2">
+              <td className="p-4">
                 {editing === 'apptheme' ? (
                   // Dropdown for editing AppthemeID
                   <select
@@ -283,7 +285,7 @@ function UserSettings() {
                   getAppthemeName(data.AppthemeID)
                 )}
               </td>
-              <td className="p-2">
+              <td className="p-4">
                 {editing === 'apptheme' ? (
                   <div className="flex items-center space-x-2">
                     <button onClick={handleCancelClick} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded">
@@ -304,16 +306,16 @@ function UserSettings() {
               <td>&nbsp;</td>
               <td>
                 {' '}
-                <p className=" text-gray-600 text-xs w-full">The new themes will be applied the next time you log in.</p>
+                <p className=" text-gray-600 text-xs w-full p-4">The new themes will be applied the next time you log in.</p>
               </td>
 
             </tr>
             <tr>
-              <td className="p-2">
-                <ProfileImage maxWidth="50px" maxHeight="50px" />
+              <td className="p-16">
+                <ProfileImage maxWidth="100px" maxHeight="100px" />
               </td>
-              <td className="p-2"><LogoUpload onUpload={handleLogoUpload} /></td>
-              <td className="p-2">
+              <td className="p-4"><LogoUpload onUpload={handleLogoUpload} /></td>
+              <td className="p-4">
                 <button
                   onClick={handleSaveClick}
                   className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
