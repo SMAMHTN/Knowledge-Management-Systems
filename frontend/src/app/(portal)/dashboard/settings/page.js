@@ -13,7 +13,7 @@ function UserSettings() {
   const [data, setData] = useState({});
   const [initialSettings, setInitialSettings] = useState([]);
   const [themeOptions, setThemeOptions] = useState([]);
-  const editableFields = ['Username', 'Password', 'Name', 'Email', 'Address', 'Phone', 'RoleID'];
+  const editableFields = ['Username', 'Password', 'Name', 'Email', 'Address', 'Phone'];
 
   useEffect(() => {
     const fetchUserData = async () => {

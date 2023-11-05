@@ -205,8 +205,9 @@ function ArticleDetail({ params }) {
           <Separator className="mb-4" />
         </div>
         <div className="bg-white rounded-md shadow p-4">
-          <div className="md:w-4/5 lg:w-3/4">
-            <form onSubmit={handleSubmit(onSubmit)}>
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="md:w-4/5 lg:w-3/4">
               <div className="mb-4">
                 <label className="block font-medium mb-1">
                   Article Title
@@ -285,13 +286,16 @@ function ArticleDetail({ params }) {
               </div>
               <div className="my-4">
                 <label className="block font-semibold mb-1">Edit Article Content</label>
-                <ArticleEditor ArticleID={data.ArticleID} />
-                {/* <p>
+              </div>
+            </div>
+
+            <ArticleEditor ArticleID={data.ArticleID} />
+            {/* <p>
               click here to see how to make an article
               {' '}
               <span className="text-blue-500 underline">links here</span>
             </p> */}
-              </div>
+            <div className="md:w-4/5 lg:w-3/4 mt-8">
               <div className="mb-4">
                 <label className="block font-semibold mb-1">Upload Document</label>
                 <UploadDoc categoryID={data.CategoryID} DocAdd={AddDoc} />
@@ -308,10 +312,11 @@ function ArticleDetail({ params }) {
                 {isSubmitting ? (<Loader2 className="animate-spin mr-2" size={16} />) : null}
                 {isSubmitting ? ('Publishing') : ('Publish')}
               </Button>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
+
     </section>
   );
 }
