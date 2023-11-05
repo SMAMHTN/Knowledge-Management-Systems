@@ -110,7 +110,7 @@ function UserDetails({ params }) {
     <section className="h-fit flex flex-auto w-full">
       <div className="flex flex-col w-full">
         <div className="bg-white w-full rounded-md shadow px-4 py-2 mb-2">
-          <h2 className="text-2xl font-semibold mb-1">List User</h2>
+          <h2 className="text-2xl font-semibold mb-1">Edit User</h2>
           <p className="text-xs mb-1">
             view and access list of user.
           </p>
