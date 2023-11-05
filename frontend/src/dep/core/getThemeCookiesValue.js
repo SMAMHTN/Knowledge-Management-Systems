@@ -5,7 +5,10 @@ function getThemeCookiesValue() {
     const ThemeValue = getCookie('theme');
     return JSON.parse(ThemeValue);
   } catch (err) {
-    return getThemeCookiesValue();
+    return JSON.stringify({
+      primary_color: '',
+      secondary_color: '',
+    });
   }
 }
 
