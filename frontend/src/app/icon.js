@@ -3,6 +3,7 @@
 import { ImageResponse } from 'next/server';
 import Image from 'next/image';
 import { CoreAPIGET } from '@/dep/core/coreHandler';
+import getThemeCookiesValueAsync from '@/dep/core/getThemeCookiesValueAsync';
 
 // Route segment config
 // export const runtime = 'edge';
@@ -16,6 +17,8 @@ import { CoreAPIGET } from '@/dep/core/coreHandler';
 
 // Image generation
 export default async function Icon() {
+  const response2 = await getThemeCookiesValueAsync();
+  console.log(response2);
   const response = await CoreAPIGET('setting');
   return new ImageResponse(
     (
