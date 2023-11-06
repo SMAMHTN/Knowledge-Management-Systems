@@ -76,7 +76,7 @@ function AddArticle() {
       <div className="flex flex-col">
         <div className="bg-white w-full rounded-md shadow px-4 py-2 mb-2">
           <h2 className="text-2xl font-semibold mb-1">Add New Article</h2>
-          <p className="text-xs mb-11">
+          <p className="text-xs mb-1">
             Customize and manage your Article details.
           </p>
           <Separator />
@@ -98,7 +98,7 @@ function AddArticle() {
                         {...field}
                         type="text"
                         className="text-sm sm:text-base placeholder-gray-500 px-2  py-1  rounded border border-gray-400 w-full focus:outline-none focus:border-blue-400 md:max-w-md shadow"
-                        placeholder="Public"
+                        placeholder="Article title..."
                       />
                       <p className="text-xs mt-1">
                         Min 2 characters & Max 50 characters. Required.
@@ -130,7 +130,7 @@ function AddArticle() {
                         {...field}
                         type="textarea"
                         className="text-sm sm:text-base placeholder-gray-500 px-2  py-1 border border-gray-400 w-full focus:outline-none focus:border-blue-400 min-h-[4rem] rounded resize-y  md:max-w-md shadow"
-                        placeholder="Designed for public"
+                        placeholder="economy, tips, 2003"
                       />
                       <p className="text-xs mt-1">
                         Write with commas to separate new tags

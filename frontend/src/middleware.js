@@ -7,18 +7,18 @@ export function middleware(req) {
   const protectedPaths = ['settings', 'dashboard', 'article', 'user', 'category', 'roles', 'permission'];
   const isPathProtected = protectedPaths?.some((path) => pathname.includes(path));
   const res = NextResponse.next();
-  const theme = req.cookies.get('theme');
-  // console.log("----------------------------------------------");
-  // console.log(theme);
-  // console.log(req.cookies.has('theme'));
-  if (!req.cookies.has('theme') || theme.value === '') {
-    console.log('Passed here');
-    SetThemeCookies().then();
-  }
-  const theme2 = req.cookies.get('theme');
-  if (typeof (theme2) === 'string') {
-    res.cookies.set('theme', theme2.value);
-  }
+  // const theme = req.cookies.get('theme');
+  // // console.log("----------------------------------------------");
+  // // console.log(theme);
+  // // console.log(req.cookies.has('theme'));
+  // if (!req.cookies.has('theme') || theme.value === '') {
+  //   console.log('Passed here');
+  //   SetThemeCookies().then();
+  // }
+  // const theme2 = req.cookies.get('theme');
+  // if (typeof (theme2) === 'string') {
+  //   res.cookies.set('theme', theme2.value);
+  // }
 
   if (isPathProtected) {
     // let AlreadyLogin;

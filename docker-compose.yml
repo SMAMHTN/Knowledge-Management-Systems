@@ -10,6 +10,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    ports:
+      - "6505:3306"
   core:
     build: ./core
     depends_on:
@@ -34,6 +36,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    ports:
+      - "6506:3306"
   kms:
     build: ./kms
     depends_on:
