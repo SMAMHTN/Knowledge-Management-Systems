@@ -198,6 +198,7 @@ export async function Logout() {
 export async function Login(Username, Password) {
   const conf = readConf();
   const credentials = generateCoreCred(Username, Password);
+  // const { signal } = new AbortController();
   const response = await fetch(`${conf.core_link}loginuser`, {
     method: 'GET',
     headers: {
@@ -205,6 +206,7 @@ export async function Login(Username, Password) {
       Accept: '*/*',
       Connection: 'keep-alive',
     },
+    cache: 'no-store',
   });
 
   if (response.ok) {
