@@ -12,9 +12,9 @@ function customObjectToString(obj) {
 
 function getThemeCookiesValue() {
   const themeCookie = getCookie('theme');
-  console.log('Cookie content:', themeCookie);
+  // console.log('Cookie content:', themeCookie);
   const themeJson = customObjectToString(themeCookie); // Convert the object to a JSON string
-  console.log(themeJson);
+  // console.log(themeJson);
   return themeJson;
 }
 

@@ -50,7 +50,6 @@ function UserDetails({ params }) {
     try {
       const response = await CoreAPIGET(`user?UserID=${params.id}`);
       const { Data } = response.body;
-      console.log(response);
       Object.keys(Data).forEach((key) => {
         setValue(key, Data[key]);
       });
