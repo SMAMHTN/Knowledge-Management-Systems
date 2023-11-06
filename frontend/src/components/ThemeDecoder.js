@@ -5,7 +5,7 @@ function ThemeDecoder() {
   const initialThemes = JSON.parse(getCookie('theme'));
   const [themes, setThemes] = useState(initialThemes);
   const [decodedTheme, setDecodedTheme] = useState(null);
-  console.log('themes ========================', themes);
+  // console.log('themes ========================', themes);
 
   useEffect(() => {
     setDecodedTheme({
@@ -15,7 +15,7 @@ function ThemeDecoder() {
   }, [themes]);
 
   // Log the decodedTheme values to the console
-  console.log('Decoded Theme:', decodedTheme);
+  // console.log('Decoded Theme:', decodedTheme);
 
   // Return null to prevent rendering a DOM element
   return null;

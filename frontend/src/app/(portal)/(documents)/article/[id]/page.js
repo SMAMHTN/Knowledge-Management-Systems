@@ -185,7 +185,6 @@ function ArticleDetail({ params }) {
 
       const response = await KmsAPI('PUT', 'article', updatedData);
       const indexing = await KmsAPI('PUT', 'article/solr', indexingID);
-      console.log(response);
       await new Promise((resolve) => setTimeout(resolve, 300));
       alertUpdate(response);
     } catch (error) {

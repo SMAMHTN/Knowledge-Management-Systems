@@ -78,7 +78,6 @@ export default function DataTable() {
         sortencoded = encodeURIComponent(sortPass);
       }
       response = await CoreAPIGET(URLParamsBuilder('listuser', page, num, queriesencoded, sortencoded));
-      console.log(response);
       setPageInfo(response.body.Info);
       setData(response.body.Data);
     } catch (error) {

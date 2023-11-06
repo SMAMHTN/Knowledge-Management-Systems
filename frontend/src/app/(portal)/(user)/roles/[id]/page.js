@@ -30,7 +30,6 @@ function UserDetails({ params }) {
     label: 'Everyone',
   });
   const handleRoleChange = (selectedOption) => {
-    console.log(selectedOption);
     setSelectedRole(selectedOption);
   };
 
@@ -45,7 +44,6 @@ function UserDetails({ params }) {
         value: response.body.Data.RoleParentID,
         label: response.body.Data.RoleParentName,
       });
-      // console.log('passed here2');
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -89,7 +87,7 @@ function UserDetails({ params }) {
           </p>
           <Separator />
         </div>
-        <div className='bg-white rounded-md shadow p-4'>
+        <div className="bg-white rounded-md shadow p-4">
           <div className=" md:w-4/5 lg:w-3/4">
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-4">

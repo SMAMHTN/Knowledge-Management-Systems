@@ -24,15 +24,10 @@ function PostMainPage() {
       const article = await KmsAPIGET(apiEndpoint);
       const a = JSON.parse(article.body.Data);
       setPosts(a.response.docs);
-      console.log(article);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
   };
-
-  useEffect(() => {
-    console.log('SearchQuery:', searchQuery);
-  }, [searchQuery]);
 
   useEffect(() => {
     const searchencoded = encodeURIComponent(search);

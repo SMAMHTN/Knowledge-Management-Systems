@@ -148,8 +148,8 @@ function SystemSetting() {
   const handleLogoUpload = (base64String) => {
     const newdata = data;
     // console.log('Handling logo upload in SystemSetting:', base64String);
-    console.log('another file');
-    console.log(base64String);
+    // console.log('another file');
+    // console.log(base64String);
     newdata.CompanyLogo = base64String;
     setData(newdata);
   };

@@ -79,7 +79,6 @@ export default function DataTable() {
       response = await CoreAPIGET(URLParamsBuilder('listrole', page, num, queriesencoded, sortencoded));
       setPageInfo(response.body.Info);
       setData(response.body.Data);
-      console.log(response);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -280,7 +279,6 @@ export default function DataTable() {
 
   const handleFilterChange = () => {
     const userInput = filterRef.current.value;
-    console.log(userInput);
     const newQ = encodeURIComponent(JSON.stringify([{
       field: 'RoleName',
       operator: 'LowerLIKE',
