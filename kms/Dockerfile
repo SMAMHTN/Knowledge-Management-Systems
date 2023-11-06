@@ -9,6 +9,9 @@ RUN go build -o kms-app
 FROM debian:bullseye-slim
 WORKDIR /app
 
+#INSTALL CURL FOR HEALTHCHECK
+RUN apt-get update && apt-get install -y curl
+
 # Copy the binary built in the previous stage
 COPY --from=builder /kms/kms-app /app/
 

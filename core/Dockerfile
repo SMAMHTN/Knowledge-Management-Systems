@@ -9,6 +9,9 @@ RUN go build -o core-app
 FROM debian:bullseye-slim
 WORKDIR /app
 
+#INSTALL CURL FOR HEALTHCHECK
+RUN apt-get update && apt-get install -y curl
+
 # Copy the binary built in the previous stage
 COPY --from=builder /core/core-app /app/
 
