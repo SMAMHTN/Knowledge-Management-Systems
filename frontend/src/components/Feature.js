@@ -146,7 +146,7 @@ export const alertLogin = (response) => {
   const respons = response;
 
   if (respons === false) {
-    error('Username and or password is wrong');
+    error('The provided username and/or password is incorrect, or your account may be inactive');
   }
 };
 // delete confirmation popup
