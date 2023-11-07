@@ -83,7 +83,7 @@ function CategoryDetail({ params }) {
       <div className="flex flex-col w-full">
         <div className="bg-white w-full rounded-md shadow px-4 py-2 mb-2">
           <h2 className="text-2xl font-semibold mb-1">Edit Category</h2>
-          <p className="text-xs mb-4">
+          <p className="text-xs mb-1">
             Customize and manage your category details.
           </p>
           <Separator />
