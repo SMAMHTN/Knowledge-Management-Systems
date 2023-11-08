@@ -41,7 +41,7 @@ function postArticle({ params }) {
   }, [params.id]);
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-white shaow rounded-md p-4">
       <div className="flex flex-auto w-full mt-2">
         <div className="flex flex-col items-left">
           <div className="flex items-left">
