@@ -77,7 +77,7 @@
       <tokenizer name="standard"/>
       <filter name="lowercase"/>
       <filter synonyms="synonyms.txt" name="synonym"/>
-      <filter minGramSize="6" name="nGram" maxGramSize="50"/>
+      <filter minGramSize="3" name="nGram" maxGramSize="50"/>
     </analyzer>
     <analyzer type="query">
       <tokenizer name="standard"/>

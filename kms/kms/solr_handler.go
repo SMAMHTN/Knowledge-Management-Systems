@@ -210,7 +210,7 @@ func SolrCallQuery(c echo.Context, q string, query string, search string, page i
 		params.Set("start", strconv.Itoa(start))
 	}
 	params.Set("indent", "true")
-	params.Set("q.op", "AND")
+	params.Set("q.op", "OR")
 	params.Set("q", qSolr)
 	params.Set("indent", "false")
 	if show != "" {
