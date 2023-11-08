@@ -20,7 +20,8 @@ function PostMainPage() {
   const newSortParams = HandleSortParams(newSortField, false);
   const fetchData = async (srch = searchParams.get('search')) => {
     try {
-      const apiEndpoint = `queryarticle?search=${srch}&show=ArticleID,OwnerName,Title,LastEditedTime,Article`;
+      const searchparamsforapi = encodeURIComponent(srch);
+      const apiEndpoint = `queryarticle?search=${searchparamsforapi}&show=ArticleID,OwnerName,Title,LastEditedTime,Article`;
       const article = await KmsAPIGET(apiEndpoint);
       const a = JSON.parse(article.body.Data);
       setPosts(a.response.docs);
