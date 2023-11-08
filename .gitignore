@@ -1,1 +1,3 @@
 core/LogCore.log
+kms_db/*
+core_db/*
