@@ -182,7 +182,7 @@ func (data *User) ReadWithoutPhoto() error {
 func (data *User) ReadLogin() error {
 	var err error
 	if data.Username != "" && data.Password != "" {
-		err = Database.QueryRow("SELECT UserID, Username, Password, Name, RoleID, AppthemeID, IsSuperAdmin, IsActive FROM core_user WHERE Username = ? AND Password = ?", data.Username, data.Password).Scan(
+		err = Database.QueryRow("SELECT UserID, Username, Password, Name, RoleID, AppthemeID, IsSuperAdmin, IsActive FROM core_user WHERE Username = ? AND Password = ? AND IsActive = 1", data.Username, data.Password).Scan(
 			&data.UserID, &data.Username,
 			&data.Password, &data.Name, &data.RoleID,
 			&data.AppthemeID, &data.IsSuperAdmin, &data.IsActive)
