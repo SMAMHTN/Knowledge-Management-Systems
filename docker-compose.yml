@@ -18,8 +18,8 @@ services:
       core-db:
         condition: service_healthy
     volumes:
-      - ./core/config/appconf/core_conf.json:/core/config/appconf/core_conf.json:rw
-      - ./core/log/:/core/log/:rw
+      - ./core/config/appconf/core_conf.json:/app/config/appconf/core_conf.json:rw
+      - ./core/log/:/app/log/:rw
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6565/checkserverrun"]
       interval: 30s
@@ -48,9 +48,9 @@ services:
       core:
         condition: service_healthy
     volumes:
-      - ./kms/config/appconf/:/kms/config/appconf/:rw
-      - ./kms/log/:/kms/log/:rw
-      - ./kms/filestore/:/kms/filestore/:rw
+      - ./kms/config/appconf/:/app/config/appconf/:rw
+      - ./kms/log/:/app/log/:rw
+      - ./kms/filestore/:/app/filestore/:rw
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5656/checkserverrun"]
       interval: 30s
