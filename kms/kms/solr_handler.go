@@ -198,7 +198,7 @@ func SolrCallQuery(c echo.Context, q string, query string, search string, page i
 		qSolr += " AND " + q
 	}
 	if search != "" {
-		qSolr += " AND searchbar:" + search
+		qSolr += " AND (title^100 OR tag^100 OR searchbar:\"" + search + "\")"
 	}
 
 	params := url.Values{}
