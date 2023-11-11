@@ -30,9 +30,19 @@ func init() {
 	fmt.Println("---------------------------------------")
 	fmt.Println("BEGIN READING FILE CONF")
 	fmt.Println("---------------------------------------")
-	Conf, err = dependency.Read_conf(ConfigurationFile)
-	if err != nil {
-		panic("CONFIGURATION FILE ERROR : " + err.Error())
+	config_file_loc_env := os.Getenv("kms_config_file")
+	if config_file_loc_env != "" {
+		fmt.Println("Using Configuration FIle at " + config_file_loc_env)
+		Conf, err = dependency.Read_conf(config_file_loc_env)
+		if err != nil {
+			panic("CONFIGURATION FILE ERROR : " + err.Error())
+		}
+	} else {
+		fmt.Println("Using Configuration FIle at " + ConfigurationFile)
+		Conf, err = dependency.Read_conf(ConfigurationFile)
+		if err != nil {
+			panic("CONFIGURATION FILE ERROR : " + err.Error())
+		}
 	}
 	fmt.Println("Read Configuration")
 	Conf.Appname = AppName

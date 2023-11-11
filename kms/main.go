@@ -1,37 +1,32 @@
 package main
 
-import "kms"
+import (
+	"dependency"
+	"fmt"
+	"kms"
 
-// type test struct{
-// 	field string
-// 	query string
-// }
+	"github.com/pemistahl/lingua-go"
+)
 
 func main() {
-	// var a []test
+	languages := []lingua.Language{
+		dependency.LinguaLanguageConverter["Indonesian"],
+		dependency.LinguaLanguageConverter["English"],
+	}
+
+	detector := lingua.NewLanguageDetectorBuilder().
+		FromLanguages(languages...).
+		Build()
+
+	if language, exists := detector.DetectLanguageOf("languages are awesome"); exists {
+		fmt.Println(language)
+	}
+
+	fmt.Println("----------------------------------------------------------")
+
 	defer kms.Database.Close()
 	defer kms.Logger.Sync()
 	defer kms.Logger.Info("KMS SERVER STOPPED")
 	kms.Logger.Info("KMS SERVER STARTED")
 	kms.Test_api()
-	// a := dependency.SortType{
-	// 	Field:     "asdasd",
-	// 	Ascending: false,
-	// }
-	// b := []dependency.WhereType{{
-	// 	Field:    "vxczv",
-	// 	Operator: "jhksd",
-	// 	Logic:    "iopi",
-	// 	Values:   []interface{}{},
-	// }}
-	// c, err := json.Marshal(a)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// d, err := json.Marshal(b)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// fmt.Println(string(c))
-	// fmt.Println(string(d))
 }

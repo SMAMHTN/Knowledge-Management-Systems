@@ -305,3 +305,8 @@ func DeleteSolrDocument(id string) error {
 
 	return nil
 }
+
+func SolrUpdateSchema(data interface{}) (err error) {
+	err = dependency.SolrCallUpdateSchema("POST", Conf.Solr_link+SolrV2SchemaAPI, Conf.Solr_username, Conf.Solr_password, data)
+	return err
+}

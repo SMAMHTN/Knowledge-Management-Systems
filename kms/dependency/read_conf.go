@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"reflect"
+	"strconv"
+	"strings"
 	// "reflect"
 )
 
@@ -29,6 +32,43 @@ type Configuration struct {
 	Solr_username         string `json:"solr_username"`
 	Solr_password         string `json:"solr_password"`
 	Max_upload            string `json:"max_upload"`
+}
+
+func (config *Configuration) GetEnv() error {
+	configType := reflect.TypeOf(*config)
+	configValue := reflect.ValueOf(config).Elem()
+
+	for i := 0; i < configType.NumField(); i++ {
+		field := configType.Field(i)
+		envVar := strings.ToLower(field.Tag.Get("json"))
+
+		if envValue := os.Getenv(envVar); envValue != "" {
+			// Only update if the environment variable is not empty
+			switch field.Type.Kind() {
+			case reflect.String:
+				configValue.Field(i).SetString(envValue)
+			case reflect.Int:
+				// Parse the integer from the environment variable
+				// Handle errors appropriately in a real-world scenario
+				port, err := strconv.Atoi(envValue)
+				if err != nil {
+					return errors.New("error parsing integer for " + envVar + ": " + err.Error())
+				}
+				configValue.Field(i).SetInt(int64(port))
+			case reflect.Bool:
+				// Parse the boolean from the environment variable
+				// Handle errors appropriately in a real-world scenario
+				value, err := strconv.ParseBool(envValue)
+				if err != nil {
+					return errors.New("error parsing boolean for " + envVar + ": " + err.Error())
+				}
+				configValue.Field(i).SetBool(value)
+				// Add more cases for other types if needed
+			}
+		}
+	}
+
+	return nil
 }
 
 func fixpath(path string) string {
@@ -63,6 +103,11 @@ func Read_conf(ConfFile string) (Configuration, error) {
 	defer file.Close()
 	decoder := json.NewDecoder(file)
 	err = decoder.Decode(&Configuration)
+	if err != nil {
+
+		return Configuration, err
+	}
+	err = Configuration.GetEnv()
 	if err != nil {
 
 		return Configuration, err

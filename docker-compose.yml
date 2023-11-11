@@ -12,6 +12,8 @@ services:
       retries: 5
     ports:
       - "6505:3306"
+    volumes:
+      - ./core_db/:/var/lib/mysql:z
   core:
     build: ./core
     depends_on:
@@ -38,6 +40,8 @@ services:
       retries: 5
     ports:
       - "6506:3306"
+    volumes:
+      - ./kms_db/:/var/lib/mysql:z
   kms:
     build: ./kms
     depends_on:
