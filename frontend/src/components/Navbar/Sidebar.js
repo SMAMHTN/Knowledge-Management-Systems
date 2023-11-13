@@ -266,7 +266,7 @@ function Sidebar({ initialTime, color }) {
   const thm = color;
   const secondaryColor = thm.theme.themecolor.secondary_color;
   return (
-    <div className="fixed hidden md:flex flex-col top-14 left-0 w-14 md:w-64 bg-neutral-50 text-white h-full z-10" style={{ backgroundColor: secondaryColor }}>
+    <div className="fixed hidden md:flex flex-col top-14 left-0 w-14 md:w-64 bg-neutral-50 text-black h-full z-10" style={{ backgroundColor: secondaryColor }}>
       <div className="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow mr-2">
         {menuComponent}
       </div>

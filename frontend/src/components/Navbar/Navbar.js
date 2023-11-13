@@ -9,7 +9,7 @@ async function Navbar(themecolor) {
   const secondaryColor = thm.theme.themecolor.secondary_color;
   return (
     <>
-      <nav className="fixed z-20 h-14 w-full items-center justify-between bg-white text-white shadow px-4 text-sm hidden md:flex" style={{ backgroundColor: secondaryColor }}>
+      <nav className="fixed z-20 h-14 w-full items-center justify-between bg-white text-black shadow px-4 text-sm hidden md:flex" style={{ backgroundColor: secondaryColor }}>
 
         <div className="flex cursor-pointer items-center gap-2 ">
           <ShowLogo maxWidth="40px" maxHeight="40px" />
