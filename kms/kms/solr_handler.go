@@ -432,7 +432,7 @@ func AddSolrTypeFieldLanguage(language string) (err error) {
 		"name": "lowercase",
 	})
 	filters = append(filters, stemfield...)
-	filters = append(filters, map[string]interface{}{"minGramSize": "3", "name": "nGram", "maxGramSize": "50"})
+	filters = append(filters, map[string]interface{}{"minGramSize": "5", "name": "nGram", "maxGramSize": "50"})
 	// Build the JSON string for filters
 	// filtersJSON := "[{\"name\":\"lowercase\"}," + stemfield + ",{\"minGramSize\":\"3\",\"name\":\"nGram\",\"maxGramSize\":\"50\"}]"
 	// var filters []map[string]interface{}
