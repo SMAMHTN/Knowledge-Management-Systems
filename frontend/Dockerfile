@@ -36,7 +36,7 @@ RUN yarn build
 FROM base AS runner
 COPY ./frontend_conf.json /frontend/frontend_conf.json
 WORKDIR /app
-COPY ./frontend/.env /app/
+COPY ./.env /app/
 
 
 ENV NODE_ENV production
