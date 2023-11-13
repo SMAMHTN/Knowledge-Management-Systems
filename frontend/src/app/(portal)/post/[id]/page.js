@@ -57,17 +57,6 @@ function postArticle({ params }) {
               {' '}
               {owner}
             </p>
-            <ul>
-              <li>
-                text 1
-              </li>
-              <li>
-                text 1
-              </li>
-              <li>
-                text 1
-              </li>
-            </ul>
             <p>
               <TimeText timestamp={time} />
             </p>
