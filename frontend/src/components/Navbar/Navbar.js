@@ -3,11 +3,14 @@ import Sidebar from './Sidebar';
 import ShowLogo, { CompanyName } from './ShowLogo';
 import getThemeCookiesValueAsync from '@/dep/core/getThemeCookiesValueAsync';
 
-async function Navbar() {
-  const theme = await getThemeCookiesValueAsync();
+async function Navbar(themecolor) {
+  // const theme = await getThemeCookiesValueAsync();
+  const thm = themecolor;
+  const secondaryColor = thm.theme.themecolor.secondary_color;
   return (
     <>
-      <nav className="fixed z-20 h-14 w-full items-center justify-between bg-white border-b border-gray-100 shadow px-4 text-sm hidden md:flex" style={{ backgroundColor: theme.secondary_color }}>
+      <nav className="fixed z-20 h-14 w-full items-center justify-between bg-white text-black shadow px-4 text-sm hidden md:flex" style={{ backgroundColor: secondaryColor }}>
+
         <div className="flex cursor-pointer items-center gap-2 ">
           <ShowLogo maxWidth="40px" maxHeight="40px" />
           <CompanyName />
@@ -16,7 +19,7 @@ async function Navbar() {
           <UserProfileDropdown />
         </div>
       </nav>
-      <Sidebar />
+      <Sidebar color={themecolor} />
     </>
   );
 }

@@ -69,7 +69,7 @@ function SuperAdminMenu() {
             <AccordionTrigger className="w-full text-left h-11 flex items-center">
               <div className="flex items-center ml-4">
                 <span className="inline-flex justify-center items-center mt-1">
-                  {docIcon}
+                  <Files />
                 </span>
 
                 <span className="ml-2 text-sm tracking-wide truncate">
@@ -248,10 +248,10 @@ function UserMenuR() {
   );
 }
 
-function Sidebar({ initialTime }) {
+function Sidebar({ initialTime, color }) {
   const userStatus = getSuperAdminStatus();
   const [menuComponent, setMenuComponent] = useState(null);
-  const theme = JSON.parse(getThemeCookiesValue());
+  // const theme = JSON.parse(getThemeCookiesValue());
   useEffect(() => {
     if (userStatus === 1) {
       setMenuComponent(<SuperAdminMenu />);
@@ -263,9 +263,10 @@ function Sidebar({ initialTime }) {
       setMenuComponent(<UserMenuR />);
     }
   }, [userStatus]);
-
+  const thm = color;
+  const secondaryColor = thm.theme.themecolor.secondary_color;
   return (
-    <div className="fixed hidden md:flex flex-col top-14 left-0 w-14 md:w-64 bg-neutral-50 text-black h-full z-10 border-r" style={{ backgroundColor: theme.secondary_color }}>
+    <div className="fixed hidden md:flex flex-col top-14 left-0 w-14 md:w-64 bg-neutral-50 text-black h-full z-10" style={{ backgroundColor: secondaryColor }}>
       <div className="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow mr-2">
         {menuComponent}
       </div>

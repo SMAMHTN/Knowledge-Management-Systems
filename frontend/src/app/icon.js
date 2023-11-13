@@ -18,7 +18,7 @@ import getThemeCookiesValueAsync from '@/dep/core/getThemeCookiesValueAsync';
 // Image generation
 export default async function Icon() {
   const response2 = await getThemeCookiesValueAsync();
-  console.log(response2);
+  // console.log(response2);
   const response = await CoreAPIGET('setting');
   return new ImageResponse(
     (
