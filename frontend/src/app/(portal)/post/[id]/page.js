@@ -57,22 +57,11 @@ function postArticle({ params }) {
               {' '}
               {owner}
             </p>
-            <ul>
-              <li>
-                text 1
-              </li>
-              <li>
-                text 1
-              </li>
-              <li>
-                text 1
-              </li>
-            </ul>
             <p>
               <TimeText timestamp={time} />
             </p>
           </div>
-          <div style={{ all: 'initial' }}>
+          <div>
             <div dangerouslySetInnerHTML={{ __html: html }} />
             <style>{css}</style>
           </div>
