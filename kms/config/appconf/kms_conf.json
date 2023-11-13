@@ -16,5 +16,6 @@
   "disable_error_log": false,
   "activate_warn_log": true,
   "activate_info_log": true,
-  "activate_terminal_log": true
+  "activate_terminal_log": true,
+  "language":["Indonesian", "English"]
 }

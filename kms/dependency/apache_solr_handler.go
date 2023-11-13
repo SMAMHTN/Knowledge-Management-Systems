@@ -2,10 +2,29 @@ package dependency
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
+
+var AllowedSolrLanguage = map[string]bool{
+	"Indonesian": true,
+	"English":    true,
+}
+
+var SolrStemLanguageString = map[string]string{
+	"Indonesian": "{\"name\":\"indonesianStem\",\"stemDerivational\":\"true\"}",
+	"English":    "{\"name\":\"porterStem\"}",
+}
+
+var SolrStemLanguage = map[string][]map[string]interface{}{
+	"Indonesian": {{
+		"name":             "indonesianStem",
+		"stemDerivational": "true",
+	}},
+	"English": {{
+		"name": "porterStem",
+	}},
+}
 
 func SolrCallUpdate(apimethod string, SolrV2URL string, username string, password string, data interface{}) ([]byte, *http.Response, error) {
 	reqheader := []ApiHeader{}
@@ -94,7 +113,7 @@ func SolrCallQuery(url string, username string, password string) ([]byte, *http.
 	return body, resp, nil
 }
 
-func SolrCallUpdateSchema(apimethod string, SolrV2URL string, username string, password string, data interface{}) error {
+func SolrCallUpdateSchema(apimethod string, SolrV2URL string, username string, password string, data interface{}) ([]byte, *http.Response, error) {
 	reqheader := []ApiHeader{}
 	headerconnection := ApiHeader{
 		HeaderKey:   "Connection",
@@ -108,22 +127,18 @@ func SolrCallUpdateSchema(apimethod string, SolrV2URL string, username string, p
 	reqheader = append(reqheader, headerconnection)
 	payload, err := json.Marshal(data)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	resp, err := ApiCallWithBasicAuth(apimethod, SolrV2URL, username, password, payload, reqheader)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
 
-	// Check if the status code is not in the 2xx range
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		body, readErr := io.ReadAll(resp.Body)
-		if readErr != nil {
-			return fmt.Errorf("HTTP error: %d", resp.StatusCode)
-		}
-		return fmt.Errorf("HTTP error: %d, Body: %s", resp.StatusCode, body)
-	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
 
-	return nil
+		return body, resp, err
+	}
+	return body, resp, nil
 }

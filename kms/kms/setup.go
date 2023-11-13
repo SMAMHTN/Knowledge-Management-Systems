@@ -19,6 +19,8 @@ var Conf dependency.Configuration
 
 var Database *sql.DB
 
+var LanguageDetector dependency.LanguageDetector
+
 func init() {
 	ConfigurationFile = filepath.Join("config", "appconf", "kms_conf.json")
 	InstallDatabase = filepath.Join("config", "db_base", "kms.sql")
@@ -44,6 +46,10 @@ func init() {
 			panic("CONFIGURATION FILE ERROR : " + err.Error())
 		}
 	}
+	err = ConfigLanguageChecker()
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println("Read Configuration")
 	Conf.Appname = AppName
 	Port_conf = ":" + strconv.Itoa(Conf.Appport)
@@ -68,6 +74,14 @@ func init() {
 	}
 	Check_DB_Exist()
 	Check_Filestore_Exist()
+	err = SolrLanguageFieldInit()
+	if err != nil {
+		Logger.Panic("FAILED TO INIT SOLR LANGUAGE FIELD WITH THIS ERROR : " + err.Error())
+	}
+	LanguageDetector, err = dependency.NlpInit(Conf.Language)
+	if err != nil {
+		Logger.Panic("FAILED TO INIT LANGUAGE DETECTOR WITH THIS ERROR : " + err.Error())
+	}
 }
 
 func Check_Dir_Exist(dirpath string) error {
@@ -138,4 +152,51 @@ func Check_DB_Exist() {
 			panic(err)
 		}
 	}
+}
+func ConfigLanguageChecker() (err error) {
+	if len(Conf.Language) < 1 {
+		Conf.Language = []string{"English"}
+	}
+	for _, lang := range Conf.Language {
+		_, exist := dependency.SolrStemLanguage[lang]
+		if !exist {
+			return errors.New(lang + " isnt supported language")
+		}
+	}
+	return nil
+}
+func SolrLanguageFieldInit() (err error) {
+	for _, lang := range Conf.Language {
+		TypeExist, err := CheckSolrTypeFieldLanguage(lang)
+		if err != nil {
+			return err
+		}
+		Exist, err := CheckSolrFieldLanguage(lang)
+		if err != nil {
+			return err
+		}
+		CopyExist, err := CheckSolrCopyFieldLanguage(lang)
+		if err != nil {
+			return err
+		}
+		if !TypeExist {
+			err = AddSolrTypeFieldLanguage(lang)
+			if err != nil {
+				return err
+			}
+		}
+		if !Exist {
+			err = AddSolrFieldLanguage(lang)
+			if err != nil {
+				return err
+			}
+		}
+		if !CopyExist {
+			err = AddSolrCopyFieldLanguage(lang)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
