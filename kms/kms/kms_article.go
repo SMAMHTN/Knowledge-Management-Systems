@@ -68,7 +68,7 @@ func ListArticle(c echo.Context) error {
 		}
 	}
 	if permission {
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_article")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, ArticleAnotherTable, c, Database, "kms_article")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -131,7 +131,7 @@ func ListArticle(c echo.Context) error {
 			res.Data = err
 			return c.JSON(http.StatusInternalServerError, res)
 		}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_article")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, ArticleAnotherTable, c, Database, "kms_article")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -179,7 +179,7 @@ func ListArticleID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	if permission {
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_article")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, ArticleAnotherTable, c, Database, "kms_article")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -228,7 +228,7 @@ func ListArticleID(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, res)
 		}
 		limit.Query = string(a)
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "kms_article")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, ArticleAnotherTable, c, Database, "kms_article")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
