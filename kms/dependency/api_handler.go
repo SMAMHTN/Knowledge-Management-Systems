@@ -3,7 +3,6 @@ package dependency
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -45,9 +44,9 @@ func ApiWithBasicAuthAndJSON(apimethod string, url string, username string, pass
 	}
 
 	// Check the response status code
-	if resp.StatusCode != http.StatusOK {
-		return resp, fmt.Errorf("HTTP request failed with status code %d", resp.StatusCode)
-	}
+	// if resp.StatusCode != http.StatusOK {
+	// 	return resp, fmt.Errorf("HTTP request failed with status code %d", resp.StatusCode)
+	// }
 
 	return resp, nil
 }
@@ -73,9 +72,9 @@ func ApiCall(apimethod string, url string, data []byte, Header []ApiHeader) (*ht
 	}
 
 	// Check the response status code
-	if resp.StatusCode != http.StatusOK {
-		return resp, fmt.Errorf("HTTP request failed with status code %d", resp.StatusCode)
-	}
+	// if resp.StatusCode != http.StatusOK {
+	// 	return resp, fmt.Errorf("HTTP request failed with status code %d", resp.StatusCode)
+	// }
 
 	return resp, nil
 }
@@ -103,9 +102,9 @@ func ApiCallWithBasicAuth(apimethod string, url string, username string, passwor
 	}
 
 	// Check the response status code
-	if resp.StatusCode != http.StatusOK {
-		return resp, fmt.Errorf("HTTP request failed with status code %d", resp.StatusCode)
-	}
+	// if resp.StatusCode != http.StatusOK {
+	// 	return resp, fmt.Errorf("HTTP request failed with status code %d", resp.StatusCode)
+	// }
 
 	return resp, nil
 }

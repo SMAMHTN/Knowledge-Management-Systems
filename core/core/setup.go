@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"dependency"
 	"fmt"
+	"os"
 	"path/filepath"
 	"reflect"
 	"strconv"
@@ -60,9 +61,19 @@ func init() {
 	fmt.Println("BEGIN READING FILE CONF")
 	fmt.Println("---------------------------------------")
 	var err error
-	Conf, err = dependency.Read_conf(ConfigurationFile)
-	if err != nil {
-		panic("CONFIGURATION FILE ERROR : " + err.Error())
+	config_file_loc_env := os.Getenv("core_config_file")
+	if config_file_loc_env != "" {
+		fmt.Println("Using Configuration FIle at " + config_file_loc_env)
+		Conf, err = dependency.Read_conf(config_file_loc_env)
+		if err != nil {
+			panic("CONFIGURATION FILE ERROR : " + err.Error())
+		}
+	} else {
+		fmt.Println("Using Configuration FIle at " + ConfigurationFile)
+		Conf, err = dependency.Read_conf(ConfigurationFile)
+		if err != nil {
+			panic("CONFIGURATION FILE ERROR : " + err.Error())
+		}
 	}
 	fmt.Println("Read Configuration")
 	Conf.Appname = AppName

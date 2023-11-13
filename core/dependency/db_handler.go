@@ -296,8 +296,12 @@ func SortQueryMaker(queryinit string, valuesinit []interface{}, sortquery []Sort
 				query += fmt.Sprintf("%s %s ?", condition.Field, condition.Operator)
 				values = append(values, condition.Values[0])
 			case "IN", "NOT IN":
-				query += fmt.Sprintf("%s %s (?%s)", condition.Field, condition.Operator, strings.Repeat(", ?", len(condition.Values)-1))
-				values = append(values, condition.Values...)
+				if len(condition.Values) > 0 {
+					query += fmt.Sprintf("%s %s (?%s)", condition.Field, condition.Operator, strings.Repeat(", ?", len(condition.Values)-1))
+					values = append(values, condition.Values...)
+				} else {
+					query += fmt.Sprintf("%s %s ()", condition.Field, condition.Operator)
+				}
 			case "BETWEEN", "NOT BETWEEN":
 				query += fmt.Sprintf("%s %s ? AND ?", condition.Field, condition.Operator)
 				values = append(values, condition.Values[0], condition.Values[1])

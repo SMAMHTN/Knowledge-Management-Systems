@@ -10,6 +10,10 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    ports:
+      - "6505:3306"
+    volumes:
+      - ./core_db/:/var/lib/mysql:z
   core:
     build: ./core
     depends_on:
@@ -34,6 +38,10 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    ports:
+      - "6506:3306"
+    volumes:
+      - ./kms_db/:/var/lib/mysql:z
   kms:
     build: ./kms
     depends_on:
@@ -50,25 +58,28 @@ services:
       retries: 5
     ports:
       - "5656:5656"
-  frontend:
-    build: ./frontend
-    depends_on:
-      kms-db:
-        condition: service_healthy
-      core:
-        condition: service_healthy
-      kms:
-        condition: service_healthy
-    ports:
-      - "3000:3000"
+  # frontend:
+  #   build: ./frontend
+  #   depends_on:
+  #     kms-db:
+  #       condition: service_healthy
+  #     core:
+  #       condition: service_healthy
+  #     kms:
+  #       condition: service_healthy
+  #   ports:
+  # #     - "3000:3000"
   solr:
     image: "solr:9.2.0"
+    environment:
+      - SOLR_HEAP=4g
     ulimits:
       nofile:
         soft: 65000
         hard: 65000
     volumes:
       - ./solr:/var/solr
+      # - ./solr/solr.in.sh:/etc/default/solr.in.sh
     ports:
       - "8983:8983"
     user: root 

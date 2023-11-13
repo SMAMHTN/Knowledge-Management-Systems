@@ -6,6 +6,26 @@ import (
 	"net/http"
 )
 
+var AllowedSolrLanguage = map[string]bool{
+	"Indonesian": true,
+	"English":    true,
+}
+
+var SolrStemLanguageString = map[string]string{
+	"Indonesian": "{\"name\":\"indonesianStem\",\"stemDerivational\":\"true\"}",
+	"English":    "{\"name\":\"porterStem\"}",
+}
+
+var SolrStemLanguage = map[string][]map[string]interface{}{
+	"Indonesian": {{
+		"name":             "indonesianStem",
+		"stemDerivational": "true",
+	}},
+	"English": {{
+		"name": "porterStem",
+	}},
+}
+
 func SolrCallUpdate(apimethod string, SolrV2URL string, username string, password string, data interface{}) ([]byte, *http.Response, error) {
 	reqheader := []ApiHeader{}
 	headerconnection := ApiHeader{
@@ -62,13 +82,7 @@ func SolrCallUpdateFromJSONString(apimethod string, SolrV2URL string, username s
 	payload = []byte(payloadstring)
 	resp, err := ApiCallWithBasicAuth(apimethod, SolrV2URL, username, password, payload, reqheader)
 	if err != nil {
-		defer resp.Body.Close()
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-
-			return body, resp, err
-		}
-		return body, resp, err
+		return nil, resp, err
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
@@ -91,6 +105,36 @@ func SolrCallQuery(url string, username string, password string) ([]byte, *http.
 		return body, resp, err
 	}
 	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+
+		return body, resp, err
+	}
+	return body, resp, nil
+}
+
+func SolrCallUpdateSchema(apimethod string, SolrV2URL string, username string, password string, data interface{}) ([]byte, *http.Response, error) {
+	reqheader := []ApiHeader{}
+	headerconnection := ApiHeader{
+		HeaderKey:   "Connection",
+		HeaderValue: "keep-alive",
+	}
+	reqheader = append(reqheader, headerconnection)
+	headerconnection = ApiHeader{
+		HeaderKey:   "Content-Type",
+		HeaderValue: "application/json",
+	}
+	reqheader = append(reqheader, headerconnection)
+	payload, err := json.Marshal(data)
+	if err != nil {
+		return nil, nil, err
+	}
+	resp, err := ApiCallWithBasicAuth(apimethod, SolrV2URL, username, password, payload, reqheader)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer resp.Body.Close()
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 
