@@ -116,7 +116,7 @@ export default function DataTable() {
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <div className="lowercase">{row.getValue('Title')}</div>,
+      cell: ({ row }) => <div>{row.getValue('Title')}</div>,
     },
     {
       accessorKey: 'Tag',

@@ -31,7 +31,7 @@ function UserSettings() {
   useEffect(() => {
     const fetchThemes = async () => {
       try {
-        const response = await CoreAPIGET('listtheme');
+        const response = await CoreAPIGET('listtheme?num=999999999999');
         const themeData = response.body.Data;
         setThemeOptions(themeData);
       } catch (error) {

@@ -227,10 +227,10 @@ function UserMenu() {
   );
 }
 
-function SidebarMobile({ isSidebarOpen, toggleSidebar }) {
+function SidebarMobile({ isSidebarOpen, toggleSidebar, color }) {
   const userStatus = getSuperAdminStatus();
   const [menuComponent, setMenuComponent] = useState(null);
-  const theme = JSON.parse(getThemeCookiesValue());
+  // const theme = JSON.parse(getThemeCookiesValue());
   useEffect(() => {
     if (userStatus === 1) {
       setMenuComponent(<SuperAdminMenu />);
@@ -240,10 +240,12 @@ function SidebarMobile({ isSidebarOpen, toggleSidebar }) {
       setMenuComponent(<UserMenu />);
     }
   }, [userStatus]);
+  const thm = color;
+  const secondaryColor = thm.theme.themecolor.secondary_color;
   return (
     <>
       {isSidebarOpen && <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-40 md:hidden" onClick={toggleSidebar} />}
-      <div className={`fixed ${isSidebarOpen ? '' : 'hidden'} md:hidden flex-col left-0 w-64 bg-neutral-50 text-black h-full z-50`} style={{ backgroundColor: theme.secondary_color }}>
+      <div className={`fixed ${isSidebarOpen ? '' : 'hidden'} md:hidden flex-col left-0 w-64 bg-neutral-50 text-black h-full z-50`} style={{ backgroundColor: secondaryColor }}>
         <div className="flex flex-col h-full">
           <div
             className="fixed z-20 flex h-14 items-center justify-between px-4 text-sm sm:px-16 md:hidden"

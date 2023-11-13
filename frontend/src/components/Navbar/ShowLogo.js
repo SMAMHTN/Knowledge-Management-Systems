@@ -34,7 +34,7 @@ export function CompanyName({ data }) {
   return (
     <DataFetchingComponent>
       {({ data, error }) => (
-        <span className="ml-2 text-black text-md tracking-wide font-medium">
+        <span className="ml-2 text-md tracking-wide font-medium">
           {data.CompanyName}
         </span>
       )}
