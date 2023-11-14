@@ -20,7 +20,9 @@ function PostMainPage() {
   const newSortParams = HandleSortParams(newSortField, false);
   const fetchData = async (srch = searchParams.get('search')) => {
     try {
-      const searchparamsforapi = encodeURIComponent(srch);
+      console.log('inside srch');
+      console.log(srch);
+      const searchparamsforapi = srch;
       const apiEndpoint = `queryarticle?search=${searchparamsforapi}&show=ArticleID,OwnerName,Title,LastEditedTime,Article`;
       const article = await KmsAPIGET(apiEndpoint);
       const a = JSON.parse(article.body.Data);
@@ -32,12 +34,16 @@ function PostMainPage() {
 
   useEffect(() => {
     const searchencoded = encodeURIComponent(search);
+    console.log('sesarchencoded2');
+    console.log(searchencoded);
     fetchData(searchencoded);
   }, [search]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     const searchencoded = encodeURIComponent(searchQuery);
+    console.log('sesarchencoded');
+    console.log(searchencoded);
     router.push(
       `/post?search=${searchencoded}`,
       { scroll: false },
