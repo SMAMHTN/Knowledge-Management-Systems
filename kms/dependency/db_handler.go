@@ -248,10 +248,10 @@ func (data *QueryType) QueryMaker(AnotherTable func([]SortType, []WhereType) ([]
 	Lowerlimit0 := (data.Page - 1) * data.Num
 	if info.TotalPage == info.CurrentPage {
 		info.TotalShow = count % data.Num
-		info.UpperLimit = Lowerlimit0 + info.TotalShow
-		info.LowerLimit = Lowerlimit0 + 1
 		if info.TotalShow == 0 {
 			info.TotalShow = data.Num
+			info.UpperLimit = Lowerlimit0 + info.TotalShow
+			info.LowerLimit = Lowerlimit0 + 1
 		}
 		if data.Num == 1 {
 			info.TotalShow = data.Num
