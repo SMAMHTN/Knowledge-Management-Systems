@@ -198,14 +198,14 @@ func SolrCallQuery(c echo.Context, q string, query string, search string, page i
 		if !exist {
 			return res, header, errors.New("detected language : " + lang + " is not found in RFC3066 list")
 		}
-		translatedfieldlist := []string{"Article", "DocContent", "Title"}
+		translatedfieldlist := []string{"Article", "DocContent"}
 		var fieldnamelist []string
 		fieldname := "kms-managed-field-language-" + langcode
 		for _, y := range translatedfieldlist {
-			fieldnamelist = append(fieldnamelist, y+"-"+fieldname)
+			fieldnamelist = append(fieldnamelist, y+"-"+fieldname+":\""+search+"\"")
 		}
 		fieldnameliststring := strings.Join(fieldnamelist, " OR ")
-		qSolr += " AND (Title-" + fieldname + "^100 OR Tag^100 OR OwnerName OR LastEditedByName OR CategoryName OR " + fieldnameliststring + ":\"" + search + "\")"
+		qSolr += " AND (Title-" + fieldname + "^100:\"" + search + "\" OR Tag^100:\"" + search + "\" OR OwnerName:\"" + search + "\" OR LastEditedByName:\"" + search + "\" OR CategoryName:\"" + search + "\" OR " + fieldnameliststring + ")"
 	}
 
 	params := url.Values{}
