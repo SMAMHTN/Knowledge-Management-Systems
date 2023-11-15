@@ -205,7 +205,7 @@ func SolrCallQuery(c echo.Context, q string, query string, search string, page i
 			fieldnamelist = append(fieldnamelist, y+"-"+fieldname+":\""+search+"\"")
 		}
 		fieldnameliststring := strings.Join(fieldnamelist, " OR ")
-		qSolr += " AND (Title-" + fieldname + "^100:\"" + search + "\" OR Tag^100:\"" + search + "\" OR OwnerName:\"" + search + "\" OR LastEditedByName:\"" + search + "\" OR CategoryName:\"" + search + "\" OR " + fieldnameliststring + ")"
+		qSolr += " AND (Title-" + fieldname + "^100 OR Tag^100 OR Title-" + fieldname + ":\"" + search + "\" OR Tag:\"" + search + "\" OR OwnerName:\"" + search + "\" OR LastEditedByName:\"" + search + "\" OR CategoryName:\"" + search + "\" OR " + fieldnameliststring + ")"
 	}
 
 	params := url.Values{}
