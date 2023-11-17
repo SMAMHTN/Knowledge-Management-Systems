@@ -71,7 +71,7 @@ services:
     environment:
       - core_link=http://core:6565
       - core_password:aldim
-      - kms_link=http://kms:6565
+      - kms_link=http://kms:5656
       - kms_password:aldim
   solr:
     image: ghcr.io/smam-tech/kms-solr:v1

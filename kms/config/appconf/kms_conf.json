@@ -19,5 +19,6 @@
   "warn_log_location":"/kms/log/Warn.log",
   "activate_info_log": true,
   "info_log_location":"/kms/log/Info.log",
-  "activate_terminal_log": true
+  "activate_terminal_log": true,
+  "language":["Indonesian","English"]
 }

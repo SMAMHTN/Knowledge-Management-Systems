@@ -3,3 +3,4 @@ kms/filestore/*
 solr/logs/*
 kms_db/*
 core_db/*
+frontend/*
