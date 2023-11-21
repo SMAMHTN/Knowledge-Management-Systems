@@ -77,12 +77,12 @@
       <tokenizer name="standard"/>
       <filter name="lowercase"/>
       <filter name="synonym" synonyms="synonyms.txt"/>
-      <filter name="nGram" maxGramSize="50" minGramSize="5"/>
+      <filter name="nGram" maxGramSize="50" minGramSize="5" preserveOriginal="true"/>
     </analyzer>
     <analyzer type="query">
       <tokenizer name="standard"/>
       <filter name="lowercase"/>
-      <filter name="nGram" maxGramSize="50" minGramSize="5"/>
+      <filter name="nGram" maxGramSize="50" minGramSize="5" preserveOriginal="true"/>
     </analyzer>
   </fieldType>
   <fieldType name="strings" class="solr.StrField" sortMissingLast="true" docValues="true" multiValued="true"/>
@@ -91,12 +91,12 @@
       <tokenizer name="standard"/>
       <filter name="lowercase"/>
       <filter name="synonym" synonyms="synonyms.txt"/>
-      <filter name="nGram" maxGramSize="50" minGramSize="5"/>
+      <filter name="nGram" maxGramSize="50" minGramSize="5" preserveOriginal="true"/>
     </analyzer>
     <analyzer type="query">
       <tokenizer name="standard"/>
       <filter name="lowercase"/>
-      <filter name="nGram" maxGramSize="50" minGramSize="5"/>
+      <filter name="nGram" maxGramSize="50" minGramSize="5" preserveOriginal="true"/>
     </analyzer>
   </fieldType>
   <fieldType name="suggestion_string_kms" class="solr.TextField">
@@ -104,12 +104,12 @@
       <tokenizer name="standard"/>
       <filter name="lowercase"/>
       <filter name="synonym" synonyms="synonyms.txt"/>
-      <filter name="edgeNGram" maxGramSize="50" minGramSize="5"/>
+      <filter name="edgeNGram" maxGramSize="50" minGramSize="5" preserveOriginal="true"/>
     </analyzer>
     <analyzer type="query">
       <tokenizer name="standard"/>
       <filter name="lowercase"/>
-      <filter name="nGram" maxGramSize="50" minGramSize="5"/>
+      <filter name="nGram" maxGramSize="50" minGramSize="5" preserveOriginal="true"/>
     </analyzer>
   </fieldType>
   <fieldType name="text_ar" class="solr.TextField" positionIncrementGap="100">
