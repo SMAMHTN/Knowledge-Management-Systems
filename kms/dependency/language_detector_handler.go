@@ -101,7 +101,7 @@ func NlpInit(LanguageList []string) (Detector LanguageDetector, err error) {
 			return Detector, err
 		}
 	}
-	if len(LanguageList) < 1 {
+	if len(LanguageList) == 1 {
 		return LanguageDetector{Detector: nil, Language: LanguageList}, nil
 	} else {
 		DetectorLangua := lingua.NewLanguageDetectorBuilder().
@@ -112,7 +112,7 @@ func NlpInit(LanguageList []string) (Detector LanguageDetector, err error) {
 }
 
 func (lld LanguageDetector) Scan(text string) (language string) {
-	if len(lld.Language) < 1 {
+	if len(lld.Language) == 1 {
 		return lld.Language[0]
 	}
 	if language, exists := lld.Detector.DetectLanguageOf(text); exists {
