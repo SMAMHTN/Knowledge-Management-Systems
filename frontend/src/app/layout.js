@@ -24,7 +24,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href={`${conf.core_link}logo`} sizes="32x32" />
+        <link rel="icon" href="/api/logo" sizes="32x32" />
       </head>
       <body className={inter.className}>
         {children}

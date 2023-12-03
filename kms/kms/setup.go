@@ -51,6 +51,7 @@ func init() {
 		panic(err)
 	}
 	fmt.Println("Read Configuration")
+	Conf = FillNeededEmptyField(Conf)
 	Conf.Appname = AppName
 	Port_conf = ":" + strconv.Itoa(Conf.Appport)
 	v := reflect.ValueOf(Conf)
@@ -199,4 +200,63 @@ func SolrLanguageFieldInit() (err error) {
 		}
 	}
 	return nil
+}
+
+func FillNeededEmptyField(data dependency.Configuration) dependency.Configuration {
+	if data.Appname == "" {
+		data.Appname = "kms"
+	}
+	if data.Appport == 0 {
+		data.Appport = 5656
+	}
+	if data.App_password == "" {
+		data.App_password = "aldim"
+	}
+	if data.Core_link == "" {
+		data.Core_link = "http://core:6565"
+	}
+	if data.Core_password == "" {
+		data.Core_password = "aldim"
+	}
+	if data.Db_link == "" {
+		data.Db_link = "kms-db"
+		data.Activate_Info_Log = true
+		data.Activate_Warn_Log = true
+		data.Activate_terminal_log = true
+		data.Disable_Error_Log = false
+	}
+	if data.Db_username == "" {
+		data.Db_username = "root"
+	}
+	if data.Db_password == "" {
+		data.Db_password = "aldim"
+	}
+	// if data.Filestore == "" {
+	// 	data.Filestore = "/kms/filestore/"
+	// }
+	// if data.Error_Log_location == "" {
+	// 	data.Error_Log_location = "default_error_log_location"
+	// }
+	// if data.Warn_Log_location == "" {
+	// 	data.Warn_Log_location = "default_warn_log_location"
+	// }
+	// if data.Info_Log_Location == "" {
+	// 	data.Info_Log_Location = "default_info_log_location"
+	// }
+	if data.Tika_link == "" {
+		data.Tika_link = "http://tika:9998"
+	}
+	if data.Solr_link == "" {
+		data.Solr_link = "http://solr:8983"
+	}
+	if data.Solr_username == "" {
+		data.Solr_username = "solr"
+	}
+	if data.Solr_password == "" {
+		data.Solr_password = "SMAM"
+	}
+	if data.Max_upload == "" {
+		data.Max_upload = "10G"
+	}
+	return data
 }
