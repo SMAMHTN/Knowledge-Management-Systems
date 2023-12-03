@@ -105,17 +105,17 @@ func Read_conf(ConfFile string) (Configuration, error) {
 		path := parent + ConfFile
 		file, err = os.Open(path)
 		if err != nil {
-
 			return Configuration, errors.New("conf file not found")
+		}
+	} else {
+		decoder := json.NewDecoder(file)
+		err = decoder.Decode(&Configuration)
+		if err != nil {
+
+			return Configuration, err
 		}
 	}
 	defer file.Close()
-	decoder := json.NewDecoder(file)
-	err = decoder.Decode(&Configuration)
-	if err != nil {
-
-		return Configuration, err
-	}
 	err = Configuration.GetEnv()
 	if err != nil {
 

@@ -101,14 +101,20 @@ func NlpInit(LanguageList []string) (Detector LanguageDetector, err error) {
 			return Detector, err
 		}
 	}
-
-	DetectorLangua := lingua.NewLanguageDetectorBuilder().
-		FromLanguages(languages...).
-		Build()
-	return LanguageDetector{Detector: DetectorLangua, Language: LanguageList}, nil
+	if len(LanguageList) < 1 {
+		return LanguageDetector{Detector: nil, Language: LanguageList}, nil
+	} else {
+		DetectorLangua := lingua.NewLanguageDetectorBuilder().
+			FromLanguages(languages...).
+			Build()
+		return LanguageDetector{Detector: DetectorLangua, Language: LanguageList}, nil
+	}
 }
 
 func (lld LanguageDetector) Scan(text string) (language string) {
+	if len(lld.Language) < 1 {
+		return lld.Language[0]
+	}
 	if language, exists := lld.Detector.DetectLanguageOf(text); exists {
 		return language.String()
 	} else {

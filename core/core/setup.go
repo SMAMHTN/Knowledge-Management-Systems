@@ -78,6 +78,7 @@ func init() {
 	fmt.Println("Read Configuration")
 	Conf.Appname = AppName
 	Port_conf = ":" + strconv.Itoa(Conf.Appport)
+	Conf = FillNeededEmptyField(Conf)
 	v := reflect.ValueOf(Conf)
 	t := v.Type()
 
@@ -98,4 +99,63 @@ func init() {
 		Logger.Panic(err.Error())
 	}
 	// db.Execute_sql_file("core.sql", Appname)
+}
+
+func FillNeededEmptyField(data dependency.Configuration) dependency.Configuration {
+	if data.Appname == "" {
+		data.Appname = "core"
+	}
+	if data.Appport == 0 {
+		data.Appport = 6565
+	}
+	if data.App_password == "" {
+		data.App_password = "aldim"
+	}
+	// if data.Core_link == "" {
+	// 	data.Core_link = "http://core:6565"
+	// }
+	// if data.Core_password == "" {
+	// 	data.Core_password = "aldim"
+	// }
+	if data.Db_link == "" {
+		data.Db_link = "core-db"
+		data.Activate_Info_Log = true
+		data.Activate_Warn_Log = true
+		data.Activate_terminal_log = true
+		data.Disable_Error_Log = false
+	}
+	if data.Db_username == "" {
+		data.Db_username = "root"
+	}
+	if data.Db_password == "" {
+		data.Db_password = "aldim"
+	}
+	// if data.Filestore == "" {
+	// 	data.Filestore = "/core/filestore/"
+	// }
+	// if data.Error_Log_location == "" {
+	// 	data.Error_Log_location = "default_error_log_location"
+	// }
+	// if data.Warn_Log_location == "" {
+	// 	data.Warn_Log_location = "default_warn_log_location"
+	// }
+	// if data.Info_Log_Location == "" {
+	// 	data.Info_Log_Location = "default_info_log_location"
+	// }
+	// if data.Tika_link == "" {
+	// 	data.Tika_link = "http://tika:9998"
+	// }
+	// if data.Solr_link == "" {
+	// 	data.Solr_link = "http://solr:8983"
+	// }
+	// if data.Solr_username == "" {
+	// 	data.Solr_username = "solr"
+	// }
+	// if data.Solr_password == "" {
+	// 	data.Solr_password = "SMAM"
+	// }
+	if data.Max_upload == "" {
+		data.Max_upload = "10G"
+	}
+	return data
 }
