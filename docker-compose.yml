@@ -25,8 +25,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 100
-    ports:
-      - "6565:6565"
+    # ports:
+    #   - "6565:6565"
     restart: always
   kms-db:
     image: "mariadb:10.10-jammy"
@@ -56,8 +56,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 100
-    ports:
-      - "5656:5656"
+    # ports:
+    #   - "5656:5656"
     restart: always
   frontend:
     image: ghcr.io/smam-tech/frontend:v1
@@ -83,12 +83,12 @@ services:
         hard: 65000
     volumes:
       - ./solr:/var/solr
-    ports:
-      - "8983:8983"
+    # ports:
+    #   - "8983:8983"
     user: root 
     command: bash -c "chown -R 8983:8983 /var/solr && runuser -u solr -- solr-foreground"
   tika:
     image: "apache/tika:2.7.0.1-full"
-    ports:
-      - "9998:9998"
+    # ports:
+    #   - "9998:9998"
     restart: always
