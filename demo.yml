@@ -1,0 +1,94 @@
+version: "3.9"
+services:
+  core-db:
+    image: "mariadb:10.10-jammy"
+    environment:
+      - MARIADB_ROOT_PASSWORD=aldim
+      - MARIADB_DATABASE=core
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MARIADB_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 1000
+    volumes:
+      - ./core_db/:/var/lib/mysql:z
+  core:
+    image: ghcr.io/smam-tech/core:v1
+    depends_on:
+      core-db:
+        condition: service_healthy
+    volumes:
+      - ./core/config/appconf/core_conf.json:/app/config/appconf/core_conf.json:rw
+      - ./core/log/:/app/log/:rw
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6565/checkserverrun"]
+      interval: 30s
+      timeout: 10s
+      retries: 100
+    # ports:
+    #   - "6565:6565"
+    restart: always
+  kms-db:
+    image: "mariadb:10.10-jammy"
+    environment:
+      - MARIADB_ROOT_PASSWORD=aldim
+      - MARIADB_DATABASE=kms
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MARIADB_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 1000
+    volumes:
+      - ./kms_db/:/var/lib/mysql:z
+  kms:
+    image: ghcr.io/smam-tech/kms:v1
+    depends_on:
+      kms-db:
+        condition: service_healthy
+      core:
+        condition: service_healthy
+    volumes:
+      - ./kms/config/appconf/:/app/config/appconf/:rw
+      - ./kms/log/:/app/log/:rw
+      - ./kms/filestore/:/app/filestore/:rw
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5656/checkserverrun"]
+      interval: 30s
+      timeout: 10s
+      retries: 100
+    # ports:
+    #   - "5656:5656"
+    restart: always
+  frontend:
+    image: ghcr.io/smam-tech/frontend:v1
+    depends_on:
+      core:
+        condition: service_healthy
+      kms:  
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      - core_link=http://core:6565
+      - core_password:aldim
+      - kms_link=http://kms:5656
+      - kms_password:aldim
+  solr:
+    image: ghcr.io/smam-tech/kms-solr:v1
+    environment:
+      - SOLR_HEAP=4g
+    ulimits:
+      nofile:
+        soft: 65000
+        hard: 65000
+    volumes:
+      - ./solr:/var/solr
+    # ports:
+    #   - "8983:8983"
+    user: root 
+    command: bash -c "chown -R 8983:8983 /var/solr && runuser -u solr -- solr-foreground"
+  tika:
+    image: "apache/tika:2.7.0.1-full"
+    # ports:
+    #   - "9998:9998"
+    restart: always
