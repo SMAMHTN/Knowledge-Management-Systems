@@ -3,6 +3,7 @@ package dependency
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"reflect"
 	"strconv"
@@ -99,27 +100,33 @@ func Get_Parent_Path() string {
 
 func Read_conf(ConfFile string) (Configuration, error) {
 	Configuration := Configuration{}
+	var err error
+	err = Configuration.GetEnv()
+	if err != nil {
+		return Configuration, err
+	}
 	file, err := os.Open(ConfFile)
 	if err != nil {
 		parent := Get_Parent_Path()
 		path := parent + ConfFile
 		file, err = os.Open(path)
 		if err != nil {
-			return Configuration, errors.New("conf file not found")
+			fmt.Println("Using Environtment, Ignoring Configuration File....")
+			return Configuration, nil
+		}
+		decoder := json.NewDecoder(file)
+		err = decoder.Decode(&Configuration)
+		if err != nil {
+			return Configuration, err
 		}
 	} else {
 		decoder := json.NewDecoder(file)
 		err = decoder.Decode(&Configuration)
 		if err != nil {
-
 			return Configuration, err
 		}
 	}
 	defer file.Close()
-	err = Configuration.GetEnv()
-	if err != nil {
-
-		return Configuration, err
-	}
+	fmt.Println("Using Configuration File, Ignoring Environtment....")
 	return Configuration, nil
 }
