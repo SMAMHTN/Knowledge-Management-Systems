@@ -10,16 +10,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 1000
-    volumes:
-      - ./core_db/:/var/lib/mysql:z
   core:
     image: ghcr.io/smam-tech/core:v1
     depends_on:
       core-db:
         condition: service_healthy
-    volumes:
-      - ./core/config/appconf/core_conf.json:/app/config/appconf/core_conf.json:rw
-      - ./core/log/:/app/log/:rw
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6565/checkserverrun"]
       interval: 30s
@@ -38,8 +33,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 1000
-    volumes:
-      - ./kms_db/:/var/lib/mysql:z
   kms:
     image: ghcr.io/smam-tech/kms:v1
     depends_on:
@@ -47,10 +40,6 @@ services:
         condition: service_healthy
       core:
         condition: service_healthy
-    volumes:
-      - ./kms/config/appconf/:/app/config/appconf/:rw
-      - ./kms/log/:/app/log/:rw
-      - ./kms/filestore/:/app/filestore/:rw
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5656/checkserverrun"]
       interval: 30s
@@ -76,19 +65,13 @@ services:
   solr:
     image: ghcr.io/smam-tech/kms-solr:v1
     environment:
-      - SOLR_HEAP=4g
+      - SOLR_HEAP=2g
     ulimits:
       nofile:
         soft: 65000
         hard: 65000
-    volumes:
-      - ./solr:/var/solr
-    # ports:
-    #   - "8983:8983"
     user: root 
     command: bash -c "chown -R 8983:8983 /var/solr && runuser -u solr -- solr-foreground"
   tika:
     image: "apache/tika:2.7.0.1-full"
-    # ports:
-    #   - "9998:9998"
     restart: always
