@@ -76,9 +76,12 @@ func init() {
 		}
 	}
 	fmt.Println("Read Configuration")
+	Conf = FillNeededEmptyField(Conf)
 	Conf.Appname = AppName
 	Port_conf = ":" + strconv.Itoa(Conf.Appport)
-	Conf = FillNeededEmptyField(Conf)
+	fmt.Println(Conf)
+	fmt.Println(Conf.Appport)
+	fmt.Println(Port_conf)
 	v := reflect.ValueOf(Conf)
 	t := v.Type()
 
