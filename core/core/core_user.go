@@ -40,7 +40,7 @@ func ListUser(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "core_user")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(UserAnotherTable, nil, nil, Database, "core_user")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
@@ -76,7 +76,7 @@ func ListUserID(c echo.Context) error {
 	if permission {
 		var LimitQuery string
 		var ValuesQuery []interface{}
-		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(nil, nil, nil, Database, "core_user")
+		LimitQuery, ValuesQuery, res.Info, err = limit.QueryMaker(UserAnotherTable, nil, nil, Database, "core_user")
 		if err != nil {
 			Logger.Warn(err.Error())
 			res.StatusCode = http.StatusBadRequest
